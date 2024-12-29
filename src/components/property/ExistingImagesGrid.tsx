@@ -22,12 +22,17 @@ export const ExistingImagesGrid = ({
     if (signedUrls[imageUrl]) return signedUrls[imageUrl];
 
     try {
+      console.log('Fetching signed URL for:', imageUrl);
       const { data, error } = await supabase.storage
         .from('properties')
         .createSignedUrl(imageUrl, 60 * 60);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error getting signed URL:', error);
+        throw error;
+      }
 
+      console.log('Received signed URL:', data.signedUrl);
       setSignedUrls(prev => ({
         ...prev,
         [imageUrl]: data.signedUrl
@@ -42,12 +47,19 @@ export const ExistingImagesGrid = ({
 
   const handleDelete = async (imageUrl: string) => {
     try {
+      console.log('Attempting to delete image:', imageUrl);
+      
       // Delete from storage
       const { error: storageError } = await supabase.storage
         .from('properties')
         .remove([imageUrl]);
 
-      if (storageError) throw storageError;
+      if (storageError) {
+        console.error('Storage deletion error:', storageError);
+        throw storageError;
+      }
+
+      console.log('Successfully deleted from storage');
 
       // Delete from property_images table
       const { error: dbError } = await supabase
@@ -55,8 +67,12 @@ export const ExistingImagesGrid = ({
         .delete()
         .match({ property_id: propertyId, image_url: imageUrl });
 
-      if (dbError) throw dbError;
+      if (dbError) {
+        console.error('Database deletion error:', dbError);
+        throw dbError;
+      }
 
+      console.log('Successfully deleted from database');
       onImageDelete(imageUrl);
       
       toast({
