@@ -31,6 +31,7 @@ export const PropertyBookingCard = ({
     <div className="space-y-6">
       <Card className="p-6 sticky top-24 min-h-fit flex flex-col justify-between gap-6">
         <div className="space-y-4">
+          <h3 className="text-xl font-semibold">Price</h3>
           <div className="flex justify-between items-center">
             <span>1 month</span>
             <span className="text-2xl font-bold">{price.toLocaleString()}฿</span>
