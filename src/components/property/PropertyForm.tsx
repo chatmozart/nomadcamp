@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Autocomplete } from "@react-google-maps/api";
 import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { ExistingImagesGrid } from "./ExistingImagesGrid";
 
 interface PropertyFormProps {
   onSubmit: (formData: {
@@ -21,6 +22,7 @@ interface PropertyFormProps {
   googleMapsLoaded: boolean;
   onPlaceSelect: (autocomplete: google.maps.places.Autocomplete) => void;
   initialData?: {
+    id?: string;
     title: string;
     description: string;
     price: number;
@@ -28,6 +30,7 @@ interface PropertyFormProps {
     priceSixMonths?: number;
     priceOneYear?: number;
     location: string;
+    existingImages?: string[];
   };
   mode?: 'create' | 'edit';
 }
@@ -49,6 +52,14 @@ export const PropertyForm = ({
   const [propertyLocation, setPropertyLocation] = useState(initialData?.location || "");
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+
+  const [existingImages, setExistingImages] = useState<string[]>(
+    initialData?.existingImages || []
+  );
+
+  const handleExistingImageDelete = (deletedImageUrl: string) => {
+    setExistingImages(prev => prev.filter(url => url !== deletedImageUrl));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -236,13 +247,25 @@ export const PropertyForm = ({
 
       <div className="space-y-2">
         <Label htmlFor="propertyImages">Property Images {mode === 'create' && '(at least 1 required)'}</Label>
+        
+        {mode === 'edit' && existingImages.length > 0 && (
+          <div className="mb-4">
+            <h3 className="text-sm font-medium mb-2">Existing Images</h3>
+            <ExistingImagesGrid
+              propertyId={initialData?.id || ''}
+              images={existingImages}
+              onImageDelete={handleExistingImageDelete}
+            />
+          </div>
+        )}
+
         <Input
           id="propertyImages"
           type="file"
           accept="image/*"
           onChange={handleImageChange}
           multiple
-          required={mode === 'create'}
+          required={mode === 'create' && existingImages.length === 0}
         />
         
         {previewUrls.length > 0 && (
