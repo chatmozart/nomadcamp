@@ -34,12 +34,14 @@ const PropertyDetails = () => {
             <Button>Add to Favorites</Button>
           </div>
         </div>
-        <Card>
-          <img src={property.image} alt={property.title} className="w-full h-64 object-cover" />
-          <div className="p-4">
-            <h2 className="text-xl font-bold">Price: ${property.price}/night</h2>
-          </div>
-        </Card>
+        <div className="h-[600px] w-full">
+          <Card>
+            <img src={property.image} alt={property.title} className="w-full h-full object-cover" />
+            <div className="p-4">
+              <h2 className="text-xl font-bold">Price: ${property.price}/night</h2>
+            </div>
+          </Card>
+        </div>
       </div>
     </div>
   );
