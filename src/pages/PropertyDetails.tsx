@@ -1,10 +1,25 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/lib/supabase";
 import { PropertyHeader } from "@/components/property/PropertyHeader";
 import { PropertyAmenities } from "@/components/property/PropertyAmenities";
 import { PropertyBookingCard } from "@/components/property/PropertyBookingCard";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface Property {
   id: string;
@@ -13,10 +28,14 @@ interface Property {
   price: number;
   location: string;
   image_url: string;
+  owner_id: string;
 }
 
 const PropertyDetails = () => {
   const { id } = useParams();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [property, setProperty] = useState<Property | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -69,6 +88,61 @@ const PropertyDetails = () => {
     loadImageUrl();
   }, [property?.image_url]);
 
+  const handleDelete = async () => {
+    if (!property) return;
+
+    console.log('Attempting to delete property:', property.id);
+    
+    try {
+      // Delete the image from storage
+      if (property.image_url) {
+        const { error: storageError } = await supabase.storage
+          .from('properties')
+          .remove([property.image_url]);
+
+        if (storageError) {
+          console.error('Error deleting property image:', storageError);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to delete property image",
+          });
+          return;
+        }
+      }
+
+      // Delete the property record
+      const { error: deleteError } = await supabase
+        .from('properties')
+        .delete()
+        .eq('id', property.id);
+
+      if (deleteError) {
+        console.error('Error deleting property:', deleteError);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to delete property",
+        });
+        return;
+      }
+
+      console.log('Property deleted successfully');
+      toast({
+        title: "Success",
+        description: "Property deleted successfully",
+      });
+      navigate('/');
+    } catch (error) {
+      console.error('Error in delete operation:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "An unexpected error occurred",
+      });
+    }
+  };
+
   if (isLoading) {
     return <div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>;
   }
@@ -86,13 +160,42 @@ const PropertyDetails = () => {
     e.currentTarget.src = '/placeholder.svg';
   };
 
+  const isOwner = user?.id === property.owner_id;
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto">
-        <PropertyHeader 
-          title={property.title}
-          location={property.location}
-        />
+        <div className="flex justify-between items-center px-4">
+          <PropertyHeader 
+            title={property.title}
+            location={property.location}
+          />
+          {isOwner && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" className="gap-2">
+                  <Trash2 className="h-4 w-4" />
+                  Delete Property
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete your
+                    property listing and remove the data from our servers.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete}>
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+        </div>
 
         {/* Image Section */}
         <div className="px-4">
