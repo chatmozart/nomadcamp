@@ -16,7 +16,7 @@ export const PropertyBookingCard = ({
   console.log('Rendering PropertyBookingCard with prices:', { price, priceThreeMonths, priceSixMonths, priceOneYear });
   
   return (
-    <Card className="p-6 sticky top-24 min-h-[400px] flex flex-col justify-between">
+    <Card className="p-6 sticky top-24 min-h-fit flex flex-col justify-between gap-6">
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <span>1 month</span>
@@ -41,7 +41,7 @@ export const PropertyBookingCard = ({
           </div>
         )}
       </div>
-      <button className="w-full bg-primary text-white py-3 rounded-lg hover:bg-primary/90 transition-colors mt-6">
+      <button className="w-full bg-primary text-white py-3 rounded-lg hover:bg-primary/90 transition-colors">
         Reserve
       </button>
     </Card>
