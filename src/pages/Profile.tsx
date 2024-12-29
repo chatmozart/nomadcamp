@@ -25,13 +25,11 @@ const Profile = () => {
         await supabase.auth.updateUser({ password: newPassword });
       }
       
-      const { error } = await supabase
-        .from('profiles')
-        .upsert({ 
-          id: user?.id,
-          name,
-          updated_at: new Date().toISOString(),
-        });
+      const { error } = await supabase.auth.updateUser({ 
+        data: { 
+          full_name: name,
+        }
+      });
 
       if (error) throw error;
 
