@@ -63,7 +63,7 @@ const Index = () => {
             <p>No properties found.</p>
           ) : (
             properties.map((property) => {
-              console.log('Property image URL:', property.image_url);
+              console.log('Property data:', property);
               return (
                 <PropertyCard 
                   key={property.id}

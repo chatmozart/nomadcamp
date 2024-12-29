@@ -1,5 +1,6 @@
 import { MapPin, Star } from "lucide-react";
 import { Link } from "react-router-dom";
+import { supabase } from "@/lib/supabase";
 
 interface PropertyCardProps {
   id: string;
@@ -21,20 +22,25 @@ const PropertyCard = ({
   image,
 }: PropertyCardProps) => {
   console.log('Rendering PropertyCard with ID:', id);
-  const imageUrl = `https://mqgpycqviacxddgnwbxo.supabase.co/storage/v1/object/public/properties/${image}`;
-  console.log('Image URL:', imageUrl);
+  // Get the public URL for the image from Supabase storage
+  const { data: publicUrl } = supabase.storage
+    .from('properties')
+    .getPublicUrl(image);
+    
+  console.log('Image source:', image);
+  console.log('Public URL:', publicUrl?.publicUrl);
   
   return (
     <Link to={`/property/${id}`} className="block">
       <div className="property-card rounded-xl overflow-hidden bg-card transition-transform hover:scale-[1.02]">
         <div className="relative aspect-[4/3]">
           <img
-            src={imageUrl}
+            src={publicUrl?.publicUrl || '/placeholder.svg'}
             alt={title}
             className="w-full h-full object-cover"
             loading="lazy"
             onError={(e) => {
-              console.error('Image failed to load:', imageUrl);
+              console.error('Image failed to load:', publicUrl?.publicUrl);
               e.currentTarget.src = '/placeholder.svg';
             }}
           />
