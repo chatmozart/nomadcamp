@@ -1,13 +1,15 @@
--- Drop existing bucket if it exists
+-- First, ensure we start fresh by dropping existing policies and bucket
 drop policy if exists "Public Access" on storage.objects;
 drop policy if exists "Allow authenticated uploads" on storage.objects;
+drop bucket if exists "properties";
 
--- Recreate the properties storage bucket
+-- Create the properties bucket
 insert into storage.buckets (id, name, public)
 values ('properties', 'properties', true)
-on conflict (id) do nothing;
+on conflict (id) do update 
+set public = true;
 
--- Allow public access to the bucket
+-- Allow public read access to all files in the bucket
 create policy "Public Access"
 on storage.objects for select
 to public
@@ -28,3 +30,4 @@ with check (
 -- Grant necessary permissions
 grant all on storage.objects to authenticated;
 grant usage on schema storage to authenticated;
+grant all on storage.buckets to authenticated;
