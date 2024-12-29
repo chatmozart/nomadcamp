@@ -54,6 +54,9 @@ const ListProperty = () => {
           owner_id: user.id,
           availability_start: formData.availabilityStart,
           availability_end: formData.availabilityEnd || null,
+          contact_name: formData.contactName,
+          contact_email: formData.contactEmail,
+          contact_whatsapp: formData.contactWhatsapp,
         })
         .select()
         .single();

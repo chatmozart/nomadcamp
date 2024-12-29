@@ -56,6 +56,9 @@ export const PropertyDetailsSection = ({
           priceOneYear={priceOneYear}
           availabilityStart={availabilityStart}
           availabilityEnd={availabilityEnd}
+          contactName={property.contact_name}
+          contactEmail={property.contact_email}
+          contactWhatsapp={property.contact_whatsapp}
         />
       </div>
 

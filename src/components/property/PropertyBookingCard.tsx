@@ -10,6 +10,9 @@ interface PropertyBookingCardProps {
   priceOneYear?: number;
   availabilityStart?: string | null;
   availabilityEnd?: string | null;
+  contactName?: string;
+  contactEmail?: string;
+  contactWhatsapp?: string;
 }
 
 export const PropertyBookingCard = ({ 
@@ -95,18 +98,21 @@ export const PropertyBookingCard = ({
               <div className="space-y-4">
                 <Input
                   type="text"
-                  placeholder="Name"
-                  className="w-full"
+                  value={contactName || ""}
+                  readOnly
+                  className="w-full bg-gray-50"
                 />
                 <Input
                   type="email"
-                  placeholder="Email"
-                  className="w-full"
+                  value={contactEmail || ""}
+                  readOnly
+                  className="w-full bg-gray-50"
                 />
                 <Input
                   type="tel"
-                  placeholder="WhatsApp Phone Number"
-                  className="w-full"
+                  value={contactWhatsapp || ""}
+                  readOnly
+                  className="w-full bg-gray-50"
                 />
               </div>
             </CollapsibleContent>

@@ -67,6 +67,9 @@ export const PropertyForm = ({
   const [selectedAmenityIds, setSelectedAmenityIds] = useState<string[]>([]);
   const [availabilityStart, setAvailabilityStart] = useState(initialData?.availabilityStart || "");
   const [availabilityEnd, setAvailabilityEnd] = useState(initialData?.availabilityEnd || "");
+  const [contactName, setContactName] = useState(initialData?.contactName || "");
+  const [contactEmail, setContactEmail] = useState(initialData?.contactEmail || "");
+  const [contactWhatsapp, setContactWhatsapp] = useState(initialData?.contactWhatsapp || "");
 
   const handleExistingImageDelete = (deletedImageUrl: string) => {
     setExistingImages(prev => prev.filter(url => url !== deletedImageUrl));
@@ -111,6 +114,9 @@ export const PropertyForm = ({
       amenityIds: selectedAmenityIds,
       availabilityStart,
       availabilityEnd,
+      contactName,
+      contactEmail,
+      contactWhatsapp,
     });
 
     if (mode === 'create') {
@@ -334,6 +340,41 @@ export const PropertyForm = ({
         onStartDateChange={setAvailabilityStart}
         onEndDateChange={setAvailabilityEnd}
       />
+
+      <div className="space-y-4 border-t pt-4">
+        <h3 className="text-lg font-semibold">Contact Information</h3>
+        
+        <div className="space-y-2">
+          <Label htmlFor="contactName">Contact Name</Label>
+          <Input
+            id="contactName"
+            value={contactName}
+            onChange={(e) => setContactName(e.target.value)}
+            placeholder="Enter contact name"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="contactEmail">Contact Email</Label>
+          <Input
+            id="contactEmail"
+            type="email"
+            value={contactEmail}
+            onChange={(e) => setContactEmail(e.target.value)}
+            placeholder="Enter contact email"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="contactWhatsapp">WhatsApp Phone Number</Label>
+          <Input
+            id="contactWhatsapp"
+            value={contactWhatsapp}
+            onChange={(e) => setContactWhatsapp(e.target.value)}
+            placeholder="Enter WhatsApp number"
+          />
+        </div>
+      </div>
 
       <Button type="submit">
         {mode === 'create' ? 'List Property' : 'Update Property'}
