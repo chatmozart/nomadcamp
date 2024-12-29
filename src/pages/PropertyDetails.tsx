@@ -60,67 +60,17 @@ const PropertyDetails = () => {
     fetchProperty();
   }, [id, toast]);
 
-  const handleDelete = async () => {
-    if (!property) return;
-
-    try {
-      console.log('Deleting property:', property.id);
-      
-      // Delete the image from storage
-      if (property.image_url) {
-        const { error: storageError } = await supabase.storage
-          .from('properties')
-          .remove([property.image_url]);
-
-        if (storageError) {
-          console.error('Error deleting property image:', storageError);
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: "Failed to delete property image",
-          });
-          return;
-        }
-      }
-
-      // Delete the property record
-      const { error: deleteError } = await supabase
-        .from('properties')
-        .delete()
-        .eq('id', property.id);
-
-      if (deleteError) {
-        console.error('Error deleting property:', deleteError);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to delete property",
-        });
-        return;
-      }
-
-      console.log('Property deleted successfully');
-      toast({
-        title: "Success",
-        description: "Property deleted successfully",
-      });
-      navigate('/');
-    } catch (error) {
-      console.error('Error in delete operation:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "An unexpected error occurred",
-      });
-    }
-  };
-
   if (isLoading) {
     return <div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>;
   }
 
   if (!property) {
-    return <div className="min-h-screen bg-background flex items-center justify-center">Property not found</div>;
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
+        <h1 className="text-2xl font-bold">Property not found</h1>
+        <p className="text-muted-foreground">The property you're looking for doesn't exist or has been removed.</p>
+      </div>
+    );
   }
 
   const isOwner = user?.id === property.owner_id;
@@ -132,12 +82,38 @@ const PropertyDetails = () => {
           <PropertyHeader 
             title={property.title}
             location={property.location}
-          />
-          <PropertyActions 
             isOwner={isOwner}
             propertyId={property.id}
-            onDelete={handleDelete}
           />
+          {isOwner && (
+            <PropertyActions 
+              isOwner={isOwner}
+              propertyId={property.id}
+              onDelete={async () => {
+                try {
+                  const { error } = await supabase
+                    .from('properties')
+                    .delete()
+                    .eq('id', property.id);
+
+                  if (error) throw error;
+
+                  toast({
+                    title: "Success",
+                    description: "Property deleted successfully",
+                  });
+                  navigate('/');
+                } catch (error) {
+                  console.error('Error deleting property:', error);
+                  toast({
+                    variant: "destructive",
+                    title: "Error",
+                    description: "Failed to delete property",
+                  });
+                }
+              }}
+            />
+          )}
         </div>
 
         <PropertyImageSection 
