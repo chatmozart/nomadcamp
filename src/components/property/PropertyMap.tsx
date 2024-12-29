@@ -61,7 +61,7 @@ export const PropertyMap = ({ address }: PropertyMapProps) => {
     <div className="h-[400px] w-full">
       <GoogleMap
         center={coordinates}
-        zoom={15}
+        zoom={12}
         mapContainerStyle={{ width: '100%', height: '100%' }}
       >
         <Marker position={coordinates} />
