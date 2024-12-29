@@ -30,13 +30,14 @@ export const AmenitiesSelection = ({ propertyId, onAmenitiesChange, mode }: Amen
         const amenityIds = data.map(item => item.amenity_id);
         console.log('Fetched amenity IDs:', amenityIds);
         setSelectedAmenities(amenityIds);
+        onAmenitiesChange(amenityIds); // Update parent component with initial amenities
       } catch (error) {
         console.error('Error in fetchPropertyAmenities:', error);
       }
     };
 
     fetchPropertyAmenities();
-  }, [propertyId, mode]);
+  }, [propertyId, mode, onAmenitiesChange]);
 
   const handleAmenityChange = (amenityId: string) => {
     setSelectedAmenities(prev => {
@@ -44,6 +45,7 @@ export const AmenitiesSelection = ({ propertyId, onAmenitiesChange, mode }: Amen
         ? prev.filter(id => id !== amenityId)
         : [...prev, amenityId];
       
+      console.log('Updated amenity selection:', newSelection);
       onAmenitiesChange(newSelection);
       return newSelection;
     });

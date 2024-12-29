@@ -35,11 +35,7 @@ const EditProperty = () => {
     if (!user || !id) return;
 
     try {
-      console.log('Submitting form with contact details:', {
-        contactName: formData.contactName,
-        contactEmail: formData.contactEmail,
-        contactWhatsapp: formData.contactWhatsapp
-      });
+      console.log('Submitting form with amenities:', formData.amenityIds);
 
       const updateData = {
         title: formData.title,
@@ -81,6 +77,8 @@ const EditProperty = () => {
           property_id: id,
           amenity_id: amenityId
         }));
+
+        console.log('Inserting new amenities:', amenityRecords);
 
         const { error: insertAmenitiesError } = await supabase
           .from('property_amenities')
@@ -162,10 +160,14 @@ const EditProperty = () => {
         onSubmit={handlePropertySubmit}
         googleMapsLoaded={!!googleMapsApiKey}
         initialData={{
-          ...property,
-          priceThreeMonths: property.price_three_months?.toString(),
-          priceSixMonths: property.price_six_months?.toString(),
-          priceOneYear: property.price_one_year?.toString(),
+          id: id,
+          title: property.title,
+          description: property.description,
+          price: property.price,
+          priceThreeMonths: property.price_three_months,
+          priceSixMonths: property.price_six_months,
+          priceOneYear: property.price_one_year,
+          location: property.location,
           existingImages: propertyImages,
           availabilityStart: property.availability_start,
           availabilityEnd: property.availability_end,
