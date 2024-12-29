@@ -68,7 +68,9 @@ const EditProperty = () => {
           ...propertyData,
           priceThreeMonths: propertyData.price_three_months,
           priceSixMonths: propertyData.price_six_months,
-          priceOneYear: propertyData.price_one_year
+          priceOneYear: propertyData.price_one_year,
+          availabilityStart: propertyData.availability_start,
+          availabilityEnd: propertyData.availability_end
         });
         
         setPropertyImages(imagesData.map(img => img.image_url));
@@ -102,10 +104,17 @@ const EditProperty = () => {
     location: string;
     imageFiles: File[];
     amenityIds: string[];
+    availabilityStart: string;
+    availabilityEnd?: string;
   }) => {
     if (!user || !id) return;
 
     try {
+      console.log('Submitting form with availability dates:', {
+        start: formData.availabilityStart,
+        end: formData.availabilityEnd
+      });
+
       // Update property data
       const updateData = {
         title: formData.title,
@@ -114,7 +123,9 @@ const EditProperty = () => {
         location: formData.location,
         price_three_months: formData.priceThreeMonths ? parseFloat(formData.priceThreeMonths) : null,
         price_six_months: formData.priceSixMonths ? parseFloat(formData.priceSixMonths) : null,
-        price_one_year: formData.priceOneYear ? parseFloat(formData.priceOneYear) : null
+        price_one_year: formData.priceOneYear ? parseFloat(formData.priceOneYear) : null,
+        availability_start: formData.availabilityStart,
+        availability_end: formData.availabilityEnd || null
       };
 
       console.log('Attempting to update property with data:', updateData);
@@ -126,6 +137,8 @@ const EditProperty = () => {
         .select();
 
       if (updateError) throw updateError;
+      
+      console.log("Property updated:", propertyData);
 
       // Update property amenities
       const { error: deleteAmenitiesError } = await supabase
@@ -226,7 +239,9 @@ const EditProperty = () => {
           priceThreeMonths: property.price_three_months,
           priceSixMonths: property.price_six_months,
           priceOneYear: property.price_one_year,
-          existingImages: propertyImages
+          existingImages: propertyImages,
+          availabilityStart: property.availability_start,
+          availabilityEnd: property.availability_end
         }}
         mode="edit"
       />
