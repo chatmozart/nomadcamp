@@ -11,16 +11,16 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <div className="fixed top-0 left-0 z-50 p-4 w-full bg-white/80 backdrop-blur-sm border-b">
+      <div className="w-full bg-white/80 backdrop-blur-sm border-b">
         <div className="max-w-7xl mx-auto">
-          <a href="/" className="flex items-center">
+          <a href="/" className="flex items-center p-4">
             <span className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
               NOMADRENT
             </span>
           </a>
         </div>
       </div>
-      <div className="pt-16"> {/* Add padding to prevent content from going under the header */}
+      <div>
         <Toaster />
         <Sonner />
         <BrowserRouter>
