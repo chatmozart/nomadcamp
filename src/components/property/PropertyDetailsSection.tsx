@@ -5,12 +5,18 @@ import { PropertyMap } from "@/components/property/PropertyMap";
 interface PropertyDetailsSectionProps {
   description: string;
   price: number;
+  priceThreeMonths?: number;
+  priceSixMonths?: number;
+  priceOneYear?: number;
   location: string;
 }
 
 export const PropertyDetailsSection = ({ 
   description, 
-  price, 
+  price,
+  priceThreeMonths,
+  priceSixMonths,
+  priceOneYear,
   location 
 }: PropertyDetailsSectionProps) => {
   return (
@@ -28,7 +34,12 @@ export const PropertyDetailsSection = ({
       </div>
 
       <div className="col-span-1">
-        <PropertyBookingCard price={price} />
+        <PropertyBookingCard 
+          price={price}
+          priceThreeMonths={priceThreeMonths}
+          priceSixMonths={priceSixMonths}
+          priceOneYear={priceOneYear}
+        />
       </div>
 
       <div className="col-span-3 -mx-4">
