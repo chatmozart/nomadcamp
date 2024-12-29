@@ -5,8 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/lib/supabase";
-import { Link } from "react-router-dom";
-import { Home, Plus } from "lucide-react";
+import { PropertiesGrid } from "@/components/property/PropertiesGrid";
 
 interface Property {
   id: number;
@@ -130,11 +129,6 @@ const Profile = () => {
     }
   };
 
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    console.error('Image failed to load, using placeholder');
-    e.currentTarget.src = '/placeholder.svg';
-  };
-
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -174,40 +168,7 @@ const Profile = () => {
           </form>
         </div>
 
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold">My Properties</h2>
-            <Link to="/list-property">
-              <Button>
-                <Plus className="w-4 h-4 mr-2" />
-                List Property
-              </Button>
-            </Link>
-          </div>
-          
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            {properties.map((property) => (
-              <Link 
-                key={property.id} 
-                to={`/property/${property.id}`}
-                className="relative aspect-square rounded-lg overflow-hidden hover:opacity-90 transition-opacity"
-              >
-                {property.image_url ? (
-                  <img
-                    src={property.imageSignedUrl || '/placeholder.svg'}
-                    alt={property.title}
-                    className="w-full h-full object-cover"
-                    onError={handleImageError}
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                    <Home className="w-8 h-8 text-gray-400" />
-                  </div>
-                )}
-              </Link>
-            ))}
-          </div>
-        </div>
+        <PropertiesGrid properties={properties} />
       </div>
     </div>
   );
