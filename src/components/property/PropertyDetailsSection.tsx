@@ -3,6 +3,7 @@ import { PropertyBookingCard } from "@/components/property/PropertyBookingCard";
 import { PropertyMap } from "@/components/property/PropertyMap";
 
 interface PropertyDetailsSectionProps {
+  id: string;
   description: string;
   price: number;
   priceThreeMonths?: number;
@@ -12,6 +13,7 @@ interface PropertyDetailsSectionProps {
 }
 
 export const PropertyDetailsSection = ({ 
+  id,
   description, 
   price,
   priceThreeMonths,
@@ -37,7 +39,7 @@ export const PropertyDetailsSection = ({
           <p className="text-gray-600">{description}</p>
         </div>
 
-        <PropertyAmenities />
+        <PropertyAmenities propertyId={id} />
       </div>
 
       <div className="col-span-1">
