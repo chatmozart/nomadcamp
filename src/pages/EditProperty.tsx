@@ -13,6 +13,7 @@ const EditProperty = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [property, setProperty] = useState<any>(null);
+  const [propertyImages, setPropertyImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { googleMapsApiKey, isLoading: isLoadingMaps } = useGoogleMaps();
   const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
@@ -20,23 +21,25 @@ const EditProperty = () => {
   const libraries = useMemo(() => ["places"], []);
 
   useEffect(() => {
-    const fetchProperty = async () => {
+    const fetchPropertyAndImages = async () => {
       if (!id) return;
 
       try {
         console.log('Fetching property with ID:', id);
-        const { data, error } = await supabase
+        
+        // Fetch property details
+        const { data: propertyData, error: propertyError } = await supabase
           .from('properties')
           .select('*')
           .eq('id', id)
           .single();
 
-        if (error) {
-          console.error('Error fetching property:', error);
-          throw error;
+        if (propertyError) {
+          console.error('Error fetching property:', propertyError);
+          throw propertyError;
         }
 
-        if (data.owner_id !== user?.id) {
+        if (propertyData.owner_id !== user?.id) {
           toast({
             variant: "destructive",
             title: "Unauthorized",
@@ -46,16 +49,32 @@ const EditProperty = () => {
           return;
         }
 
-        console.log('Fetched property data:', data);
+        // Fetch property images
+        const { data: imagesData, error: imagesError } = await supabase
+          .from('property_images')
+          .select('image_url')
+          .eq('property_id', id)
+          .order('order', { ascending: true });
+
+        if (imagesError) {
+          console.error('Error fetching property images:', imagesError);
+          throw imagesError;
+        }
+
+        console.log('Fetched property data:', propertyData);
+        console.log('Fetched property images:', imagesData);
+
         setProperty({
-          ...data,
-          priceThreeMonths: data.price_three_months,
-          priceSixMonths: data.price_six_months,
-          priceOneYear: data.price_one_year
+          ...propertyData,
+          priceThreeMonths: propertyData.price_three_months,
+          priceSixMonths: propertyData.price_six_months,
+          priceOneYear: propertyData.price_one_year
         });
+        
+        setPropertyImages(imagesData.map(img => img.image_url));
         setIsLoading(false);
       } catch (error) {
-        console.error('Error in fetchProperty:', error);
+        console.error('Error in fetchPropertyAndImages:', error);
         toast({
           variant: "destructive",
           title: "Error",
@@ -65,7 +84,7 @@ const EditProperty = () => {
       }
     };
 
-    fetchProperty();
+    fetchPropertyAndImages();
   }, [id, user, navigate, toast]);
 
   const onLoad = (autocomplete: google.maps.places.Autocomplete) => {
@@ -189,7 +208,8 @@ const EditProperty = () => {
           ...property,
           priceThreeMonths: property.price_three_months,
           priceSixMonths: property.price_six_months,
-          priceOneYear: property.price_one_year
+          priceOneYear: property.price_one_year,
+          existingImages: propertyImages
         }}
         mode="edit"
       />
