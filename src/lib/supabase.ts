@@ -9,8 +9,6 @@ if (!supabaseUrl || !supabaseKey) {
 }
 
 console.log('Initializing Supabase client...');
-console.log('Using URL:', supabaseUrl);
-console.log('Using API key starting with:', supabaseKey.substring(0, 10) + '...');
 
 export const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: {
@@ -18,23 +16,21 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
     storageKey: 'supabase.auth.token',
     storage: localStorage,
     autoRefreshToken: true,
-    detectSessionInUrl: false,
+    detectSessionInUrl: true,
   },
 });
 
-// Test the connection
+// Test the connection and clear invalid sessions
 supabase.auth.getSession().then(({ data, error }) => {
   if (error) {
     console.error('Supabase connection error:', error);
-    // Clear any invalid sessions
     localStorage.removeItem('supabase.auth.token');
   } else {
     console.log('Supabase connection successful');
     if (data.session) {
-      console.log('User is authenticated');
+      console.log('Valid session found');
     } else {
       console.log('No active session');
-      // Clear any stale tokens
       localStorage.removeItem('supabase.auth.token');
     }
   }

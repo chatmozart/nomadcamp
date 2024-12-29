@@ -18,9 +18,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  // Function to clear all auth data
   const clearAuthData = () => {
-    console.log('Clearing all auth data...');
+    console.log('Clearing auth data...');
     localStorage.removeItem('supabase.auth.token');
     setUser(null);
   };
@@ -64,24 +63,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signIn = async (email: string, password: string) => {
     try {
       console.log('Attempting sign in for:', email);
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      if (error) throw error;
-      console.log('Sign in successful');
-      toast({
-        title: "Welcome back!",
-        description: "You've successfully signed in.",
-      });
+
+      if (error) {
+        console.error('Sign in error:', error);
+        if (error.message === 'Invalid login credentials') {
+          toast({
+            variant: "destructive",
+            title: "Invalid credentials",
+            description: "Please check your email and password.",
+          });
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Error signing in",
+            description: error.message,
+          });
+        }
+        clearAuthData();
+        throw error;
+      }
+
+      if (data?.user) {
+        console.log('Sign in successful for:', data.user.email);
+        toast({
+          title: "Welcome back!",
+          description: "You've successfully signed in.",
+        });
+      }
     } catch (error) {
       console.error('Sign in error:', error);
       clearAuthData();
-      toast({
-        variant: "destructive",
-        title: "Error signing in",
-        description: error instanceof Error ? error.message : "An error occurred",
-      });
+      throw error;
     }
   };
 
@@ -92,7 +108,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email,
         password,
       });
-      if (error) throw error;
+      
+      if (error) {
+        console.error('Sign up error:', error);
+        toast({
+          variant: "destructive",
+          title: "Error creating account",
+          description: error.message,
+        });
+        throw error;
+      }
+
       console.log('Sign up successful');
       toast({
         title: "Account created",
@@ -100,18 +126,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
     } catch (error) {
       console.error('Sign up error:', error);
-      toast({
-        variant: "destructive",
-        title: "Error creating account",
-        description: error instanceof Error ? error.message : "An error occurred",
-      });
+      throw error;
     }
   };
 
   const signOut = async () => {
     try {
       console.log('Attempting sign out...');
-      // Clear auth data first to prevent JWT issues
       clearAuthData();
       
       const { error } = await supabase.auth.signOut();
@@ -124,7 +145,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
     } catch (error) {
       console.error('Sign out error:', error);
-      // Auth data is already cleared at this point
       toast({
         variant: "destructive",
         title: "Error signing out",
