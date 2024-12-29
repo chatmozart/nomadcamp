@@ -27,22 +27,23 @@ const PropertyDetails = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [property, setProperty] = useState<Property | null>(null);
+  const [propertyImages, setPropertyImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchProperty = async () => {
+    const fetchPropertyAndImages = async () => {
       if (!id) return;
 
       try {
         console.log('Fetching property details for ID:', id);
-        const { data, error } = await supabase
+        const { data: propertyData, error: propertyError } = await supabase
           .from('properties')
           .select('*')
           .eq('id', id)
           .single();
 
-        if (error) {
-          console.error('Error fetching property:', error);
+        if (propertyError) {
+          console.error('Error fetching property:', propertyError);
           toast({
             variant: "destructive",
             title: "Error",
@@ -51,16 +52,32 @@ const PropertyDetails = () => {
           return;
         }
 
-        console.log('Property details fetched:', data);
-        setProperty(data);
+        console.log('Property details fetched:', propertyData);
+        setProperty(propertyData);
+
+        // Fetch all images for this property
+        const { data: imagesData, error: imagesError } = await supabase
+          .from('property_images')
+          .select('image_url')
+          .eq('property_id', id)
+          .order('order', { ascending: true });
+
+        if (imagesError) {
+          console.error('Error fetching property images:', imagesError);
+          return;
+        }
+
+        console.log('Property images fetched:', imagesData);
+        const imageUrls = imagesData.map(img => img.image_url);
+        setPropertyImages(imageUrls);
       } catch (error) {
-        console.error('Error in fetchProperty:', error);
+        console.error('Error in fetchPropertyAndImages:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchProperty();
+    fetchPropertyAndImages();
   }, [id, toast]);
 
   if (isLoading) {
@@ -122,6 +139,7 @@ const PropertyDetails = () => {
         <PropertyImageSection 
           imageUrl={property.image_url}
           title={property.title}
+          additionalImages={propertyImages}
         />
 
         <PropertyDetailsSection 

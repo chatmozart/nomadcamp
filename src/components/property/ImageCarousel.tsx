@@ -17,6 +17,7 @@ export const ImageCarousel = ({ images, title }: ImageCarouselProps) => {
       const urls = await Promise.all(
         images.map(async (imageUrl) => {
           try {
+            console.log('Fetching signed URL for:', imageUrl);
             const { data, error } = await supabase.storage
               .from('properties')
               .createSignedUrl(imageUrl, 60 * 60);
@@ -26,6 +27,7 @@ export const ImageCarousel = ({ images, title }: ImageCarouselProps) => {
               return null;
             }
 
+            console.log('Received signed URL:', data.signedUrl);
             return data.signedUrl;
           } catch (error) {
             console.error('Error in getSignedUrl:', error);
