@@ -17,10 +17,32 @@ const ListProperty = () => {
   const [propertyLocation, setPropertyLocation] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
+  const [googleMapsApiKey, setGoogleMapsApiKey] = useState<string>("");
 
   console.log("Rendering ListProperty component");
 
   const libraries = useMemo(() => ["places"], []);
+
+  // Fetch Google Maps API key from Supabase
+  React.useEffect(() => {
+    const fetchApiKey = async () => {
+      const { data: { GOOGLE_MAPS_API_KEY }, error } = await supabase
+        .from('secrets')
+        .select('GOOGLE_MAPS_API_KEY')
+        .single();
+
+      if (error) {
+        console.error('Error fetching Google Maps API key:', error);
+        return;
+      }
+
+      if (GOOGLE_MAPS_API_KEY) {
+        setGoogleMapsApiKey(GOOGLE_MAPS_API_KEY);
+      }
+    };
+
+    fetchApiKey();
+  }, []);
 
   const onLoad = (autocomplete: google.maps.places.Autocomplete) => {
     console.log("Autocomplete loaded:", autocomplete);
@@ -88,9 +110,13 @@ const ListProperty = () => {
     }
   };
 
+  if (!googleMapsApiKey) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <LoadScript
-      googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ""}
+      googleMapsApiKey={googleMapsApiKey}
       libraries={libraries as any}
     >
       <div className="container mx-auto px-4 py-8">
