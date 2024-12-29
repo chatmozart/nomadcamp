@@ -76,6 +76,8 @@ export const PropertyForm = ({
     previewUrls,
     existingImages,
     setExistingImages,
+    setImageFiles,
+    setPreviewUrls,
     handlePlaceSelect,
     handleImageChange,
     removeImage,

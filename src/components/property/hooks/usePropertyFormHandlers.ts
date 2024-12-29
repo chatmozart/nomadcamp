@@ -64,6 +64,8 @@ export const usePropertyFormHandlers = (
     previewUrls,
     existingImages,
     setExistingImages,
+    setImageFiles,
+    setPreviewUrls,
     handlePlaceSelect,
     handleImageChange,
     removeImage,
