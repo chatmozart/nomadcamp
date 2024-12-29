@@ -22,13 +22,30 @@ const PropertyCard = ({
   image,
 }: PropertyCardProps) => {
   console.log('Rendering PropertyCard with ID:', id);
+  console.log('Raw image path:', image);
+  
   // Get the public URL for the image from Supabase storage
   const { data: publicUrl } = supabase.storage
     .from('properties')
     .getPublicUrl(image);
     
-  console.log('Image source:', image);
-  console.log('Public URL:', publicUrl?.publicUrl);
+  console.log('Generated public URL:', publicUrl?.publicUrl);
+  
+  // Verify bucket access
+  const checkBucketAccess = async () => {
+    const { data, error } = await supabase.storage
+      .from('properties')
+      .list();
+    
+    if (error) {
+      console.error('Bucket access error:', error);
+    } else {
+      console.log('Bucket contents:', data);
+    }
+  };
+  
+  // Check bucket access when component mounts
+  checkBucketAccess();
   
   return (
     <Link to={`/property/${id}`} className="block">
@@ -40,7 +57,11 @@ const PropertyCard = ({
             className="w-full h-full object-cover"
             loading="lazy"
             onError={(e) => {
-              console.error('Image failed to load:', publicUrl?.publicUrl);
+              console.error('Image failed to load:', {
+                publicUrl: publicUrl?.publicUrl,
+                originalImage: image,
+                error: e
+              });
               e.currentTarget.src = '/placeholder.svg';
             }}
           />
