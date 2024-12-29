@@ -24,22 +24,14 @@ const PropertyCard = ({
   console.log('Rendering PropertyCard with ID:', id);
   console.log('Raw image path:', image);
   
-  // Construct the URL using the object/public endpoint
-  const imageUrl = `https://mqgpycqviacxddgnwbxo.supabase.co/storage/v1/object/public/properties/${image}`;
-  console.log('Constructed image URL:', imageUrl);
+  // Get the public URL for the image
+  const { data } = supabase.storage
+    .from('properties')
+    .getPublicUrl(image);
+    
+  const imageUrl = data?.publicUrl;
+  console.log('Supabase public URL:', imageUrl);
 
-  // Function to validate image URL
-  const validateImageUrl = async (url: string) => {
-    try {
-      const response = await fetch(url, { method: 'HEAD' });
-      console.log('Image validation response:', response.status);
-      return response.ok;
-    } catch (error) {
-      console.error('Image validation error:', error);
-      return false;
-    }
-  };
-  
   return (
     <Link to={`/property/${id}`} className="block">
       <div className="property-card rounded-xl overflow-hidden bg-card transition-transform hover:scale-[1.02]">
@@ -49,20 +41,13 @@ const PropertyCard = ({
             alt={title}
             className="w-full h-full object-cover"
             loading="lazy"
-            onError={async (e) => {
+            onError={(e) => {
               console.error('Image failed to load:', {
                 imageUrl,
                 originalImage: image,
                 error: e
               });
-              
-              // Try to validate the URL before falling back to placeholder
-              const isValid = await validateImageUrl(imageUrl);
-              console.log('Image URL validation result:', isValid);
-              
-              if (!isValid) {
-                e.currentTarget.src = '/placeholder.svg';
-              }
+              e.currentTarget.src = '/placeholder.svg';
             }}
           />
         </div>
