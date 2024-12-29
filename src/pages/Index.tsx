@@ -16,9 +16,11 @@ const Index = () => {
     const fetchProperties = async () => {
       console.log('Fetching properties from Supabase...');
       try {
+        // Use anon key for public access
         const { data, error } = await supabase
           .from('properties')
-          .select('*');
+          .select('*')
+          .order('created_at', { ascending: false });
 
         if (error) {
           console.error('Error fetching properties:', error);
