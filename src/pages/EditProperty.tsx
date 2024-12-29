@@ -81,9 +81,8 @@ const EditProperty = () => {
     if (!user || !id) return;
 
     try {
-      console.log('Updating property with data:', formData);
-      
-      const updateData: any = {
+      // Create update data with all fields
+      const updateData = {
         title: formData.title,
         description: formData.description,
         price: parseFloat(formData.price),
@@ -93,17 +92,20 @@ const EditProperty = () => {
         price_one_year: formData.priceOneYear ? parseFloat(formData.priceOneYear) : null
       };
 
-      console.log('Sending update with data:', updateData);
+      console.log('Attempting to update property with data:', updateData);
 
-      const { error: updateError } = await supabase
+      const { data, error: updateError } = await supabase
         .from('properties')
         .update(updateData)
-        .eq('id', id);
+        .eq('id', id)
+        .select();
 
       if (updateError) {
         console.error('Error updating property:', updateError);
         throw updateError;
       }
+
+      console.log('Update successful. Updated data:', data);
 
       // Handle new images if any
       if (formData.imageFiles.length > 0) {
