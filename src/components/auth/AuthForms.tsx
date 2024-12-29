@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { LogIn } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export function AuthForms() {
   const [isOpen, setIsOpen] = useState(false);
@@ -33,9 +34,9 @@ export function AuthForms() {
   if (user) {
     return (
       <div className="flex items-center gap-4">
-        <span className="text-sm text-muted-foreground">
+        <Link to="/profile" className="text-sm text-muted-foreground hover:text-primary transition-colors">
           {user.email}
-        </span>
+        </Link>
         <Button variant="outline" onClick={signOut}>
           Sign Out
         </Button>
