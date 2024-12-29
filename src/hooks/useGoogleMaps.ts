@@ -8,16 +8,13 @@ export const useGoogleMaps = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const fetchApiKey = async () => {
+    const loadGoogleMaps = async () => {
       try {
         setIsLoading(true);
-        console.log('Fetching Google Maps API key from Supabase config...');
+        console.log('Fetching Google Maps API key...');
         
-        const { data: config, error } = await supabase
-          .from('config')
-          .select('value')
-          .eq('key', 'GOOGLE_MAPS_API_KEY')
-          .single();
+        // Get the API key from Supabase environment variables
+        const { data, error } = await supabase.functions.invoke('get-google-maps-key');
 
         if (error) {
           console.error('Error fetching Google Maps API key:', error);
@@ -30,17 +27,17 @@ export const useGoogleMaps = () => {
           return;
         }
 
-        if (config?.value) {
+        if (data?.apiKey) {
           console.log('Successfully fetched Google Maps API key');
           // Load the Google Maps JavaScript API
           const script = document.createElement('script');
-          script.src = `https://maps.googleapis.com/maps/api/js?key=${config.value}&libraries=places`;
+          script.src = `https://maps.googleapis.com/maps/api/js?key=${data.apiKey}&libraries=places`;
           script.async = true;
           script.defer = true;
           
           script.onload = () => {
             console.log('Google Maps JavaScript API loaded successfully');
-            setGoogleMapsApiKey(config.value);
+            setGoogleMapsApiKey(data.apiKey);
             setIsLoading(false);
           };
 
@@ -56,7 +53,7 @@ export const useGoogleMaps = () => {
 
           document.head.appendChild(script);
         } else {
-          console.log('No Google Maps API key found in config');
+          console.log('No Google Maps API key found');
           toast({
             variant: "destructive",
             title: "Configuration Required",
@@ -65,7 +62,7 @@ export const useGoogleMaps = () => {
           setIsLoading(false);
         }
       } catch (err) {
-        console.error('Error in fetchApiKey:', err);
+        console.error('Error in loadGoogleMaps:', err);
         toast({
           variant: "destructive",
           title: "Error",
@@ -75,7 +72,7 @@ export const useGoogleMaps = () => {
       }
     };
 
-    fetchApiKey();
+    loadGoogleMaps();
 
     // Cleanup function
     return () => {
