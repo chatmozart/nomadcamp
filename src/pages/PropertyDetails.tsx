@@ -39,40 +39,47 @@ const PropertyDetails = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Header section */}
+      <div className="container mx-auto px-4 py-4">
+        <h1 className="text-3xl font-bold">{property.title}</h1>
+        <div className="flex items-center mt-2 text-muted-foreground">
+          <MapPin className="w-4 h-4 mr-1" />
+          <span>{property.location}</span>
+          <div className="flex items-center ml-4">
+            <Star className="w-4 h-4 text-primary fill-current" />
+            <span className="ml-1 font-medium">{property.rating}</span>
+            <span className="text-sm ml-1">({property.reviews} reviews)</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Full-width carousel section */}
+      <div className="w-full bg-black/5 py-8">
+        <div className="max-w-[2000px] mx-auto px-4">
+          <Carousel className="w-full">
+            <CarouselContent>
+              {property.images.map((image, index) => (
+                <CarouselItem key={index}>
+                  <div className="aspect-[16/9] relative rounded-lg overflow-hidden">
+                    <img
+                      src={image}
+                      alt={`${property.title} - Image ${index + 1}`}
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="left-8" />
+            <CarouselNext className="right-8" />
+          </Carousel>
+        </div>
+      </div>
+
+      {/* Content section */}
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="space-y-6">
-            <div>
-              <h1 className="text-3xl font-bold">{property.title}</h1>
-              <div className="flex items-center mt-2 text-muted-foreground">
-                <MapPin className="w-4 h-4 mr-1" />
-                <span>{property.location}</span>
-                <div className="flex items-center ml-4">
-                  <Star className="w-4 h-4 text-primary fill-current" />
-                  <span className="ml-1 font-medium">{property.rating}</span>
-                  <span className="text-sm ml-1">({property.reviews} reviews)</span>
-                </div>
-              </div>
-            </div>
-
-            <Carousel className="w-full">
-              <CarouselContent>
-                {property.images.map((image, index) => (
-                  <CarouselItem key={index}>
-                    <div className="aspect-[16/9] relative rounded-lg overflow-hidden">
-                      <img
-                        src={image}
-                        alt={`${property.title} - Image ${index + 1}`}
-                        className="object-cover w-full h-full"
-                      />
-                    </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious />
-              <CarouselNext />
-            </Carousel>
-
             <div className="space-y-4">
               <h2 className="text-2xl font-semibold">About this property</h2>
               <p className="text-muted-foreground">{property.description}</p>
