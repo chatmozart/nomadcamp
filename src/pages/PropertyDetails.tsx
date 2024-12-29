@@ -33,11 +33,12 @@ const PropertyDetails = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Title Section */}
       <div className="container mx-auto px-4 pt-6 pb-2">
         <h1 className="text-4xl font-semibold">{property.title}</h1>
       </div>
 
-      {/* Full-width image grid section with reduced height */}
+      {/* Image Grid Section */}
       <div className="w-full mb-8">
         <div className="grid grid-cols-4 gap-2 h-[50vh] max-w-[2000px] mx-auto">
           <div className="col-span-2 row-span-2 relative">
@@ -84,8 +85,9 @@ const PropertyDetails = () => {
         </div>
       </div>
 
-      {/* Content section moved below images */}
+      {/* Content Section */}
       <div className="container mx-auto px-4 py-8">
+        {/* Rating and Location Section */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-4">
             <div className="flex items-center">
@@ -105,7 +107,9 @@ const PropertyDetails = () => {
           </div>
         </div>
 
+        {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          {/* Left Column */}
           <div className="lg:col-span-2 space-y-6">
             <div className="flex items-center justify-between pb-6 border-b">
               <div>
@@ -141,6 +145,7 @@ const PropertyDetails = () => {
             </div>
           </div>
 
+          {/* Right Column - Booking Card */}
           <div>
             <div className="sticky top-8 bg-card rounded-xl p-6 border shadow-sm">
               <div className="mb-4">
