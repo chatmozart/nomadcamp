@@ -29,6 +29,9 @@ const ListProperty = () => {
     price: string;
     location: string;
     imageFiles: File[];
+    amenityIds: string[];
+    availabilityStart: string;
+    availabilityEnd?: string;
   }) => {
     if (!user) {
       toast({
@@ -49,6 +52,8 @@ const ListProperty = () => {
           price: parseFloat(formData.price),
           location: formData.location,
           owner_id: user.id,
+          availability_start: formData.availabilityStart,
+          availability_end: formData.availabilityEnd || null,
         })
         .select()
         .single();

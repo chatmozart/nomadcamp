@@ -8,6 +8,7 @@ import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ExistingImagesGrid } from "./ExistingImagesGrid";
 import { AmenitiesSelection } from "./AmenitiesSelection";
+import { PropertyAvailabilityFields } from "./PropertyAvailabilityFields";
 
 interface PropertyFormProps {
   onSubmit: (formData: {
@@ -20,6 +21,8 @@ interface PropertyFormProps {
     location: string;
     imageFiles: File[];
     amenityIds: string[];
+    availabilityStart: string;
+    availabilityEnd?: string;
   }) => Promise<void>;
   googleMapsLoaded: boolean;
   onPlaceSelect: (autocomplete: google.maps.places.Autocomplete) => void;
@@ -33,6 +36,8 @@ interface PropertyFormProps {
     priceOneYear?: number;
     location: string;
     existingImages?: string[];
+    availabilityStart?: string;
+    availabilityEnd?: string;
   };
   mode?: 'create' | 'edit';
 }
@@ -60,6 +65,8 @@ export const PropertyForm = ({
   );
 
   const [selectedAmenityIds, setSelectedAmenityIds] = useState<string[]>([]);
+  const [availabilityStart, setAvailabilityStart] = useState(initialData?.availabilityStart || "");
+  const [availabilityEnd, setAvailabilityEnd] = useState(initialData?.availabilityEnd || "");
 
   const handleExistingImageDelete = (deletedImageUrl: string) => {
     setExistingImages(prev => prev.filter(url => url !== deletedImageUrl));
@@ -77,8 +84,20 @@ export const PropertyForm = ({
       return;
     }
 
-    console.log('Submitting form with images:', imageFiles);
-    console.log('Selected amenities:', selectedAmenityIds);
+    if (!availabilityStart) {
+      toast({
+        variant: "destructive",
+        title: "Availability Required",
+        description: "Please select when the property becomes available",
+      });
+      return;
+    }
+
+    console.log('Submitting form with data:', {
+      images: imageFiles,
+      amenities: selectedAmenityIds,
+      availability: { start: availabilityStart, end: availabilityEnd }
+    });
 
     await onSubmit({
       title: propertyTitle,
@@ -90,6 +109,8 @@ export const PropertyForm = ({
       location: propertyLocation,
       imageFiles,
       amenityIds: selectedAmenityIds,
+      availabilityStart,
+      availabilityEnd,
     });
 
     if (mode === 'create') {
@@ -103,6 +124,8 @@ export const PropertyForm = ({
       setImageFiles([]);
       setPreviewUrls([]);
       setSelectedAmenityIds([]);
+      setAvailabilityStart("");
+      setAvailabilityEnd("");
     }
   };
 
@@ -303,6 +326,13 @@ export const PropertyForm = ({
         propertyId={initialData?.id}
         onAmenitiesChange={setSelectedAmenityIds}
         mode={mode}
+      />
+
+      <PropertyAvailabilityFields
+        initialStartDate={availabilityStart}
+        initialEndDate={availabilityEnd}
+        onStartDateChange={setAvailabilityStart}
+        onEndDateChange={setAvailabilityEnd}
       />
 
       <Button type="submit">

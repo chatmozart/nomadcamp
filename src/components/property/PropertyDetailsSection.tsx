@@ -10,6 +10,8 @@ interface PropertyDetailsSectionProps {
   priceSixMonths?: number;
   priceOneYear?: number;
   location: string;
+  availabilityStart?: string | null;
+  availabilityEnd?: string | null;
 }
 
 export const PropertyDetailsSection = ({ 
@@ -19,13 +21,17 @@ export const PropertyDetailsSection = ({
   priceThreeMonths,
   priceSixMonths,
   priceOneYear,
-  location 
+  location,
+  availabilityStart,
+  availabilityEnd
 }: PropertyDetailsSectionProps) => {
-  console.log('PropertyDetailsSection rendering with prices:', {
+  console.log('PropertyDetailsSection rendering with data:', {
     price,
     priceThreeMonths,
     priceSixMonths,
-    priceOneYear
+    priceOneYear,
+    availabilityStart,
+    availabilityEnd
   });
 
   return (
@@ -48,6 +54,8 @@ export const PropertyDetailsSection = ({
           priceThreeMonths={priceThreeMonths}
           priceSixMonths={priceSixMonths}
           priceOneYear={priceOneYear}
+          availabilityStart={availabilityStart}
+          availabilityEnd={availabilityEnd}
         />
       </div>
 
