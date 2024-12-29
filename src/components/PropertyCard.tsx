@@ -47,9 +47,7 @@ const PropertyCard = ({
                 originalImage: image,
                 error: e
               });
-              if (!imageUrl) {
-                e.currentTarget.src = '/placeholder.svg';
-              }
+              e.currentTarget.src = '/placeholder.svg';
             }}
           />
         </div>
