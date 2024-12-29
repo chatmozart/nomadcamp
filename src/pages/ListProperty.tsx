@@ -32,6 +32,9 @@ const ListProperty = () => {
     amenityIds: string[];
     availabilityStart: string;
     availabilityEnd?: string;
+    contactName?: string;
+    contactEmail?: string;
+    contactWhatsapp?: string;
   }) => {
     if (!user) {
       toast({
@@ -43,7 +46,6 @@ const ListProperty = () => {
     }
 
     try {
-      // First, create the property record
       const { data: propertyData, error: propertyError } = await supabase
         .from('properties')
         .insert({

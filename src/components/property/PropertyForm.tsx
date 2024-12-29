@@ -23,6 +23,9 @@ interface PropertyFormProps {
     amenityIds: string[];
     availabilityStart: string;
     availabilityEnd?: string;
+    contactName?: string;
+    contactEmail?: string;
+    contactWhatsapp?: string;
   }) => Promise<void>;
   googleMapsLoaded: boolean;
   onPlaceSelect: (autocomplete: google.maps.places.Autocomplete) => void;
@@ -38,6 +41,9 @@ interface PropertyFormProps {
     existingImages?: string[];
     availabilityStart?: string;
     availabilityEnd?: string;
+    contactName?: string;
+    contactEmail?: string;
+    contactWhatsapp?: string;
   };
   mode?: 'create' | 'edit';
 }
@@ -59,21 +65,9 @@ export const PropertyForm = ({
   const [propertyLocation, setPropertyLocation] = useState(initialData?.location || "");
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-
-  const [existingImages, setExistingImages] = useState<string[]>(
-    initialData?.existingImages || []
-  );
-
-  const [selectedAmenityIds, setSelectedAmenityIds] = useState<string[]>([]);
-  const [availabilityStart, setAvailabilityStart] = useState(initialData?.availabilityStart || "");
-  const [availabilityEnd, setAvailabilityEnd] = useState(initialData?.availabilityEnd || "");
   const [contactName, setContactName] = useState(initialData?.contactName || "");
   const [contactEmail, setContactEmail] = useState(initialData?.contactEmail || "");
   const [contactWhatsapp, setContactWhatsapp] = useState(initialData?.contactWhatsapp || "");
-
-  const handleExistingImageDelete = (deletedImageUrl: string) => {
-    setExistingImages(prev => prev.filter(url => url !== deletedImageUrl));
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,7 +93,8 @@ export const PropertyForm = ({
     console.log('Submitting form with data:', {
       images: imageFiles,
       amenities: selectedAmenityIds,
-      availability: { start: availabilityStart, end: availabilityEnd }
+      availability: { start: availabilityStart, end: availabilityEnd },
+      contact: { name: contactName, email: contactEmail, whatsapp: contactWhatsapp }
     });
 
     await onSubmit({
@@ -132,53 +127,10 @@ export const PropertyForm = ({
       setSelectedAmenityIds([]);
       setAvailabilityStart("");
       setAvailabilityEnd("");
+      setContactName("");
+      setContactEmail("");
+      setContactWhatsapp("");
     }
-  };
-
-  const handlePlaceSelect = (autocomplete: google.maps.places.Autocomplete) => {
-    const place = autocomplete.getPlace();
-    if (place.formatted_address) {
-      setPropertyLocation(place.formatted_address);
-    }
-    onPlaceSelect(autocomplete);
-  };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    
-    if (imageFiles.length + files.length > 10) {
-      toast({
-        variant: "destructive",
-        title: "Too many images",
-        description: "Maximum 10 images allowed per property",
-      });
-      return;
-    }
-    
-    const newFiles = files.filter(file => {
-      const isValid = file.type.startsWith('image/');
-      if (!isValid) {
-        toast({
-          variant: "destructive",
-          title: "Invalid file type",
-          description: `${file.name} is not an image file`,
-        });
-      }
-      return isValid;
-    });
-
-    setImageFiles(prev => [...prev, ...newFiles]);
-    
-    // Generate preview URLs
-    newFiles.forEach(file => {
-      const url = URL.createObjectURL(file);
-      setPreviewUrls(prev => [...prev, url]);
-    });
-  };
-
-  const removeImage = (index: number) => {
-    setImageFiles(prev => prev.filter((_, i) => i !== index));
-    setPreviewUrls(prev => prev.filter((_, i) => i !== index));
   };
 
   return (
