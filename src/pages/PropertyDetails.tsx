@@ -1,25 +1,12 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Card } from "@/components/ui/card";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { PropertyHeader } from "@/components/property/PropertyHeader";
-import { PropertyAmenities } from "@/components/property/PropertyAmenities";
-import { PropertyBookingCard } from "@/components/property/PropertyBookingCard";
-import { useAuth } from "@/contexts/AuthContext";
-import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { PropertyImageSection } from "@/components/property/PropertyImageSection";
+import { PropertyDetailsSection } from "@/components/property/PropertyDetailsSection";
+import { PropertyActions } from "@/components/property/PropertyActions";
 
 interface Property {
   id: string;
@@ -34,66 +21,51 @@ interface Property {
 const PropertyDetails = () => {
   const { id } = useParams();
   const { user } = useAuth();
-  const navigate = useNavigate();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [property, setProperty] = useState<Property | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProperty = async () => {
-      console.log('Fetching property details for ID:', id);
-      const { data, error } = await supabase
-        .from('properties')
-        .select('*')
-        .eq('id', id)
-        .single();
+      if (!id) return;
 
-      if (error) {
-        console.error('Error fetching property:', error);
-        return;
-      }
-
-      console.log('Property details fetched:', data);
-      setProperty(data);
-      setIsLoading(false);
-    };
-
-    fetchProperty();
-  }, [id]);
-
-  useEffect(() => {
-    const loadImageUrl = async () => {
-      if (!property?.image_url) return;
-
-      console.log('PropertyDetails - Starting to load image URL:', property.image_url);
-      
       try {
-        const { data, error } = await supabase.storage
+        console.log('Fetching property details for ID:', id);
+        const { data, error } = await supabase
           .from('properties')
-          .createSignedUrl(property.image_url, 60 * 60); // URL valid for 1 hour
+          .select('*')
+          .eq('id', id)
+          .single();
 
         if (error) {
-          console.error('PropertyDetails - Error generating signed URL:', error);
+          console.error('Error fetching property:', error);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to load property details",
+          });
           return;
         }
 
-        console.log('PropertyDetails - Generated Supabase signed URL:', data?.signedUrl);
-        setImageUrl(data?.signedUrl || null);
+        console.log('Property details fetched:', data);
+        setProperty(data);
       } catch (error) {
-        console.error('PropertyDetails - Failed to generate signed URL:', error);
+        console.error('Error in fetchProperty:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    loadImageUrl();
-  }, [property?.image_url]);
+    fetchProperty();
+  }, [id, toast]);
 
   const handleDelete = async () => {
     if (!property) return;
 
-    console.log('Attempting to delete property:', property.id);
-    
     try {
+      console.log('Deleting property:', property.id);
+      
       // Delete the image from storage
       if (property.image_url) {
         const { error: storageError } = await supabase.storage
@@ -151,15 +123,6 @@ const PropertyDetails = () => {
     return <div className="min-h-screen bg-background flex items-center justify-center">Property not found</div>;
   }
 
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    console.error('PropertyDetails - Image failed to load:', {
-      imageUrl,
-      originalImage: property.image_url,
-      error: e
-    });
-    e.currentTarget.src = '/placeholder.svg';
-  };
-
   const isOwner = user?.id === property.owner_id;
 
   return (
@@ -170,65 +133,22 @@ const PropertyDetails = () => {
             title={property.title}
             location={property.location}
           />
-          {isOwner && (
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive" className="gap-2">
-                  <Trash2 className="h-4 w-4" />
-                  Delete Property
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete your
-                    property listing and remove the data from our servers.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleDelete}>
-                    Delete
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          )}
+          <PropertyActions 
+            isOwner={isOwner}
+            propertyId={property.id}
+            onDelete={handleDelete}
+          />
         </div>
 
-        {/* Image Section */}
-        <div className="px-4">
-          <Card className="overflow-hidden">
-            <img 
-              src={imageUrl || '/placeholder.svg'}
-              alt={property.title} 
-              className="w-full h-[600px] object-cover"
-              onError={handleImageError}
-            />
-          </Card>
-        </div>
+        <PropertyImageSection 
+          imageUrl={property.image_url}
+          title={property.title}
+        />
 
-        {/* Details Section */}
-        <div className="grid grid-cols-3 gap-12 px-4 py-8">
-          <div className="col-span-2">
-            <div className="border-b pb-6">
-              <h2 className="text-2xl font-semibold mb-4">
-                Property Details
-              </h2>
-            </div>
-
-            <div className="py-6 border-b">
-              <p className="text-gray-600">{property.description}</p>
-            </div>
-
-            <PropertyAmenities />
-          </div>
-
-          <div className="col-span-1">
-            <PropertyBookingCard price={property.price} />
-          </div>
-        </div>
+        <PropertyDetailsSection 
+          description={property.description}
+          price={property.price}
+        />
       </div>
     </div>
   );

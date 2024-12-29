@@ -10,6 +10,7 @@ import PropertyDetails from "./pages/PropertyDetails";
 import PropertiesList from "./pages/PropertiesList";
 import Profile from "./pages/Profile";
 import ListProperty from "./pages/ListProperty";
+import EditProperty from "./pages/EditProperty";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/property/:id" element={<PropertyDetails />} />
+              <Route path="/property/:id/edit" element={<EditProperty />} />
               <Route path="/properties/:location" element={<PropertiesList />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/list-property" element={<ListProperty />} />
