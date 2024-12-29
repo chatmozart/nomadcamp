@@ -23,35 +23,41 @@ const EditProperty = () => {
     const fetchProperty = async () => {
       if (!id) return;
 
-      const { data, error } = await supabase
-        .from('properties')
-        .select('*')
-        .eq('id', id)
-        .single();
+      try {
+        console.log('Fetching property with ID:', id);
+        const { data, error } = await supabase
+          .from('properties')
+          .select('*')
+          .eq('id', id)
+          .single();
 
-      if (error) {
-        console.error('Error fetching property:', error);
+        if (error) {
+          console.error('Error fetching property:', error);
+          throw error;
+        }
+
+        if (data.owner_id !== user?.id) {
+          toast({
+            variant: "destructive",
+            title: "Unauthorized",
+            description: "You don't have permission to edit this property",
+          });
+          navigate('/profile');
+          return;
+        }
+
+        console.log('Fetched property data:', data);
+        setProperty(data);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error in fetchProperty:', error);
         toast({
           variant: "destructive",
           title: "Error",
           description: "Failed to load property details",
         });
         navigate('/profile');
-        return;
       }
-
-      if (data.owner_id !== user?.id) {
-        toast({
-          variant: "destructive",
-          title: "Unauthorized",
-          description: "You don't have permission to edit this property",
-        });
-        navigate('/profile');
-        return;
-      }
-
-      setProperty(data);
-      setIsLoading(false);
     };
 
     fetchProperty();
@@ -77,30 +83,27 @@ const EditProperty = () => {
     try {
       console.log('Updating property with data:', formData);
       
-      const updateData = {
+      const updateData: any = {
         title: formData.title,
         description: formData.description,
         price: parseFloat(formData.price),
         location: formData.location,
+        price_three_months: formData.priceThreeMonths ? parseFloat(formData.priceThreeMonths) : null,
+        price_six_months: formData.priceSixMonths ? parseFloat(formData.priceSixMonths) : null,
+        price_one_year: formData.priceOneYear ? parseFloat(formData.priceOneYear) : null
       };
 
-      // Only add price fields if they have values
-      if (formData.priceThreeMonths) {
-        updateData['price_three_months'] = parseFloat(formData.priceThreeMonths);
-      }
-      if (formData.priceSixMonths) {
-        updateData['price_six_months'] = parseFloat(formData.priceSixMonths);
-      }
-      if (formData.priceOneYear) {
-        updateData['price_one_year'] = parseFloat(formData.priceOneYear);
-      }
+      console.log('Sending update with data:', updateData);
 
       const { error: updateError } = await supabase
         .from('properties')
         .update(updateData)
         .eq('id', id);
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        console.error('Error updating property:', updateError);
+        throw updateError;
+      }
 
       // Handle new images if any
       if (formData.imageFiles.length > 0) {
