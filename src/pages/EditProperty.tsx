@@ -66,19 +66,27 @@ const EditProperty = () => {
     title: string;
     description: string;
     price: string;
+    priceThreeMonths: string;
+    priceSixMonths: string;
+    priceOneYear: string;
     location: string;
     imageFiles: File[];
   }) => {
     if (!user || !id) return;
 
     try {
-      // Update property details
+      console.log('Updating property with data:', formData);
+      
+      // Update property details including all price fields
       const { error: updateError } = await supabase
         .from('properties')
         .update({
           title: formData.title,
           description: formData.description,
           price: parseFloat(formData.price),
+          price_three_months: formData.priceThreeMonths ? parseFloat(formData.priceThreeMonths) : null,
+          price_six_months: formData.priceSixMonths ? parseFloat(formData.priceSixMonths) : null,
+          price_one_year: formData.priceOneYear ? parseFloat(formData.priceOneYear) : null,
           location: formData.location,
         })
         .eq('id', id);
