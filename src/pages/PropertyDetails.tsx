@@ -24,8 +24,10 @@ const properties = [
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80",
       "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&q=80",
     ],
+    beds: 3,
+    baths: 2,
+    maxGuests: 6
   },
-  // ... other properties
 ];
 
 const PropertyDetails = () => {
@@ -38,58 +40,106 @@ const PropertyDetails = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header section */}
-      <div className="container mx-auto px-4 py-4">
-        <h1 className="text-3xl font-bold">{property.title}</h1>
-        <div className="flex items-center mt-2 text-muted-foreground">
-          <MapPin className="w-4 h-4 mr-1" />
-          <span>{property.location}</span>
-          <div className="flex items-center ml-4">
-            <Star className="w-4 h-4 text-primary fill-current" />
-            <span className="ml-1 font-medium">{property.rating}</span>
-            <span className="text-sm ml-1">({property.reviews} reviews)</span>
+      <div className="container mx-auto px-4 py-6">
+        <h1 className="text-4xl font-semibold mb-2">{property.title}</h1>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center">
+              <Star className="w-5 h-5 text-primary fill-current" />
+              <span className="ml-1 font-medium">{property.rating}</span>
+              <span className="mx-1">·</span>
+              <span className="underline">{property.reviews} reviews</span>
+            </div>
+            <div className="flex items-center">
+              <MapPin className="w-5 h-5" />
+              <span className="ml-1 underline">{property.location}</span>
+            </div>
+          </div>
+          <div className="flex items-center space-x-4">
+            <Button variant="outline">Share</Button>
+            <Button variant="outline">Save</Button>
           </div>
         </div>
       </div>
 
-      {/* Full-width carousel section */}
-      <div className="w-full">
-        <Carousel className="w-full">
-          <CarouselContent>
-            {property.images.map((image, index) => (
-              <CarouselItem key={index}>
-                <div className="aspect-[21/9] relative overflow-hidden">
-                  <img
-                    src={image}
-                    alt={`${property.title} - Image ${index + 1}`}
-                    className="object-cover w-full h-full"
-                  />
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious className="left-8" />
-          <CarouselNext className="right-8" />
-        </Carousel>
+      {/* Full-width image grid section */}
+      <div className="w-full mb-8">
+        <div className="grid grid-cols-4 gap-2 h-[65vh] px-4 max-w-[2000px] mx-auto">
+          <div className="col-span-2 row-span-2 relative">
+            <img
+              src={property.images[0]}
+              alt={`${property.title} - Main`}
+              className="w-full h-full object-cover rounded-l-xl"
+            />
+          </div>
+          <div className="relative">
+            <img
+              src={property.images[1]}
+              alt={`${property.title} - Second`}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="relative">
+            <img
+              src={property.images[1]}
+              alt={`${property.title} - Third`}
+              className="w-full h-full object-cover rounded-tr-xl"
+            />
+          </div>
+          <div className="relative">
+            <img
+              src={property.images[2]}
+              alt={`${property.title} - Fourth`}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="relative">
+            <img
+              src={property.images[2]}
+              alt={`${property.title} - Fifth`}
+              className="w-full h-full object-cover rounded-br-xl"
+            />
+            <Button 
+              variant="outline" 
+              className="absolute bottom-4 right-4 bg-white hover:bg-white/90"
+            >
+              Show all photos
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* Content section */}
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="space-y-6">
-            <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          <div className="lg:col-span-2 space-y-6">
+            <div className="flex items-center justify-between pb-6 border-b">
+              <div>
+                <h2 className="text-2xl font-semibold">
+                  Entire villa hosted by Owner
+                </h2>
+                <p className="text-muted-foreground">
+                  {property.maxGuests} guests · {property.beds} bedrooms · {property.baths} baths
+                </p>
+              </div>
+              <div className="w-12 h-12 rounded-full bg-gray-200"></div>
+            </div>
+
+            <div className="space-y-4 pb-6 border-b">
               <h2 className="text-2xl font-semibold">About this property</h2>
-              <p className="text-muted-foreground">{property.description}</p>
+              <p className="text-muted-foreground leading-relaxed">
+                {property.description}
+              </p>
             </div>
 
             <div className="space-y-4">
-              <h2 className="text-2xl font-semibold">Amenities</h2>
+              <h2 className="text-2xl font-semibold">What this place offers</h2>
               <div className="grid grid-cols-2 gap-4">
                 {property.amenities.map((amenity, index) => (
-                  <div key={index} className="flex items-center space-x-2">
-                    {amenity.includes("WiFi") && <Wifi className="w-4 h-4" />}
-                    {amenity.includes("Kitchen") && <Coffee className="w-4 h-4" />}
-                    {amenity.includes("TV") && <Tv className="w-4 h-4" />}
+                  <div key={index} className="flex items-center space-x-4">
+                    {amenity.includes("WiFi") && <Wifi className="w-6 h-6" />}
+                    {amenity.includes("Kitchen") && <Coffee className="w-6 h-6" />}
+                    {amenity.includes("TV") && <Tv className="w-6 h-6" />}
                     <span>{amenity}</span>
                   </div>
                 ))}
@@ -97,33 +147,26 @@ const PropertyDetails = () => {
             </div>
           </div>
 
-          <div className="lg:pl-8">
-            <div className="sticky top-8 bg-card rounded-lg p-6 border shadow-sm">
-              <div className="text-2xl font-bold mb-4">
-                ${property.price}
-                <span className="text-muted-foreground text-base font-normal">
-                  {" "}
-                  / month
-                </span>
+          <div>
+            <div className="sticky top-8 bg-card rounded-xl p-6 border shadow-sm">
+              <div className="mb-4">
+                <span className="text-2xl font-bold">${property.price}</span>
+                <span className="text-muted-foreground"> / month</span>
               </div>
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Check-in
-                    </label>
-                    <div className="flex items-center border rounded-md p-2">
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1 border rounded-t-lg p-3">
+                    <label className="block text-sm font-medium">Check-in</label>
+                    <div className="flex items-center">
                       <Calendar className="w-4 h-4 mr-2" />
-                      <span>Select date</span>
+                      <span>Add date</span>
                     </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Check-out
-                    </label>
-                    <div className="flex items-center border rounded-md p-2">
+                  <div className="space-y-1 border rounded-t-lg p-3">
+                    <label className="block text-sm font-medium">Check-out</label>
+                    <div className="flex items-center">
                       <Calendar className="w-4 h-4 mr-2" />
-                      <span>Select date</span>
+                      <span>Add date</span>
                     </div>
                   </div>
                 </div>
