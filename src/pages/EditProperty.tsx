@@ -1,98 +1,20 @@
-import { useState, useMemo, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { PropertyForm } from "@/components/property/PropertyForm";
 import { useGoogleMaps } from "@/hooks/useGoogleMaps";
 import { Skeleton } from "@/components/ui/skeleton";
+import { usePropertyData } from "@/components/property/hooks/usePropertyData";
 
 const EditProperty = () => {
   const { id } = useParams();
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [property, setProperty] = useState<any>(null);
-  const [propertyImages, setPropertyImages] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const { googleMapsApiKey, isLoading: isLoadingMaps } = useGoogleMaps();
-  const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
-
-  const libraries = useMemo(() => ["places"], []);
-
-  useEffect(() => {
-    const fetchPropertyAndImages = async () => {
-      if (!id) return;
-
-      try {
-        console.log('Fetching property with ID:', id);
-        
-        // Fetch property details
-        const { data: propertyData, error: propertyError } = await supabase
-          .from('properties')
-          .select('*')
-          .eq('id', id)
-          .single();
-
-        if (propertyError) {
-          console.error('Error fetching property:', propertyError);
-          throw propertyError;
-        }
-
-        if (propertyData.owner_id !== user?.id) {
-          toast({
-            variant: "destructive",
-            title: "Unauthorized",
-            description: "You don't have permission to edit this property",
-          });
-          navigate('/profile');
-          return;
-        }
-
-        // Fetch property images
-        const { data: imagesData, error: imagesError } = await supabase
-          .from('property_images')
-          .select('image_url')
-          .eq('property_id', id)
-          .order('order', { ascending: true });
-
-        if (imagesError) {
-          console.error('Error fetching property images:', imagesError);
-          throw imagesError;
-        }
-
-        console.log('Fetched property data:', propertyData);
-        console.log('Fetched property images:', imagesData);
-
-        setProperty({
-          ...propertyData,
-          priceThreeMonths: propertyData.price_three_months,
-          priceSixMonths: propertyData.price_six_months,
-          priceOneYear: propertyData.price_one_year,
-          availabilityStart: propertyData.availability_start,
-          availabilityEnd: propertyData.availability_end
-        });
-        
-        setPropertyImages(imagesData.map(img => img.image_url));
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Error in fetchPropertyAndImages:', error);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to load property details",
-        });
-        navigate('/profile');
-      }
-    };
-
-    fetchPropertyAndImages();
-  }, [id, user, navigate, toast]);
-
-  const onLoad = (autocomplete: google.maps.places.Autocomplete) => {
-    console.log("Autocomplete loaded:", autocomplete);
-    setAutocomplete(autocomplete);
-  };
+  const { property, propertyImages, isLoading } = usePropertyData(id);
 
   const handlePropertySubmit = async (formData: {
     title: string;
@@ -119,7 +41,6 @@ const EditProperty = () => {
         contactWhatsapp: formData.contactWhatsapp
       });
 
-      // Update property data
       const updateData = {
         title: formData.title,
         description: formData.description,
@@ -240,15 +161,17 @@ const EditProperty = () => {
       <PropertyForm 
         onSubmit={handlePropertySubmit}
         googleMapsLoaded={!!googleMapsApiKey}
-        onPlaceSelect={onLoad}
         initialData={{
           ...property,
-          priceThreeMonths: property.price_three_months,
-          priceSixMonths: property.price_six_months,
-          priceOneYear: property.price_one_year,
+          priceThreeMonths: property.price_three_months?.toString(),
+          priceSixMonths: property.price_six_months?.toString(),
+          priceOneYear: property.price_one_year?.toString(),
           existingImages: propertyImages,
           availabilityStart: property.availability_start,
-          availabilityEnd: property.availability_end
+          availabilityEnd: property.availability_end,
+          contactName: property.contact_name,
+          contactEmail: property.contact_email,
+          contactWhatsapp: property.contact_whatsapp
         }}
         mode="edit"
       />
