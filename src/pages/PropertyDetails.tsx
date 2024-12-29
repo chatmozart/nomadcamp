@@ -102,6 +102,17 @@ const PropertyDetails = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Logo */}
+      <div className="fixed top-0 left-0 z-50 p-4">
+        <a href="/" className="flex items-center">
+          <img 
+            src="/logo.svg" 
+            alt="NomadRent Logo" 
+            className="h-8 w-auto"
+          />
+        </a>
+      </div>
+
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="px-4 py-6">
