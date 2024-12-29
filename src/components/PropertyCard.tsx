@@ -22,19 +22,17 @@ const PropertyCard = ({
 }: PropertyCardProps) => {
   console.log('Rendering PropertyCard with ID:', id);
   
-  const imageUrl = `https://mqgpycqviacxddgnwbxo.supabase.co/storage/v1/object/public/properties/${image}`;
-  
   return (
     <Link to={`/property/${id}`} className="block">
       <div className="property-card rounded-xl overflow-hidden bg-card transition-transform hover:scale-[1.02]">
         <div className="relative aspect-[4/3]">
           <img
-            src={imageUrl}
+            src={image}
             alt={title}
             className="w-full h-full object-cover"
             loading="lazy"
             onError={(e) => {
-              console.error('Image failed to load:', imageUrl);
+              console.error('Image failed to load:', image);
               e.currentTarget.src = '/placeholder.svg';
             }}
           />
