@@ -1,12 +1,18 @@
 import { PropertyAmenities } from "@/components/property/PropertyAmenities";
 import { PropertyBookingCard } from "@/components/property/PropertyBookingCard";
+import { PropertyMap } from "@/components/property/PropertyMap";
 
 interface PropertyDetailsSectionProps {
   description: string;
   price: number;
+  location: string;
 }
 
-export const PropertyDetailsSection = ({ description, price }: PropertyDetailsSectionProps) => {
+export const PropertyDetailsSection = ({ 
+  description, 
+  price, 
+  location 
+}: PropertyDetailsSectionProps) => {
   return (
     <div className="grid grid-cols-3 gap-12 px-4 py-8">
       <div className="col-span-2">
@@ -19,6 +25,11 @@ export const PropertyDetailsSection = ({ description, price }: PropertyDetailsSe
         </div>
 
         <PropertyAmenities />
+
+        <div className="mt-8">
+          <h3 className="text-xl font-semibold mb-4">Location</h3>
+          <PropertyMap address={location} />
+        </div>
       </div>
 
       <div className="col-span-1">

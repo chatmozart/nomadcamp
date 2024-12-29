@@ -6,17 +6,18 @@ import PropertyCard from "@/components/PropertyCard";
 import SearchBar from "@/components/SearchBar";
 import CategoryFilter from "@/components/CategoryFilter";
 import { supabase } from "@/lib/supabase";
+import { groupPropertiesByLocation, LOCATION_CATEGORIES } from "@/utils/locationUtils";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [properties, setProperties] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [groupedProperties, setGroupedProperties] = useState<Record<string, any[]>>({});
 
   useEffect(() => {
     const fetchProperties = async () => {
       console.log('Fetching properties from Supabase...');
       try {
-        // Use anon key for public access
         const { data, error } = await supabase
           .from('properties')
           .select('*')
@@ -29,6 +30,10 @@ const Index = () => {
 
         console.log('Properties fetched successfully:', data);
         setProperties(data || []);
+        
+        // Group the properties by location
+        const grouped = groupPropertiesByLocation(data || []);
+        setGroupedProperties(grouped);
       } catch (error) {
         console.error('Unexpected error fetching properties:', error);
       } finally {
@@ -63,27 +68,56 @@ const Index = () => {
       <div className="container mx-auto px-4 py-12">
         <CategoryFilter />
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
+        <div className="space-y-16 mt-8">
           {isLoading ? (
             <p>Loading properties...</p>
-          ) : properties.length === 0 ? (
+          ) : Object.keys(groupedProperties).length === 0 ? (
             <p>No properties found.</p>
           ) : (
-            properties.map((property) => {
-              console.log('Rendering property:', property);
+            LOCATION_CATEGORIES.map((category) => {
+              const categoryProperties = groupedProperties[category];
+              if (!categoryProperties?.length) return null;
+              
               return (
-                <PropertyCard 
-                  key={property.id}
-                  id={property.id}
-                  title={property.title}
-                  location={property.location}
-                  price={property.price}
-                  rating={4.5}
-                  reviews={0}
-                  image={property.image_url}
-                />
+                <div key={category} className="space-y-6">
+                  <h2 className="text-2xl font-semibold">{category}</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {categoryProperties.map((property) => (
+                      <PropertyCard 
+                        key={property.id}
+                        id={property.id}
+                        title={property.title}
+                        location={property.location}
+                        price={property.price}
+                        rating={4.5}
+                        reviews={0}
+                        image={property.image_url}
+                      />
+                    ))}
+                  </div>
+                </div>
               );
             })
+          )}
+          
+          {groupedProperties.Other?.length > 0 && (
+            <div className="space-y-6">
+              <h2 className="text-2xl font-semibold">Other Locations</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {groupedProperties.Other.map((property) => (
+                  <PropertyCard 
+                    key={property.id}
+                    id={property.id}
+                    title={property.title}
+                    location={property.location}
+                    price={property.price}
+                    rating={4.5}
+                    reviews={0}
+                    image={property.image_url}
+                  />
+                ))}
+              </div>
+            </div>
           )}
         </div>
       </div>

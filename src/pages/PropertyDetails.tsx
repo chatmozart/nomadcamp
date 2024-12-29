@@ -124,6 +124,7 @@ const PropertyDetails = () => {
         <PropertyDetailsSection 
           description={property.description}
           price={property.price}
+          location={property.location}
         />
       </div>
     </div>
