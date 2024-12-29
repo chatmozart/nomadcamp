@@ -39,8 +39,8 @@ const PropertyDetails = () => {
       </div>
 
       {/* Image Grid Section */}
-      <div className="w-full mb-8">
-        <div className="grid grid-cols-4 gap-2 h-[50vh] max-w-[2000px] mx-auto">
+      <div className="container mx-auto px-4 mb-8">
+        <div className="grid grid-cols-4 gap-2 h-[45vh] max-w-[2000px] mx-auto">
           <div className="col-span-2 row-span-2 relative">
             <img
               src={property.images[0]}
@@ -86,7 +86,7 @@ const PropertyDetails = () => {
       </div>
 
       {/* Content Section */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4">
         {/* Rating and Location Section */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-4">
@@ -146,7 +146,7 @@ const PropertyDetails = () => {
           </div>
 
           {/* Right Column - Booking Card */}
-          <div>
+          <div className="relative">
             <div className="sticky top-8 bg-card rounded-xl p-6 border shadow-sm">
               <div className="mb-4">
                 <span className="text-2xl font-bold">${property.price}</span>
