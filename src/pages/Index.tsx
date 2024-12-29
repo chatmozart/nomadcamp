@@ -41,7 +41,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section */}
       <div className="relative h-[70vh] bg-gradient-to-r from-gray-900/90 to-gray-900/70 flex items-center justify-center">
         <div className="absolute inset-0 -z-10">
           <img
@@ -52,16 +51,15 @@ const Index = () => {
         </div>
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 fade-in">
-            Find your next perfect stay
+            Welcome to NomadRent
           </h1>
           <p className="text-xl text-white/90 mb-8 fade-in">
-            Discover unique homes and experiences around the world
+            Find your perfect stay in digital nomad hotspots around the world
           </p>
           <SearchBar />
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="container mx-auto px-4 py-12">
         <CategoryFilter />
         

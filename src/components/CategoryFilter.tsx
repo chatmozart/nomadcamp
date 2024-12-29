@@ -6,11 +6,13 @@ const CategoryFilter = () => {
   
   const categories = [
     "All",
-    "Beach Houses",
-    "Mountain Cabins",
-    "City Apartments",
-    "Luxury Villas",
-    "Unique Stays",
+    "Koh Phangan",
+    "Chiang Mai",
+    "Bali",
+    "Lisbon",
+    "Tenerife",
+    "Santa Teresa",
+    "Tamarindo"
   ];
 
   return (
