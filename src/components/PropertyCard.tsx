@@ -24,13 +24,9 @@ const PropertyCard = ({
   console.log('Rendering PropertyCard with ID:', id);
   console.log('Raw image path:', image);
   
-  // Get the public URL for the image
-  const { data } = supabase.storage
-    .from('properties')
-    .getPublicUrl(image);
-    
-  const imageUrl = data?.publicUrl;
-  console.log('Supabase public URL:', imageUrl);
+  // Construct the URL directly using the Supabase storage URL format
+  const imageUrl = `https://mqgpycqviacxddgnwbxo.supabase.co/storage/v1/object/public/properties/${image}`;
+  console.log('Constructed image URL:', imageUrl);
 
   return (
     <Link to={`/property/${id}`} className="block">
@@ -47,7 +43,10 @@ const PropertyCard = ({
                 originalImage: image,
                 error: e
               });
-              e.currentTarget.src = '/placeholder.svg';
+              // Only use placeholder if there's an actual error
+              if (!image || e.currentTarget.src !== imageUrl) {
+                e.currentTarget.src = '/placeholder.svg';
+              }
             }}
           />
         </div>
