@@ -1,3 +1,6 @@
+-- Drop existing table if it exists
+drop table if exists "public"."property_images";
+
 -- Add new images table to store multiple images per property
 create table "public"."property_images" (
     "id" uuid not null default gen_random_uuid(),
@@ -12,9 +15,8 @@ create table "public"."property_images" (
 alter table "public"."property_images" enable row level security;
 
 -- Create policies
-create policy "Users can view all property images"
+create policy "Images are viewable by everyone"
     on property_images for select
-    to authenticated
     using (true);
 
 create policy "Users can insert images for their properties"
@@ -51,7 +53,7 @@ create policy "Users can delete images for their properties"
     );
 
 -- Add constraint to limit images per property
-create function check_image_limit()
+create or replace function check_image_limit()
 returns trigger as $$
 begin
   if (select count(*) from property_images where property_id = NEW.property_id) >= 10 then
@@ -60,6 +62,8 @@ begin
   return NEW;
 end;
 $$ language plpgsql;
+
+drop trigger if exists enforce_image_limit on property_images;
 
 create trigger enforce_image_limit
 before insert on property_images
