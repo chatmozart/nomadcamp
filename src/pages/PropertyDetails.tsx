@@ -1,13 +1,6 @@
 import { useParams } from "react-router-dom";
 import { MapPin, Star, Calendar, Wifi, Coffee, Tv } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
 
 const properties = [
   {
@@ -41,30 +34,12 @@ const PropertyDetails = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-6">
-        <h1 className="text-4xl font-semibold mb-2">{property.title}</h1>
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center">
-              <Star className="w-5 h-5 text-primary fill-current" />
-              <span className="ml-1 font-medium">{property.rating}</span>
-              <span className="mx-1">·</span>
-              <span className="underline">{property.reviews} reviews</span>
-            </div>
-            <div className="flex items-center">
-              <MapPin className="w-5 h-5" />
-              <span className="ml-1 underline">{property.location}</span>
-            </div>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Button variant="outline">Share</Button>
-            <Button variant="outline">Save</Button>
-          </div>
-        </div>
+        <h1 className="text-4xl font-semibold mb-6">{property.title}</h1>
       </div>
 
-      {/* Full-width image grid section */}
+      {/* Full-width image grid section with reduced height */}
       <div className="w-full mb-8">
-        <div className="grid grid-cols-4 gap-2 h-[65vh] px-4 max-w-[2000px] mx-auto">
+        <div className="grid grid-cols-4 gap-2 h-[50vh] max-w-[2000px] mx-auto">
           <div className="col-span-2 row-span-2 relative">
             <img
               src={property.images[0]}
@@ -109,8 +84,27 @@ const PropertyDetails = () => {
         </div>
       </div>
 
-      {/* Content section */}
+      {/* Content section moved below images */}
       <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center">
+              <Star className="w-5 h-5 text-primary fill-current" />
+              <span className="ml-1 font-medium">{property.rating}</span>
+              <span className="mx-1">·</span>
+              <span className="underline">{property.reviews} reviews</span>
+            </div>
+            <div className="flex items-center">
+              <MapPin className="w-5 h-5" />
+              <span className="ml-1 underline">{property.location}</span>
+            </div>
+          </div>
+          <div className="flex items-center space-x-4">
+            <Button variant="outline">Share</Button>
+            <Button variant="outline">Save</Button>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2 space-y-6">
             <div className="flex items-center justify-between pb-6 border-b">
