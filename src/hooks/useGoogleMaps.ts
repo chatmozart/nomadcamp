@@ -11,13 +11,14 @@ export const useGoogleMaps = () => {
     const loadGoogleMaps = async () => {
       try {
         setIsLoading(true);
-        console.log('Fetching Google Maps API key...');
+        console.log('Starting Google Maps API key fetch...');
         
-        // Get the API key from Supabase environment variables
+        // Get the API key from Supabase Edge Function
         const { data, error } = await supabase.functions.invoke('get-google-maps-key');
+        console.log('Edge Function response:', { data, error });
 
         if (error) {
-          console.error('Error fetching Google Maps API key:', error);
+          console.error('Error from Edge Function:', error);
           toast({
             variant: "destructive",
             title: "Error",
@@ -28,7 +29,7 @@ export const useGoogleMaps = () => {
         }
 
         if (data?.apiKey) {
-          console.log('Successfully fetched Google Maps API key');
+          console.log('Successfully received API key from Edge Function');
           // Load the Google Maps JavaScript API
           const script = document.createElement('script');
           script.src = `https://maps.googleapis.com/maps/api/js?key=${data.apiKey}&libraries=places`;
@@ -41,8 +42,8 @@ export const useGoogleMaps = () => {
             setIsLoading(false);
           };
 
-          script.onerror = () => {
-            console.error('Failed to load Google Maps JavaScript API');
+          script.onerror = (e) => {
+            console.error('Failed to load Google Maps JavaScript API:', e);
             toast({
               variant: "destructive",
               title: "Error",
@@ -53,7 +54,7 @@ export const useGoogleMaps = () => {
 
           document.head.appendChild(script);
         } else {
-          console.log('No Google Maps API key found');
+          console.log('No Google Maps API key found in Edge Function response');
           toast({
             variant: "destructive",
             title: "Configuration Required",
@@ -62,7 +63,7 @@ export const useGoogleMaps = () => {
           setIsLoading(false);
         }
       } catch (err) {
-        console.error('Error in loadGoogleMaps:', err);
+        console.error('Unexpected error in loadGoogleMaps:', err);
         toast({
           variant: "destructive",
           title: "Error",
