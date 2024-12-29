@@ -27,7 +27,7 @@ export const PropertyDetailsSection = ({
         <PropertyAmenities />
 
         <div className="mt-8">
-          <h3 className="text-xl font-semibold mb-4">Location</h3>
+          <h3 className="text-xl font-semibold mb-4">Map</h3>
           <PropertyMap address={location} />
         </div>
       </div>
