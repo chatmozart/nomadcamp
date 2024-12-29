@@ -45,7 +45,12 @@ const ListProperty = () => {
       if (formData.imageFile) {
         console.log("Processing image file:", formData.imageFile);
         const fileExt = formData.imageFile.name.split('.').pop();
-        const fileName = `${Math.random()}.${fileExt}`;
+        // Generate a more URL-friendly filename using timestamp and random string
+        const timestamp = Date.now();
+        const randomStr = Math.random().toString(36).substring(2, 8);
+        const fileName = `${timestamp}-${randomStr}.${fileExt}`;
+        
+        console.log("Generated filename:", fileName);
         
         // Upload the image file to Supabase storage
         const { error: uploadError, data: uploadData } = await supabase.storage
