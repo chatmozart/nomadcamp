@@ -41,16 +41,28 @@ const ListProperty = () => {
       let imageUrl = "";
       
       if (formData.imageFile) {
+        console.log("Uploading image to Supabase storage...");
         const fileExt = formData.imageFile.name.split('.').pop();
         const fileName = `${Math.random()}.${fileExt}`;
+        
         const { error: uploadError, data } = await supabase.storage
           .from('properties')
           .upload(fileName, formData.imageFile);
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          console.error("Error uploading image:", uploadError);
+          throw new Error(uploadError.message);
+        }
+        
+        if (!data?.path) {
+          throw new Error("Failed to get uploaded image path");
+        }
+        
         imageUrl = data.path;
+        console.log("Image uploaded successfully:", imageUrl);
       }
 
+      console.log("Creating property record in database...");
       const { error } = await supabase
         .from('properties')
         .insert({
