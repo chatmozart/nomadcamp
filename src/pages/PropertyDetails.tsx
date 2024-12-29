@@ -1,4 +1,3 @@
-import { useParams } from "react-router-dom";
 import { 
   MapPin, 
   Star, 
@@ -9,7 +8,13 @@ import {
   Wifi,
   Coffee,
   Tv,
-  User
+  User,
+  BedDouble,
+  Bath,
+  Medal,
+  Key,
+  Home,
+  Clock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -30,7 +35,20 @@ const properties = [
     rating: 4.9,
     reviews: 128,
     description: "Experience luxury living in this stunning oceanfront villa. Perfect for digital nomads seeking inspiration with panoramic views of the Pacific Ocean. This fully furnished property includes a dedicated workspace, high-speed fiber internet, and all modern amenities.",
-    amenities: ["High-speed WiFi", "Dedicated Workspace", "Full Kitchen", "Ocean View", "Smart TV", "Pool"],
+    highlights: [
+      "Entire villa to yourself",
+      "Enhanced Clean",
+      "Self check-in",
+      "Free cancellation for 48 hours"
+    ],
+    amenities: [
+      { name: "High-speed WiFi", icon: Wifi },
+      { name: "Full Kitchen", icon: Coffee },
+      { name: "Smart TV", icon: Tv },
+      { name: "Ocean View", icon: Home },
+      { name: "Pool", icon: Home },
+      { name: "Workspace", icon: Home }
+    ],
     images: [
       "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80",
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80",
@@ -41,11 +59,35 @@ const properties = [
       image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80",
       joinedDate: "2019",
       responseRate: "100%",
-      responseTime: "within an hour"
+      responseTime: "within an hour",
+      totalReviews: 245,
+      isSuperhost: true
     },
     beds: 3,
     baths: 2,
-    maxGuests: 6
+    maxGuests: 6,
+    reviews: [
+      {
+        id: 1,
+        user: {
+          name: "John",
+          image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80"
+        },
+        rating: 5,
+        date: "October 2023",
+        comment: "Amazing place with stunning views. Sarah was an excellent host and made sure we had everything we needed."
+      },
+      {
+        id: 2,
+        user: {
+          name: "Emma",
+          image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80"
+        },
+        rating: 5,
+        date: "September 2023",
+        comment: "The villa exceeded our expectations. The location is perfect and the amenities are top-notch."
+      }
+    ]
   },
 ];
 
@@ -68,7 +110,7 @@ const PropertyDetails = () => {
               <Star className="w-4 h-4 text-primary fill-current" />
               <span className="ml-1 font-medium">{property.rating}</span>
               <span className="mx-1">·</span>
-              <span className="underline">{property.reviews} reviews</span>
+              <span className="underline">{property.reviews.length} reviews</span>
             </div>
             <div className="flex items-center">
               <MapPin className="w-4 h-4" />
@@ -89,8 +131,8 @@ const PropertyDetails = () => {
       </div>
 
       {/* Image Gallery */}
-      <div className="container mx-auto px-4 mb-8">
-        <Carousel className="w-full">
+      <div className="container mx-auto px-4 mb-12">
+        <Carousel className="w-full max-h-[45vh]">
           <CarouselContent>
             {property.images.map((image, index) => (
               <CarouselItem key={index}>
@@ -132,6 +174,18 @@ const PropertyDetails = () => {
               </Avatar>
             </div>
 
+            {/* Highlights */}
+            <div className="space-y-4 pb-6 border-b">
+              {property.highlights.map((highlight, index) => (
+                <div key={index} className="flex items-center gap-4">
+                  <Medal className="w-6 h-6 text-primary" />
+                  <div>
+                    <p className="font-medium">{highlight}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
             {/* Description */}
             <div className="space-y-4 pb-6 border-b">
               <h2 className="text-xl font-semibold">About this place</h2>
@@ -141,15 +195,40 @@ const PropertyDetails = () => {
             </div>
 
             {/* Amenities */}
-            <div className="space-y-4">
+            <div className="space-y-4 pb-6 border-b">
               <h2 className="text-xl font-semibold">What this place offers</h2>
               <div className="grid grid-cols-2 gap-4">
                 {property.amenities.map((amenity, index) => (
                   <div key={index} className="flex items-center gap-4">
-                    {amenity.includes("WiFi") && <Wifi className="w-6 h-6" />}
-                    {amenity.includes("Kitchen") && <Coffee className="w-6 h-6" />}
-                    {amenity.includes("TV") && <Tv className="w-6 h-6" />}
-                    <span>{amenity}</span>
+                    <amenity.icon className="w-6 h-6" />
+                    <span>{amenity.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Reviews */}
+            <div className="space-y-6">
+              <div className="flex items-center gap-2">
+                <Star className="w-6 h-6 text-primary fill-current" />
+                <span className="text-xl font-semibold">
+                  {property.rating} · {property.reviews.length} reviews
+                </span>
+              </div>
+              <div className="grid gap-6">
+                {property.reviews.map((review) => (
+                  <div key={review.id} className="space-y-4">
+                    <div className="flex items-center gap-4">
+                      <Avatar>
+                        <AvatarImage src={review.user.image} alt={review.user.name} />
+                        <AvatarFallback>{review.user.name[0]}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-medium">{review.user.name}</p>
+                        <p className="text-sm text-muted-foreground">{review.date}</p>
+                      </div>
+                    </div>
+                    <p className="text-muted-foreground">{review.comment}</p>
                   </div>
                 ))}
               </div>
@@ -157,7 +236,7 @@ const PropertyDetails = () => {
           </div>
 
           {/* Right Column - Booking Card */}
-          <div>
+          <div className="lg:block">
             <div className="sticky top-8 bg-card rounded-xl p-6 border shadow-sm">
               <div className="mb-4">
                 <span className="text-2xl font-bold">${property.price}</span>
@@ -188,6 +267,55 @@ const PropertyDetails = () => {
                   </div>
                 </div>
                 <Button className="w-full">Book now</Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Host Section */}
+        <div className="mt-12 pb-12 border-t">
+          <div className="max-w-3xl pt-12">
+            <div className="flex items-center gap-4 mb-6">
+              <Avatar className="h-20 w-20">
+                <AvatarImage src={property.host.image} alt={property.host.name} />
+                <AvatarFallback>{property.host.name[0]}</AvatarFallback>
+              </Avatar>
+              <div>
+                <h2 className="text-2xl font-semibold">Hosted by {property.host.name}</h2>
+                <p className="text-muted-foreground">
+                  Joined in {property.host.joinedDate} · {property.host.totalReviews} reviews
+                </p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {property.host.isSuperhost && (
+                <div className="flex items-center gap-4">
+                  <Medal className="w-6 h-6 text-primary" />
+                  <div>
+                    <p className="font-medium">Superhost</p>
+                    <p className="text-sm text-muted-foreground">
+                      Superhosts are experienced, highly rated hosts.
+                    </p>
+                  </div>
+                </div>
+              )}
+              <div className="flex items-center gap-4">
+                <Key className="w-6 h-6" />
+                <div>
+                  <p className="font-medium">Great check-in experience</p>
+                  <p className="text-sm text-muted-foreground">
+                    100% of recent guests gave the check-in process a 5-star rating.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <Clock className="w-6 h-6" />
+                <div>
+                  <p className="font-medium">Great communication</p>
+                  <p className="text-sm text-muted-foreground">
+                    {property.host.responseRate} response rate · Responds {property.host.responseTime}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
