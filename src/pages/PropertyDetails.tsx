@@ -9,7 +9,6 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 
-// This would typically come from an API, but for now we'll use static data
 const properties = [
   {
     id: 1,
@@ -54,26 +53,24 @@ const PropertyDetails = () => {
       </div>
 
       {/* Full-width carousel section */}
-      <div className="w-full bg-black/5 py-8">
-        <div className="max-w-[2000px] mx-auto px-4">
-          <Carousel className="w-full">
-            <CarouselContent>
-              {property.images.map((image, index) => (
-                <CarouselItem key={index}>
-                  <div className="aspect-[21/9] relative rounded-lg overflow-hidden">
-                    <img
-                      src={image}
-                      alt={`${property.title} - Image ${index + 1}`}
-                      className="object-cover w-full h-full"
-                    />
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious className="left-8" />
-            <CarouselNext className="right-8" />
-          </Carousel>
-        </div>
+      <div className="w-full">
+        <Carousel className="w-full">
+          <CarouselContent>
+            {property.images.map((image, index) => (
+              <CarouselItem key={index}>
+                <div className="aspect-[21/9] relative overflow-hidden">
+                  <img
+                    src={image}
+                    alt={`${property.title} - Image ${index + 1}`}
+                    className="object-cover w-full h-full"
+                  />
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="left-8" />
+          <CarouselNext className="right-8" />
+        </Carousel>
       </div>
 
       {/* Content section */}
