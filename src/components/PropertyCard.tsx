@@ -2,7 +2,7 @@ import { MapPin, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface PropertyCardProps {
-  id: number;
+  id: string;  // Changed from number to string to match UUID format
   title: string;
   location: string;
   price: number;
@@ -20,6 +20,8 @@ const PropertyCard = ({
   reviews,
   image,
 }: PropertyCardProps) => {
+  console.log('Rendering PropertyCard with ID:', id); // Added for debugging
+  
   return (
     <Link to={`/property/${id}`} className="block">
       <div className="property-card rounded-xl overflow-hidden bg-card transition-transform hover:scale-[1.02]">
