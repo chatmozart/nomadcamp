@@ -12,6 +12,9 @@ interface PropertyFormProps {
     title: string;
     description: string;
     price: string;
+    priceThreeMonths: string;
+    priceSixMonths: string;
+    priceOneYear: string;
     location: string;
     imageFiles: File[];
   }) => Promise<void>;
@@ -21,6 +24,9 @@ interface PropertyFormProps {
     title: string;
     description: string;
     price: number;
+    priceThreeMonths?: number;
+    priceSixMonths?: number;
+    priceOneYear?: number;
     location: string;
   };
   mode?: 'create' | 'edit';
@@ -37,6 +43,9 @@ export const PropertyForm = ({
   const [propertyTitle, setPropertyTitle] = useState(initialData?.title || "");
   const [propertyDescription, setPropertyDescription] = useState(initialData?.description || "");
   const [propertyPrice, setPropertyPrice] = useState(initialData?.price?.toString() || "");
+  const [propertyPriceThreeMonths, setPropertyPriceThreeMonths] = useState(initialData?.priceThreeMonths?.toString() || "");
+  const [propertyPriceSixMonths, setPropertyPriceSixMonths] = useState(initialData?.priceSixMonths?.toString() || "");
+  const [propertyPriceOneYear, setPropertyPriceOneYear] = useState(initialData?.priceOneYear?.toString() || "");
   const [propertyLocation, setPropertyLocation] = useState(initialData?.location || "");
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
@@ -44,7 +53,6 @@ export const PropertyForm = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Ensure we have at least one image file for new properties
     if (mode === 'create' && imageFiles.length === 0) {
       toast({
         variant: "destructive",
@@ -60,15 +68,20 @@ export const PropertyForm = ({
       title: propertyTitle,
       description: propertyDescription,
       price: propertyPrice,
+      priceThreeMonths: propertyPriceThreeMonths,
+      priceSixMonths: propertyPriceSixMonths,
+      priceOneYear: propertyPriceOneYear,
       location: propertyLocation,
       imageFiles,
     });
 
-    // Reset form
     if (mode === 'create') {
       setPropertyTitle("");
       setPropertyDescription("");
       setPropertyPrice("");
+      setPropertyPriceThreeMonths("");
+      setPropertyPriceSixMonths("");
+      setPropertyPriceOneYear("");
       setPropertyLocation("");
       setImageFiles([]);
       setPreviewUrls([]);
@@ -146,14 +159,47 @@ export const PropertyForm = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="propertyPrice">Price per Month</Label>
+        <Label htmlFor="propertyPrice">Price per Month (฿)</Label>
         <Input
           id="propertyPrice"
           type="number"
           value={propertyPrice}
           onChange={(e) => setPropertyPrice(e.target.value)}
-          placeholder="Enter price"
+          placeholder="Enter monthly price"
           required
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="propertyPriceThreeMonths">Price for 3 Months (฿)</Label>
+        <Input
+          id="propertyPriceThreeMonths"
+          type="number"
+          value={propertyPriceThreeMonths}
+          onChange={(e) => setPropertyPriceThreeMonths(e.target.value)}
+          placeholder="Enter 3-month price"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="propertyPriceSixMonths">Price for 6 Months (฿)</Label>
+        <Input
+          id="propertyPriceSixMonths"
+          type="number"
+          value={propertyPriceSixMonths}
+          onChange={(e) => setPropertyPriceSixMonths(e.target.value)}
+          placeholder="Enter 6-month price"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="propertyPriceOneYear">Price for 12 Months (฿)</Label>
+        <Input
+          id="propertyPriceOneYear"
+          type="number"
+          value={propertyPriceOneYear}
+          onChange={(e) => setPropertyPriceOneYear(e.target.value)}
+          placeholder="Enter yearly price"
         />
       </div>
 
