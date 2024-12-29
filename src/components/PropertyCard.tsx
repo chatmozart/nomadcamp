@@ -44,7 +44,7 @@ const PropertyCard = ({
         </div>
         <div className="mt-4">
           <span className="font-semibold text-lg">${price}</span>
-          <span className="text-muted-foreground"> / night</span>
+          <span className="text-muted-foreground"> / month</span>
         </div>
       </div>
     </div>

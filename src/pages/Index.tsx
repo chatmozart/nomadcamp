@@ -14,7 +14,7 @@ const Index = () => {
       id: 1,
       title: "Luxury Villa with Ocean View",
       location: "Malibu, California",
-      price: 550,
+      price: 2200,
       rating: 4.9,
       reviews: 128,
       image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80",
@@ -23,7 +23,7 @@ const Index = () => {
       id: 2,
       title: "Modern Downtown Loft",
       location: "New York City, NY",
-      price: 299,
+      price: 1800,
       rating: 4.8,
       reviews: 96,
       image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80",
@@ -32,7 +32,7 @@ const Index = () => {
       id: 3,
       title: "Cozy Mountain Cabin",
       location: "Aspen, Colorado",
-      price: 199,
+      price: 1500,
       rating: 4.95,
       reviews: 156,
       image: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&q=80",
@@ -54,7 +54,7 @@ const Index = () => {
             Welcome to NomadRent
           </h1>
           <p className="text-xl text-white/90 mb-8 fade-in">
-            Find your perfect stay in digital nomad hotspots around the world
+            When renting for one month or more, the perfect stay in digital nomad hotspots
           </p>
           <SearchBar />
         </div>
