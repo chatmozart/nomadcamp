@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import PropertyDetails from "./pages/PropertyDetails";
 import PropertiesList from "./pages/PropertiesList";
 import Profile from "./pages/Profile";
+import ListProperty from "./pages/ListProperty";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = () => (
               <Route path="/property/:id" element={<PropertyDetails />} />
               <Route path="/properties/:location" element={<PropertiesList />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/list-property" element={<ListProperty />} />
             </Routes>
           </div>
         </BrowserRouter>
