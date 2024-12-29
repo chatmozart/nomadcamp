@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,7 +24,7 @@ const ListProperty = () => {
   const libraries = useMemo(() => ["places"], []);
 
   // Fetch Google Maps API key from Supabase
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchApiKey = async () => {
       const { data: { GOOGLE_MAPS_API_KEY }, error } = await supabase
         .from('secrets')
