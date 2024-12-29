@@ -18,33 +18,60 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
+  // Function to clear all auth data
+  const clearAuthData = () => {
+    console.log('Clearing all auth data...');
+    localStorage.removeItem('supabase.auth.token');
+    localStorage.removeItem('supabase.auth.expires_at');
+    localStorage.removeItem('supabase.auth.refresh_token');
+    setUser(null);
+  };
+
   useEffect(() => {
+    console.log('Initializing auth state...');
     // Check active sessions and sets the user
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        console.error('Error getting session:', error);
+        clearAuthData();
+      } else {
+        console.log('Session check complete:', session ? 'Active session found' : 'No active session');
+        setUser(session?.user ?? null);
+      }
       setLoading(false);
     });
 
     // Listen for changes on auth state (logged in, signed out, etc.)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event);
+      if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+        clearAuthData();
+      } else {
+        setUser(session?.user ?? null);
+      }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      console.log('Cleaning up auth subscriptions');
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
     try {
+      console.log('Attempting sign in...');
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       if (error) throw error;
+      console.log('Sign in successful');
       toast({
         title: "Welcome back!",
         description: "You've successfully signed in.",
       });
     } catch (error) {
+      console.error('Sign in error:', error);
       toast({
         variant: "destructive",
         title: "Error signing in",
@@ -55,16 +82,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, password: string) => {
     try {
+      console.log('Attempting sign up...');
       const { error } = await supabase.auth.signUp({
         email,
         password,
       });
       if (error) throw error;
+      console.log('Sign up successful');
       toast({
         title: "Account created",
         description: "Please check your email for verification.",
       });
     } catch (error) {
+      console.error('Sign up error:', error);
       toast({
         variant: "destructive",
         title: "Error creating account",
@@ -75,13 +105,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
+      console.log('Attempting sign out...');
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
+      
+      // Clear all auth data regardless of the signOut result
+      clearAuthData();
+      
+      console.log('Sign out successful');
       toast({
         title: "Signed out",
         description: "You've been successfully signed out.",
       });
     } catch (error) {
+      console.error('Sign out error:', error);
+      // Still clear auth data even if there's an error
+      clearAuthData();
+      
       toast({
         variant: "destructive",
         title: "Error signing out",
