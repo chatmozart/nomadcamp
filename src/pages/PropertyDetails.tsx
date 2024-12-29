@@ -13,6 +13,9 @@ interface Property {
   title: string;
   description: string;
   price: number;
+  price_three_months: number | null;
+  price_six_months: number | null;
+  price_one_year: number | null;
   location: string;
   image_url: string;
   owner_id: string;
@@ -124,6 +127,9 @@ const PropertyDetails = () => {
         <PropertyDetailsSection 
           description={property.description}
           price={property.price}
+          priceThreeMonths={property.price_three_months || undefined}
+          priceSixMonths={property.price_six_months || undefined}
+          priceOneYear={property.price_one_year || undefined}
           location={property.location}
         />
       </div>

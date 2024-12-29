@@ -19,6 +19,13 @@ export const PropertyDetailsSection = ({
   priceOneYear,
   location 
 }: PropertyDetailsSectionProps) => {
+  console.log('PropertyDetailsSection rendering with prices:', {
+    price,
+    priceThreeMonths,
+    priceSixMonths,
+    priceOneYear
+  });
+
   return (
     <div className="grid grid-cols-3 gap-12 px-4 py-8">
       <div className="col-span-2">
