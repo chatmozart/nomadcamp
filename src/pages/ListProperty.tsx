@@ -1,10 +1,10 @@
 import { useState, useMemo } from "react";
-import { LoadScript } from "@react-google-maps/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { PropertyForm } from "@/components/property/PropertyForm";
 import { useGoogleMaps } from "@/hooks/useGoogleMaps";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const ListProperty = () => {
   const { user } = useAuth();
@@ -79,7 +79,19 @@ const ListProperty = () => {
   };
 
   if (isLoading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Skeleton className="h-8 w-48 mb-8" />
+        <div className="space-y-4 max-w-xl">
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-48" />
+        </div>
+      </div>
+    );
   }
 
   if (!googleMapsApiKey) {
@@ -94,19 +106,14 @@ const ListProperty = () => {
   }
 
   return (
-    <LoadScript
-      googleMapsApiKey={googleMapsApiKey}
-      libraries={libraries as any}
-    >
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold mb-8">List a New Property</h1>
-        <PropertyForm 
-          onSubmit={handlePropertySubmit}
-          googleMapsLoaded={!!googleMapsApiKey}
-          onPlaceSelect={onLoad}
-        />
-      </div>
-    </LoadScript>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-8">List a New Property</h1>
+      <PropertyForm 
+        onSubmit={handlePropertySubmit}
+        googleMapsLoaded={!!googleMapsApiKey}
+        onPlaceSelect={onLoad}
+      />
+    </div>
   );
 };
 
