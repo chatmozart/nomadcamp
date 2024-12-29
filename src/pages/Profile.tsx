@@ -20,17 +20,49 @@ const Profile = () => {
   const [name, setName] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [properties, setProperties] = useState<Property[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (user) {
+        console.log('Fetching user profile data...');
+        const { data: { user: userData }, error } = await supabase.auth.getUser();
+
+        if (error) {
+          console.error('Error fetching user profile:', error);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to load profile data",
+          });
+          return;
+        }
+
+        if (userData?.user_metadata?.full_name) {
+          console.log('User profile data loaded:', userData.user_metadata);
+          setName(userData.user_metadata.full_name);
+        }
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, [user, toast]);
 
   useEffect(() => {
     const fetchProperties = async () => {
       if (user) {
+        console.log('Fetching user properties...');
         const { data, error } = await supabase
           .from('properties')
           .select('id, title, image_url')
           .eq('owner_id', user.id);
 
         if (!error && data) {
+          console.log('Properties loaded:', data);
           setProperties(data);
+        } else if (error) {
+          console.error('Error fetching properties:', error);
         }
       }
     };
@@ -41,6 +73,7 @@ const Profile = () => {
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      console.log('Updating user profile...');
       if (newPassword) {
         await supabase.auth.updateUser({ password: newPassword });
       }
@@ -53,11 +86,13 @@ const Profile = () => {
 
       if (error) throw error;
 
+      console.log('Profile updated successfully');
       toast({
         title: "Profile updated",
         description: "Your profile has been updated successfully.",
       });
     } catch (error) {
+      console.error('Error updating profile:', error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -65,6 +100,14 @@ const Profile = () => {
       });
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center">Loading profile...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
