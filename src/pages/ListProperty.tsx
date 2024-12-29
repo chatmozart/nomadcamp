@@ -28,7 +28,7 @@ const ListProperty = () => {
     description: string;
     price: string;
     location: string;
-    imageFile: File | null;
+    imageFiles: File[];
   }) => {
     if (!user) {
       toast({
@@ -40,49 +40,64 @@ const ListProperty = () => {
     }
 
     try {
-      let imageUrl = "";
-      
-      if (formData.imageFile) {
-        console.log("Processing image file:", formData.imageFile);
-        const fileExt = formData.imageFile.name.split('.').pop();
-        // Generate a more URL-friendly filename using timestamp and random string
-        const timestamp = Date.now();
-        const randomStr = Math.random().toString(36).substring(2, 8);
-        const fileName = `${timestamp}-${randomStr}.${fileExt}`;
-        
-        console.log("Generated filename:", fileName);
-        
-        // Upload the image file to Supabase storage
-        const { error: uploadError, data: uploadData } = await supabase.storage
-          .from('properties')
-          .upload(fileName, formData.imageFile);
-
-        if (uploadError) {
-          console.error("Error uploading image:", uploadError);
-          throw new Error(uploadError.message);
-        }
-        
-        if (!uploadData?.path) {
-          throw new Error("Failed to get uploaded image path");
-        }
-        
-        imageUrl = uploadData.path;
-        console.log("Image uploaded successfully. Path:", imageUrl);
-      }
-
-      console.log("Creating property record with image URL:", imageUrl);
-      const { error } = await supabase
+      // First, create the property record
+      const { data: propertyData, error: propertyError } = await supabase
         .from('properties')
         .insert({
           title: formData.title,
           description: formData.description,
           price: parseFloat(formData.price),
           location: formData.location,
-          image_url: imageUrl,
           owner_id: user.id,
-        });
+        })
+        .select()
+        .single();
 
-      if (error) throw error;
+      if (propertyError) throw propertyError;
+      
+      console.log("Property created:", propertyData);
+
+      // Upload images and create image records
+      for (const [index, file] of formData.imageFiles.entries()) {
+        console.log(`Processing image ${index + 1}:`, file);
+        
+        const fileExt = file.name.split('.').pop();
+        const timestamp = Date.now();
+        const randomStr = Math.random().toString(36).substring(2, 8);
+        const fileName = `${timestamp}-${randomStr}.${fileExt}`;
+        
+        console.log("Generated filename:", fileName);
+        
+        // Upload the image file
+        const { error: uploadError, data: uploadData } = await supabase.storage
+          .from('properties')
+          .upload(fileName, file);
+
+        if (uploadError) {
+          console.error("Error uploading image:", uploadError);
+          throw uploadError;
+        }
+        
+        if (!uploadData?.path) {
+          throw new Error("Failed to get uploaded image path");
+        }
+        
+        // Create image record
+        const { error: imageError } = await supabase
+          .from('property_images')
+          .insert({
+            property_id: propertyData.id,
+            image_url: uploadData.path,
+            order: index,
+          });
+
+        if (imageError) {
+          console.error("Error creating image record:", imageError);
+          throw imageError;
+        }
+        
+        console.log(`Image ${index + 1} uploaded successfully:`, uploadData.path);
+      }
 
       toast({
         title: "Property listed",

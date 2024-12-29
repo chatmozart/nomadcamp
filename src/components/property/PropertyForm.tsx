@@ -4,6 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Autocomplete } from "@react-google-maps/api";
+import { X } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface PropertyFormProps {
   onSubmit: (formData: {
@@ -11,44 +13,66 @@ interface PropertyFormProps {
     description: string;
     price: string;
     location: string;
-    imageFile: File | null;
+    imageFiles: File[];
   }) => Promise<void>;
   googleMapsLoaded: boolean;
   onPlaceSelect: (autocomplete: google.maps.places.Autocomplete) => void;
+  initialData?: {
+    title: string;
+    description: string;
+    price: number;
+    location: string;
+  };
+  mode?: 'create' | 'edit';
 }
 
-export const PropertyForm = ({ onSubmit, googleMapsLoaded, onPlaceSelect }: PropertyFormProps) => {
-  const [propertyTitle, setPropertyTitle] = useState("");
-  const [propertyDescription, setPropertyDescription] = useState("");
-  const [propertyPrice, setPropertyPrice] = useState("");
-  const [propertyLocation, setPropertyLocation] = useState("");
-  const [imageFile, setImageFile] = useState<File | null>(null);
+export const PropertyForm = ({ 
+  onSubmit, 
+  googleMapsLoaded, 
+  onPlaceSelect,
+  initialData,
+  mode = 'create'
+}: PropertyFormProps) => {
+  const { toast } = useToast();
+  const [propertyTitle, setPropertyTitle] = useState(initialData?.title || "");
+  const [propertyDescription, setPropertyDescription] = useState(initialData?.description || "");
+  const [propertyPrice, setPropertyPrice] = useState(initialData?.price?.toString() || "");
+  const [propertyLocation, setPropertyLocation] = useState(initialData?.location || "");
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Ensure we have an image file
-    if (!imageFile) {
-      console.error('No image file selected');
+    // Ensure we have at least one image file for new properties
+    if (mode === 'create' && imageFiles.length === 0) {
+      toast({
+        variant: "destructive",
+        title: "Image Required",
+        description: "Please select at least one image for the property",
+      });
       return;
     }
 
-    console.log('Submitting form with image:', imageFile);
+    console.log('Submitting form with images:', imageFiles);
 
     await onSubmit({
       title: propertyTitle,
       description: propertyDescription,
       price: propertyPrice,
       location: propertyLocation,
-      imageFile, // Pass the actual File object
+      imageFiles,
     });
 
     // Reset form
-    setPropertyTitle("");
-    setPropertyDescription("");
-    setPropertyPrice("");
-    setPropertyLocation("");
-    setImageFile(null);
+    if (mode === 'create') {
+      setPropertyTitle("");
+      setPropertyDescription("");
+      setPropertyPrice("");
+      setPropertyLocation("");
+      setImageFiles([]);
+      setPreviewUrls([]);
+    }
   };
 
   const handlePlaceSelect = (autocomplete: google.maps.places.Autocomplete) => {
@@ -60,11 +84,41 @@ export const PropertyForm = ({ onSubmit, googleMapsLoaded, onPlaceSelect }: Prop
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      console.log('Selected image file:', file);
-      setImageFile(file);
+    const files = Array.from(e.target.files || []);
+    
+    if (imageFiles.length + files.length > 10) {
+      toast({
+        variant: "destructive",
+        title: "Too many images",
+        description: "Maximum 10 images allowed per property",
+      });
+      return;
     }
+    
+    const newFiles = files.filter(file => {
+      const isValid = file.type.startsWith('image/');
+      if (!isValid) {
+        toast({
+          variant: "destructive",
+          title: "Invalid file type",
+          description: `${file.name} is not an image file`,
+        });
+      }
+      return isValid;
+    });
+
+    setImageFiles(prev => [...prev, ...newFiles]);
+    
+    // Generate preview URLs
+    newFiles.forEach(file => {
+      const url = URL.createObjectURL(file);
+      setPreviewUrls(prev => [...prev, url]);
+    });
+  };
+
+  const removeImage = (index: number) => {
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
+    setPreviewUrls(prev => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -135,17 +189,43 @@ export const PropertyForm = ({ onSubmit, googleMapsLoaded, onPlaceSelect }: Prop
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="propertyImage">Property Image</Label>
+        <Label htmlFor="propertyImages">Property Images {mode === 'create' && '(at least 1 required)'}</Label>
         <Input
-          id="propertyImage"
+          id="propertyImages"
           type="file"
           accept="image/*"
           onChange={handleImageChange}
-          required
+          multiple
+          required={mode === 'create'}
         />
+        
+        {previewUrls.length > 0 && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
+            {previewUrls.map((url, index) => (
+              <div key={index} className="relative">
+                <img
+                  src={url}
+                  alt={`Preview ${index + 1}`}
+                  className="w-full aspect-square object-cover rounded-lg"
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="icon"
+                  className="absolute top-2 right-2"
+                  onClick={() => removeImage(index)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      <Button type="submit">List Property</Button>
+      <Button type="submit">
+        {mode === 'create' ? 'List Property' : 'Update Property'}
+      </Button>
     </form>
   );
 };
