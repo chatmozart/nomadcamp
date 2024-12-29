@@ -8,7 +8,7 @@ const PropertiesList = () => {
   const [properties, setProperties] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   
-  console.log("Current location:", location);
+  console.log("Current location param:", location);
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -21,7 +21,8 @@ const PropertiesList = () => {
           .map(word => word.charAt(0).toUpperCase() + word.slice(1))
           .join(' ');
         
-        query = query.eq('location', displayLocation);
+        console.log('Searching for location:', displayLocation);
+        query = query.ilike('location', `%${displayLocation}%`);
       }
 
       const { data, error } = await query;
@@ -60,7 +61,7 @@ const PropertiesList = () => {
                   price={property.price}
                   rating={4.5}
                   reviews={0}
-                  image={property.image_url} // Pass just the image filename
+                  image={property.image_url}
                 />
               </div>
             ))
