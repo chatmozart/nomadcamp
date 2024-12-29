@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { LoadScript, Autocomplete } from "@react-google-maps/api";
@@ -18,6 +18,7 @@ const ListProperty = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
   const [googleMapsApiKey, setGoogleMapsApiKey] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true);
 
   console.log("Rendering ListProperty component");
 
@@ -26,23 +27,43 @@ const ListProperty = () => {
   // Fetch Google Maps API key from Supabase
   useEffect(() => {
     const fetchApiKey = async () => {
-      const { data: { GOOGLE_MAPS_API_KEY }, error } = await supabase
-        .from('secrets')
-        .select('GOOGLE_MAPS_API_KEY')
-        .single();
+      try {
+        setIsLoading(true);
+        const { data, error } = await supabase
+          .from('secrets')
+          .select('GOOGLE_MAPS_API_KEY')
+          .single();
 
-      if (error) {
-        console.error('Error fetching Google Maps API key:', error);
-        return;
-      }
+        if (error) {
+          console.error('Error fetching Google Maps API key:', error);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Could not load Google Maps. Please try again later.",
+          });
+          return;
+        }
 
-      if (GOOGLE_MAPS_API_KEY) {
-        setGoogleMapsApiKey(GOOGLE_MAPS_API_KEY);
+        if (data?.GOOGLE_MAPS_API_KEY) {
+          console.log('Successfully fetched Google Maps API key');
+          setGoogleMapsApiKey(data.GOOGLE_MAPS_API_KEY);
+        } else {
+          console.error('No Google Maps API key found in secrets');
+          toast({
+            variant: "destructive",
+            title: "Configuration Error",
+            description: "Google Maps API key not found. Please contact support.",
+          });
+        }
+      } catch (err) {
+        console.error('Error in fetchApiKey:', err);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchApiKey();
-  }, []);
+  }, [toast]);
 
   const onLoad = (autocomplete: google.maps.places.Autocomplete) => {
     console.log("Autocomplete loaded:", autocomplete);
@@ -110,8 +131,19 @@ const ListProperty = () => {
     }
   };
 
+  if (isLoading) {
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+  }
+
   if (!googleMapsApiKey) {
-    return <div>Loading...</div>;
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-2">Configuration Required</h2>
+          <p>Google Maps API key is not configured. Please contact support.</p>
+        </div>
+      </div>
+    );
   }
 
   return (

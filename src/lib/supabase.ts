@@ -11,7 +11,12 @@ if (!supabaseUrl || !supabaseKey) {
 console.log('Initializing Supabase client...');
 console.log('Supabase URL:', supabaseUrl);
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+  }
+});
 
 // Test the connection
 supabase.auth.getSession().then(({ data, error }) => {
