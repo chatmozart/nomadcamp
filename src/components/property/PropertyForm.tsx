@@ -26,13 +26,23 @@ export const PropertyForm = ({ onSubmit, googleMapsLoaded, onPlaceSelect }: Prop
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Ensure we have an image file
+    if (!imageFile) {
+      console.error('No image file selected');
+      return;
+    }
+
+    console.log('Submitting form with image:', imageFile);
+
     await onSubmit({
       title: propertyTitle,
       description: propertyDescription,
       price: propertyPrice,
       location: propertyLocation,
-      imageFile,
+      imageFile, // Pass the actual File object
     });
+
     // Reset form
     setPropertyTitle("");
     setPropertyDescription("");
@@ -47,6 +57,14 @@ export const PropertyForm = ({ onSubmit, googleMapsLoaded, onPlaceSelect }: Prop
       setPropertyLocation(place.formatted_address);
     }
     onPlaceSelect(autocomplete);
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      console.log('Selected image file:', file);
+      setImageFile(file);
+    }
   };
 
   return (
@@ -122,7 +140,7 @@ export const PropertyForm = ({ onSubmit, googleMapsLoaded, onPlaceSelect }: Prop
           id="propertyImage"
           type="file"
           accept="image/*"
-          onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+          onChange={handleImageChange}
           required
         />
       </div>
