@@ -143,6 +143,7 @@ const PropertyDetails = () => {
         />
 
         <PropertyDetailsSection 
+          id={property.id}
           description={property.description}
           price={property.price}
           priceThreeMonths={property.price_three_months || undefined}
