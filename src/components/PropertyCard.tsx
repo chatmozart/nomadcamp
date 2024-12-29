@@ -31,16 +31,29 @@ const PropertyCard = ({
     
   console.log('Generated public URL:', publicUrl?.publicUrl);
   
-  // Verify bucket access
+  // Verify bucket access and contents
   const checkBucketAccess = async () => {
-    const { data, error } = await supabase.storage
-      .from('properties')
-      .list();
-    
-    if (error) {
-      console.error('Bucket access error:', error);
-    } else {
-      console.log('Bucket contents:', data);
+    try {
+      const { data: bucketData, error: bucketError } = await supabase.storage
+        .getBucket('properties');
+      
+      if (bucketError) {
+        console.error('Bucket info error:', bucketError);
+      } else {
+        console.log('Bucket info:', bucketData);
+      }
+      
+      const { data: listData, error: listError } = await supabase.storage
+        .from('properties')
+        .list();
+      
+      if (listError) {
+        console.error('Bucket listing error:', listError);
+      } else {
+        console.log('Bucket contents:', listData);
+      }
+    } catch (error) {
+      console.error('Bucket access check failed:', error);
     }
   };
   
