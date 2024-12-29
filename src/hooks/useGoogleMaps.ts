@@ -11,6 +11,8 @@ export const useGoogleMaps = () => {
     const fetchApiKey = async () => {
       try {
         setIsLoading(true);
+        console.log('Fetching Google Maps API key from Supabase secrets...');
+        
         const { data, error } = await supabase
           .from('secrets')
           .select('GOOGLE_MAPS_API_KEY')
@@ -29,9 +31,21 @@ export const useGoogleMaps = () => {
         if (data?.GOOGLE_MAPS_API_KEY) {
           console.log('Successfully fetched Google Maps API key');
           setGoogleMapsApiKey(data.GOOGLE_MAPS_API_KEY);
+        } else {
+          console.log('No Google Maps API key found in secrets');
+          toast({
+            variant: "destructive",
+            title: "Configuration Required",
+            description: "Google Maps API key is not configured.",
+          });
         }
       } catch (err) {
         console.error('Error in fetchApiKey:', err);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load Google Maps configuration.",
+        });
       } finally {
         setIsLoading(false);
       }
