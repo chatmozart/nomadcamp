@@ -1,4 +1,8 @@
--- Create the properties storage bucket if it doesn't exist
+-- Drop existing bucket if it exists
+drop policy if exists "Public Access" on storage.objects;
+drop policy if exists "Allow authenticated uploads" on storage.objects;
+
+-- Recreate the properties storage bucket
 insert into storage.buckets (id, name, public)
 values ('properties', 'properties', true)
 on conflict (id) do nothing;
@@ -20,3 +24,7 @@ with check (
        storage.extension(name) = 'png' or 
        storage.extension(name) = 'webp')
 );
+
+-- Grant necessary permissions
+grant all on storage.objects to authenticated;
+grant usage on schema storage to authenticated;
