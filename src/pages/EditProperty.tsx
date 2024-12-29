@@ -77,18 +77,27 @@ const EditProperty = () => {
     try {
       console.log('Updating property with data:', formData);
       
-      // Update property details including all price fields
+      const updateData = {
+        title: formData.title,
+        description: formData.description,
+        price: parseFloat(formData.price),
+        location: formData.location,
+      };
+
+      // Only add price fields if they have values
+      if (formData.priceThreeMonths) {
+        updateData['price_three_months'] = parseFloat(formData.priceThreeMonths);
+      }
+      if (formData.priceSixMonths) {
+        updateData['price_six_months'] = parseFloat(formData.priceSixMonths);
+      }
+      if (formData.priceOneYear) {
+        updateData['price_one_year'] = parseFloat(formData.priceOneYear);
+      }
+
       const { error: updateError } = await supabase
         .from('properties')
-        .update({
-          title: formData.title,
-          description: formData.description,
-          price: parseFloat(formData.price),
-          price_three_months: formData.priceThreeMonths ? parseFloat(formData.priceThreeMonths) : null,
-          price_six_months: formData.priceSixMonths ? parseFloat(formData.priceSixMonths) : null,
-          price_one_year: formData.priceOneYear ? parseFloat(formData.priceOneYear) : null,
-          location: formData.location,
-        })
+        .update(updateData)
         .eq('id', id);
 
       if (updateError) throw updateError;
