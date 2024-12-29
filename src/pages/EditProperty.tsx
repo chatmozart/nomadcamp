@@ -106,13 +106,17 @@ const EditProperty = () => {
     amenityIds: string[];
     availabilityStart: string;
     availabilityEnd?: string;
+    contactName?: string;
+    contactEmail?: string;
+    contactWhatsapp?: string;
   }) => {
     if (!user || !id) return;
 
     try {
-      console.log('Submitting form with availability dates:', {
-        start: formData.availabilityStart,
-        end: formData.availabilityEnd
+      console.log('Submitting form with contact details:', {
+        contactName: formData.contactName,
+        contactEmail: formData.contactEmail,
+        contactWhatsapp: formData.contactWhatsapp
       });
 
       // Update property data
@@ -125,7 +129,10 @@ const EditProperty = () => {
         price_six_months: formData.priceSixMonths ? parseFloat(formData.priceSixMonths) : null,
         price_one_year: formData.priceOneYear ? parseFloat(formData.priceOneYear) : null,
         availability_start: formData.availabilityStart,
-        availability_end: formData.availabilityEnd || null
+        availability_end: formData.availabilityEnd || null,
+        contact_name: formData.contactName || null,
+        contact_email: formData.contactEmail || null,
+        contact_whatsapp: formData.contactWhatsapp || null
       };
 
       console.log('Attempting to update property with data:', updateData);

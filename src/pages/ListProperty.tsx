@@ -45,6 +45,12 @@ const ListProperty = () => {
 
     try {
       setIsLoading(true);
+      console.log('Creating property with contact details:', {
+        contactName,
+        contactEmail,
+        contactWhatsapp
+      });
+
       const { data: propertyData, error: propertyError } = await supabase
         .from('properties')
         .insert({
@@ -55,9 +61,9 @@ const ListProperty = () => {
           owner_id: user.id,
           availability_start: availabilityStart,
           availability_end: availabilityEnd,
-          contact_name: contactName,
-          contact_email: contactEmail,
-          contact_whatsapp: contactWhatsapp
+          contact_name: contactName || null,
+          contact_email: contactEmail || null,
+          contact_whatsapp: contactWhatsapp || null
         })
         .select()
         .single();
