@@ -62,18 +62,21 @@ const Index = () => {
           ) : properties.length === 0 ? (
             <p>No properties found.</p>
           ) : (
-            properties.map((property) => (
-              <PropertyCard 
-                key={property.id}
-                id={property.id}
-                title={property.title}
-                location={property.location}
-                price={property.price}
-                rating={4.5} // Default rating until we implement a rating system
-                reviews={0} // Default reviews until we implement a review system
-                image={`https://mqgpycqviacxddgnwbxo.supabase.co/storage/v1/object/public/properties/${property.image_url}`}
-              />
-            ))
+            properties.map((property) => {
+              console.log('Property image URL:', property.image_url);
+              return (
+                <PropertyCard 
+                  key={property.id}
+                  id={property.id}
+                  title={property.title}
+                  location={property.location}
+                  price={property.price}
+                  rating={4.5}
+                  reviews={0}
+                  image={property.image_url}
+                />
+              );
+            })
           )}
         </div>
       </div>
