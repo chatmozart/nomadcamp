@@ -12,7 +12,7 @@ interface PropertyHeaderProps {
 export const PropertyHeader = ({ title, location }: PropertyHeaderProps) => {
   return (
     <div className="flex justify-between items-start mb-6">
-      <div>
+      <div className="pt-4">
         <h1 className="text-2xl font-bold mb-2">{title}</h1>
         <p className="text-gray-600">{location}</p>
       </div>
