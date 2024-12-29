@@ -133,6 +133,10 @@ const EditProperty = () => {
     }
   };
 
+  const handlePlaceSelect = (autocomplete: google.maps.places.Autocomplete) => {
+    console.log('Place selected:', autocomplete.getPlace());
+  };
+
   if (isLoading || isLoadingMaps) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -159,6 +163,7 @@ const EditProperty = () => {
       <PropertyForm 
         onSubmit={handlePropertySubmit}
         googleMapsLoaded={!!googleMapsApiKey}
+        onPlaceSelect={handlePlaceSelect}
         initialData={{
           id: id,
           title: property.title,
