@@ -133,24 +133,26 @@ const PropertyDetails = () => {
         </div>
 
         {/* Image Gallery */}
-        <div className="px-4 mb-12">
-          <Carousel className="w-full max-h-[45vh]">
-            <CarouselContent>
-              {property.images.map((image, index) => (
-                <CarouselItem key={index}>
-                  <div className="aspect-[16/9]">
-                    <img 
-                      src={image} 
-                      alt={`Property ${index + 1}`} 
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
-          </Carousel>
+        <div className="relative w-full h-[600px] px-4 mb-12">
+          <div className="w-full h-full">
+            <Carousel className="w-full h-full">
+              <CarouselContent>
+                {property.images.map((image, index) => (
+                  <CarouselItem key={index}>
+                    <div className="w-full h-[600px]">
+                      <img 
+                        src={image} 
+                        alt={`Property ${index + 1}`} 
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
+          </div>
         </div>
 
         {/* Main Content */}
