@@ -2,9 +2,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AuthForms } from "@/components/auth/AuthForms";
+import SearchBar from "@/components/SearchBar";
 import Index from "./pages/Index";
 import PropertyDetails from "./pages/PropertyDetails";
 import PropertiesList from "./pages/PropertiesList";
@@ -14,23 +15,33 @@ import EditProperty from "./pages/EditProperty";
 
 const queryClient = new QueryClient();
 
+const Header = () => {
+  const location = useLocation();
+  const isIndexPage = location.pathname === "/";
+
+  return (
+    <div className="w-full bg-white/80 backdrop-blur-sm border-b sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex items-center justify-between p-4">
+          <a href="/" className="flex items-center">
+            <span className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+              NOMADRENT
+            </span>
+          </a>
+          {!isIndexPage && <SearchBar />}
+          <AuthForms />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <TooltipProvider>
         <BrowserRouter>
-          <div className="w-full bg-white/80 backdrop-blur-sm border-b">
-            <div className="max-w-7xl mx-auto">
-              <div className="flex items-center justify-between p-4">
-                <a href="/" className="flex items-center">
-                  <span className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-                    NOMADRENT
-                  </span>
-                </a>
-                <AuthForms />
-              </div>
-            </div>
-          </div>
+          <Header />
           <div>
             <Toaster />
             <Sonner />
