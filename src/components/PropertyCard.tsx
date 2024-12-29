@@ -22,11 +22,23 @@ const PropertyCard = ({
   image,
 }: PropertyCardProps) => {
   console.log('Rendering PropertyCard with ID:', id);
-  console.log('Image path:', image);
+  console.log('Raw image path:', image);
   
-  // Construct the URL using the S3 connection URL
+  // Construct the URL using the object/public endpoint
   const imageUrl = `https://mqgpycqviacxddgnwbxo.supabase.co/storage/v1/object/public/properties/${image}`;
   console.log('Constructed image URL:', imageUrl);
+
+  // Function to validate image URL
+  const validateImageUrl = async (url: string) => {
+    try {
+      const response = await fetch(url, { method: 'HEAD' });
+      console.log('Image validation response:', response.status);
+      return response.ok;
+    } catch (error) {
+      console.error('Image validation error:', error);
+      return false;
+    }
+  };
   
   return (
     <Link to={`/property/${id}`} className="block">
@@ -37,13 +49,20 @@ const PropertyCard = ({
             alt={title}
             className="w-full h-full object-cover"
             loading="lazy"
-            onError={(e) => {
+            onError={async (e) => {
               console.error('Image failed to load:', {
                 imageUrl,
                 originalImage: image,
                 error: e
               });
-              e.currentTarget.src = '/placeholder.svg';
+              
+              // Try to validate the URL before falling back to placeholder
+              const isValid = await validateImageUrl(imageUrl);
+              console.log('Image URL validation result:', isValid);
+              
+              if (!isValid) {
+                e.currentTarget.src = '/placeholder.svg';
+              }
             }}
           />
         </div>
