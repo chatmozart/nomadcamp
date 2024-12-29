@@ -10,11 +10,12 @@ if (!supabaseUrl || !supabaseKey) {
 
 console.log('Initializing Supabase client...');
 console.log('Supabase URL:', supabaseUrl);
+console.log('Using API key starting with:', supabaseKey.substring(0, 10) + '...');
 
 export const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: {
-    persistSession: true,
     autoRefreshToken: true,
+    persistSession: true,
     detectSessionInUrl: true,
     storage: window.localStorage
   }
