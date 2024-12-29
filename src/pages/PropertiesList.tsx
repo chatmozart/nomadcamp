@@ -57,13 +57,15 @@ const PropertiesList = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold mb-8 fade-in">
+      <div className="container mx-auto px-4 py-6 sm:py-12">
+        <h1 className="text-2xl sm:text-4xl font-bold mb-4 sm:mb-8 fade-in px-2">
           Properties in {location?.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
         </h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
           {properties.map((property) => (
-            <PropertyCard key={property.id} {...property} />
+            <div key={property.id} className="px-2 sm:px-0">
+              <PropertyCard {...property} />
+            </div>
           ))}
         </div>
       </div>
