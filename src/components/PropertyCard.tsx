@@ -1,6 +1,7 @@
 import { MapPin, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
+import { useEffect, useState } from "react";
 
 interface PropertyCardProps {
   id: string;
@@ -21,16 +22,32 @@ const PropertyCard = ({
   reviews,
   image,
 }: PropertyCardProps) => {
-  console.log('PropertyCard - Starting render for ID:', id);
-  console.log('PropertyCard - Raw image path:', image);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  
+  useEffect(() => {
+    const loadImageUrl = async () => {
+      console.log('PropertyCard - Starting to load image URL for ID:', id);
+      console.log('PropertyCard - Raw image path:', image);
+      
+      try {
+        const { data, error } = await supabase.storage
+          .from('properties')
+          .createSignedUrl(image, 60 * 60); // URL valid for 1 hour
 
-  // Get a signed URL for the image using Supabase storage
-  const { data } = supabase.storage
-    .from('properties')
-    .createSignedUrl(image, 60 * 60); // URL valid for 1 hour
+        if (error) {
+          console.error('PropertyCard - Error generating signed URL:', error);
+          return;
+        }
 
-  const imageUrl = data?.signedUrl;
-  console.log('PropertyCard - Generated Supabase signed URL:', imageUrl);
+        console.log('PropertyCard - Generated Supabase signed URL:', data?.signedUrl);
+        setImageUrl(data?.signedUrl || null);
+      } catch (error) {
+        console.error('PropertyCard - Failed to generate signed URL:', error);
+      }
+    };
+
+    loadImageUrl();
+  }, [id, image]);
 
   // Function to handle image load error
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
@@ -56,7 +73,7 @@ const PropertyCard = ({
       <div className="property-card rounded-xl overflow-hidden bg-card transition-transform hover:scale-[1.02]">
         <div className="relative aspect-[4/3]">
           <img
-            src={imageUrl}
+            src={imageUrl || '/placeholder.svg'}
             alt={title}
             className="w-full h-full object-cover"
             loading="lazy"
