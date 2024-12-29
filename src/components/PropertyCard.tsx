@@ -22,56 +22,24 @@ const PropertyCard = ({
   image,
 }: PropertyCardProps) => {
   console.log('Rendering PropertyCard with ID:', id);
-  console.log('Raw image path:', image);
+  console.log('Image path:', image);
   
-  // Get the public URL for the image from Supabase storage
-  const { data: publicUrl } = supabase.storage
-    .from('properties')
-    .getPublicUrl(image);
-    
-  console.log('Generated public URL:', publicUrl?.publicUrl);
-  
-  // Verify bucket access and contents
-  const checkBucketAccess = async () => {
-    try {
-      const { data: bucketData, error: bucketError } = await supabase.storage
-        .getBucket('properties');
-      
-      if (bucketError) {
-        console.error('Bucket info error:', bucketError);
-      } else {
-        console.log('Bucket info:', bucketData);
-      }
-      
-      const { data: listData, error: listError } = await supabase.storage
-        .from('properties')
-        .list();
-      
-      if (listError) {
-        console.error('Bucket listing error:', listError);
-      } else {
-        console.log('Bucket contents:', listData);
-      }
-    } catch (error) {
-      console.error('Bucket access check failed:', error);
-    }
-  };
-  
-  // Check bucket access when component mounts
-  checkBucketAccess();
+  // Construct the direct URL to the image in Supabase storage
+  const imageUrl = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/properties/${image}`;
+  console.log('Constructed image URL:', imageUrl);
   
   return (
     <Link to={`/property/${id}`} className="block">
       <div className="property-card rounded-xl overflow-hidden bg-card transition-transform hover:scale-[1.02]">
         <div className="relative aspect-[4/3]">
           <img
-            src={publicUrl?.publicUrl || '/placeholder.svg'}
+            src={imageUrl}
             alt={title}
             className="w-full h-full object-cover"
             loading="lazy"
             onError={(e) => {
               console.error('Image failed to load:', {
-                publicUrl: publicUrl?.publicUrl,
+                imageUrl,
                 originalImage: image,
                 error: e
               });
