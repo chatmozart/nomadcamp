@@ -14,7 +14,7 @@ interface PropertyFormProps {
     imageFile: File | null;
   }) => Promise<void>;
   googleMapsLoaded: boolean;
-  onPlaceSelect: (place: google.maps.places.Autocomplete) => void;
+  onPlaceSelect: (autocomplete: google.maps.places.Autocomplete) => void;
 }
 
 export const PropertyForm = ({ onSubmit, googleMapsLoaded, onPlaceSelect }: PropertyFormProps) => {
@@ -39,6 +39,14 @@ export const PropertyForm = ({ onSubmit, googleMapsLoaded, onPlaceSelect }: Prop
     setPropertyPrice("");
     setPropertyLocation("");
     setImageFile(null);
+  };
+
+  const handlePlaceSelect = (autocomplete: google.maps.places.Autocomplete) => {
+    const place = autocomplete.getPlace();
+    if (place.formatted_address) {
+      setPropertyLocation(place.formatted_address);
+    }
+    onPlaceSelect(autocomplete);
   };
 
   return (
@@ -80,7 +88,15 @@ export const PropertyForm = ({ onSubmit, googleMapsLoaded, onPlaceSelect }: Prop
       <div className="space-y-2">
         <Label htmlFor="propertyLocation">Location</Label>
         {googleMapsLoaded ? (
-          <Autocomplete onLoad={onPlaceSelect}>
+          <Autocomplete
+            onLoad={onPlaceSelect}
+            onPlaceChanged={() => {
+              const autocomplete = document.querySelector('input#propertyLocation') as HTMLInputElement;
+              if (autocomplete) {
+                setPropertyLocation(autocomplete.value);
+              }
+            }}
+          >
             <Input
               id="propertyLocation"
               value={propertyLocation}
