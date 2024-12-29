@@ -60,7 +60,7 @@ const PropertyDetails = () => {
             <CarouselContent>
               {property.images.map((image, index) => (
                 <CarouselItem key={index}>
-                  <div className="aspect-[16/9] relative rounded-lg overflow-hidden">
+                  <div className="aspect-[21/9] relative rounded-lg overflow-hidden">
                     <img
                       src={image}
                       alt={`${property.title} - Image ${index + 1}`}

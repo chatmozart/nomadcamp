@@ -54,7 +54,7 @@ const Index = () => {
             Welcome to NomadRent
           </h1>
           <p className="text-xl text-white/90 mb-8 fade-in">
-            When renting for one month or more, the perfect stay in digital nomad hotspots
+            For digital nomads looking to rent for minimum 1 month
           </p>
           <SearchBar />
         </div>
