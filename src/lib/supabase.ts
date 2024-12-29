@@ -15,6 +15,8 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
+    detectSessionInUrl: true,
+    storage: window.localStorage
   }
 });
 
@@ -24,5 +26,10 @@ supabase.auth.getSession().then(({ data, error }) => {
     console.error('Supabase connection error:', error);
   } else {
     console.log('Supabase connection successful');
+    if (data.session) {
+      console.log('User is authenticated');
+    } else {
+      console.log('No active session');
+    }
   }
 });

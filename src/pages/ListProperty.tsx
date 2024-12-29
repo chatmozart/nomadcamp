@@ -1,97 +1,51 @@
-import { useState, useMemo, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { useState, useMemo } from "react";
+import { LoadScript } from "@react-google-maps/api";
+import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
-import { useAuth } from "@/contexts/AuthContext";
-import { LoadScript, Autocomplete } from "@react-google-maps/api";
+import { PropertyForm } from "@/components/property/PropertyForm";
+import { useGoogleMaps } from "@/hooks/useGoogleMaps";
 
 const ListProperty = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [propertyTitle, setPropertyTitle] = useState("");
-  const [propertyDescription, setPropertyDescription] = useState("");
-  const [propertyPrice, setPropertyPrice] = useState("");
-  const [propertyLocation, setPropertyLocation] = useState("");
-  const [imageFile, setImageFile] = useState<File | null>(null);
   const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
-  const [googleMapsApiKey, setGoogleMapsApiKey] = useState<string>("");
-  const [isLoading, setIsLoading] = useState(true);
+  const { googleMapsApiKey, isLoading } = useGoogleMaps();
 
   console.log("Rendering ListProperty component");
 
   const libraries = useMemo(() => ["places"], []);
-
-  // Fetch Google Maps API key from Supabase
-  useEffect(() => {
-    const fetchApiKey = async () => {
-      try {
-        setIsLoading(true);
-        const { data, error } = await supabase
-          .from('secrets')
-          .select('GOOGLE_MAPS_API_KEY')
-          .single();
-
-        if (error) {
-          console.error('Error fetching Google Maps API key:', error);
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: "Could not load Google Maps. Please try again later.",
-          });
-          return;
-        }
-
-        if (data?.GOOGLE_MAPS_API_KEY) {
-          console.log('Successfully fetched Google Maps API key');
-          setGoogleMapsApiKey(data.GOOGLE_MAPS_API_KEY);
-        } else {
-          console.error('No Google Maps API key found in secrets');
-          toast({
-            variant: "destructive",
-            title: "Configuration Error",
-            description: "Google Maps API key not found. Please contact support.",
-          });
-        }
-      } catch (err) {
-        console.error('Error in fetchApiKey:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchApiKey();
-  }, [toast]);
 
   const onLoad = (autocomplete: google.maps.places.Autocomplete) => {
     console.log("Autocomplete loaded:", autocomplete);
     setAutocomplete(autocomplete);
   };
 
-  const onPlaceChanged = () => {
-    if (autocomplete !== null) {
-      const place = autocomplete.getPlace();
-      console.log("Place selected:", place);
-      if (place.formatted_address) {
-        setPropertyLocation(place.formatted_address);
-      }
+  const handlePropertySubmit = async (formData: {
+    title: string;
+    description: string;
+    price: string;
+    location: string;
+    imageFile: File | null;
+  }) => {
+    if (!user) {
+      toast({
+        variant: "destructive",
+        title: "Authentication Required",
+        description: "Please sign in to list a property.",
+      });
+      return;
     }
-  };
 
-  const handlePropertySubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Submitting property form");
     try {
       let imageUrl = "";
       
-      if (imageFile) {
-        const fileExt = imageFile.name.split('.').pop();
+      if (formData.imageFile) {
+        const fileExt = formData.imageFile.name.split('.').pop();
         const fileName = `${Math.random()}.${fileExt}`;
         const { error: uploadError, data } = await supabase.storage
           .from('properties')
-          .upload(fileName, imageFile);
+          .upload(fileName, formData.imageFile);
 
         if (uploadError) throw uploadError;
         imageUrl = data.path;
@@ -100,12 +54,12 @@ const ListProperty = () => {
       const { error } = await supabase
         .from('properties')
         .insert({
-          title: propertyTitle,
-          description: propertyDescription,
-          price: parseFloat(propertyPrice),
-          location: propertyLocation,
+          title: formData.title,
+          description: formData.description,
+          price: parseFloat(formData.price),
+          location: formData.location,
           image_url: imageUrl,
-          owner_id: user?.id,
+          owner_id: user.id,
         });
 
       if (error) throw error;
@@ -114,13 +68,6 @@ const ListProperty = () => {
         title: "Property listed",
         description: "Your property has been listed successfully.",
       });
-
-      // Reset form
-      setPropertyTitle("");
-      setPropertyDescription("");
-      setPropertyPrice("");
-      setPropertyLocation("");
-      setImageFile(null);
     } catch (error) {
       console.error("Error submitting property:", error);
       toast({
@@ -153,70 +100,11 @@ const ListProperty = () => {
     >
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold mb-8">List a New Property</h1>
-        <form onSubmit={handlePropertySubmit} className="space-y-4 max-w-xl">
-          <div className="space-y-2">
-            <Label htmlFor="propertyTitle">Property Title</Label>
-            <Input
-              id="propertyTitle"
-              value={propertyTitle}
-              onChange={(e) => setPropertyTitle(e.target.value)}
-              placeholder="Enter property title"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="propertyDescription">Description</Label>
-            <Textarea
-              id="propertyDescription"
-              value={propertyDescription}
-              onChange={(e) => setPropertyDescription(e.target.value)}
-              placeholder="Describe your property"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="propertyPrice">Price per Month</Label>
-            <Input
-              id="propertyPrice"
-              type="number"
-              value={propertyPrice}
-              onChange={(e) => setPropertyPrice(e.target.value)}
-              placeholder="Enter price"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="propertyLocation">Location</Label>
-            <Autocomplete
-              onLoad={onLoad}
-              onPlaceChanged={onPlaceChanged}
-            >
-              <Input
-                id="propertyLocation"
-                value={propertyLocation}
-                onChange={(e) => setPropertyLocation(e.target.value)}
-                placeholder="Enter location"
-                required
-              />
-            </Autocomplete>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="propertyImage">Property Image</Label>
-            <Input
-              id="propertyImage"
-              type="file"
-              accept="image/*"
-              onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-              required
-            />
-          </div>
-
-          <Button type="submit">List Property</Button>
-        </form>
+        <PropertyForm 
+          onSubmit={handlePropertySubmit}
+          googleMapsLoaded={!!googleMapsApiKey}
+          onPlaceSelect={onLoad}
+        />
       </div>
     </LoadScript>
   );
