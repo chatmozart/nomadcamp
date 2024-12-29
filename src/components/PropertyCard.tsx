@@ -21,8 +21,8 @@ const PropertyCard = ({
   reviews,
   image,
 }: PropertyCardProps) => {
-  console.log('Rendering PropertyCard with ID:', id);
-  console.log('Raw image path:', image);
+  console.log('PropertyCard - Starting render for ID:', id);
+  console.log('PropertyCard - Raw image path:', image);
 
   // Get the public URL for the image using Supabase storage
   const { data } = supabase.storage
@@ -30,7 +30,26 @@ const PropertyCard = ({
     .getPublicUrl(image);
 
   const imageUrl = data?.publicUrl;
-  console.log('Generated Supabase URL:', imageUrl);
+  console.log('PropertyCard - Generated Supabase URL:', imageUrl);
+
+  // Function to handle image load error
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    console.error('PropertyCard - Image failed to load:', {
+      id,
+      imageUrl,
+      originalImage: image,
+      error: e
+    });
+    e.currentTarget.src = '/placeholder.svg';
+  };
+
+  // Function to handle successful image load
+  const handleImageLoad = () => {
+    console.log('PropertyCard - Image loaded successfully:', {
+      id,
+      imageUrl
+    });
+  };
 
   return (
     <Link to={`/property/${id}`} className="block">
@@ -41,14 +60,8 @@ const PropertyCard = ({
             alt={title}
             className="w-full h-full object-cover"
             loading="lazy"
-            onError={(e) => {
-              console.error('Image failed to load:', {
-                imageUrl,
-                originalImage: image,
-                error: e
-              });
-              e.currentTarget.src = '/placeholder.svg';
-            }}
+            onError={handleImageError}
+            onLoad={handleImageLoad}
           />
         </div>
         <div className="p-4">
