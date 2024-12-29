@@ -25,15 +25,15 @@ export const PropertyDetailsSection = ({
         </div>
 
         <PropertyAmenities />
-
-        <div className="mt-8">
-          <h3 className="text-xl font-semibold mb-4">Map</h3>
-          <PropertyMap address={location} />
-        </div>
       </div>
 
       <div className="col-span-1">
         <PropertyBookingCard price={price} />
+      </div>
+
+      <div className="col-span-3 -mx-4">
+        <h3 className="text-xl font-semibold mb-4 px-4">Map</h3>
+        <PropertyMap address={location} />
       </div>
     </div>
   );
