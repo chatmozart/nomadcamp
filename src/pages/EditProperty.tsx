@@ -101,11 +101,12 @@ const EditProperty = () => {
     priceOneYear: string;
     location: string;
     imageFiles: File[];
+    amenityIds: string[];
   }) => {
     if (!user || !id) return;
 
     try {
-      // Create update data with all fields
+      // Update property data
       const updateData = {
         title: formData.title,
         description: formData.description,
@@ -118,18 +119,34 @@ const EditProperty = () => {
 
       console.log('Attempting to update property with data:', updateData);
 
-      const { data, error: updateError } = await supabase
+      const { data: propertyData, error: updateError } = await supabase
         .from('properties')
         .update(updateData)
         .eq('id', id)
         .select();
 
-      if (updateError) {
-        console.error('Error updating property:', updateError);
-        throw updateError;
-      }
+      if (updateError) throw updateError;
 
-      console.log('Update successful. Updated data:', data);
+      // Update property amenities
+      const { error: deleteAmenitiesError } = await supabase
+        .from('property_amenities')
+        .delete()
+        .eq('property_id', id);
+
+      if (deleteAmenitiesError) throw deleteAmenitiesError;
+
+      if (formData.amenityIds.length > 0) {
+        const amenityRecords = formData.amenityIds.map(amenityId => ({
+          property_id: id,
+          amenity_id: amenityId
+        }));
+
+        const { error: insertAmenitiesError } = await supabase
+          .from('property_amenities')
+          .insert(amenityRecords);
+
+        if (insertAmenitiesError) throw insertAmenitiesError;
+      }
 
       // Handle new images if any
       if (formData.imageFiles.length > 0) {

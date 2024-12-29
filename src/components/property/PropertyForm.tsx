@@ -7,6 +7,7 @@ import { Autocomplete } from "@react-google-maps/api";
 import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ExistingImagesGrid } from "./ExistingImagesGrid";
+import { AmenitiesSelection } from "./AmenitiesSelection";
 
 interface PropertyFormProps {
   onSubmit: (formData: {
@@ -18,6 +19,7 @@ interface PropertyFormProps {
     priceOneYear: string;
     location: string;
     imageFiles: File[];
+    amenityIds: string[];
   }) => Promise<void>;
   googleMapsLoaded: boolean;
   onPlaceSelect: (autocomplete: google.maps.places.Autocomplete) => void;
@@ -57,6 +59,8 @@ export const PropertyForm = ({
     initialData?.existingImages || []
   );
 
+  const [selectedAmenityIds, setSelectedAmenityIds] = useState<string[]>([]);
+
   const handleExistingImageDelete = (deletedImageUrl: string) => {
     setExistingImages(prev => prev.filter(url => url !== deletedImageUrl));
   };
@@ -74,6 +78,7 @@ export const PropertyForm = ({
     }
 
     console.log('Submitting form with images:', imageFiles);
+    console.log('Selected amenities:', selectedAmenityIds);
 
     await onSubmit({
       title: propertyTitle,
@@ -84,6 +89,7 @@ export const PropertyForm = ({
       priceOneYear: propertyPriceOneYear,
       location: propertyLocation,
       imageFiles,
+      amenityIds: selectedAmenityIds,
     });
 
     if (mode === 'create') {
@@ -96,6 +102,7 @@ export const PropertyForm = ({
       setPropertyLocation("");
       setImageFiles([]);
       setPreviewUrls([]);
+      setSelectedAmenityIds([]);
     }
   };
 
@@ -291,6 +298,12 @@ export const PropertyForm = ({
           </div>
         )}
       </div>
+
+      <AmenitiesSelection
+        propertyId={initialData?.id}
+        onAmenitiesChange={setSelectedAmenityIds}
+        mode={mode}
+      />
 
       <Button type="submit">
         {mode === 'create' ? 'List Property' : 'Update Property'}
