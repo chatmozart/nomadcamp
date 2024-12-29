@@ -47,7 +47,12 @@ const EditProperty = () => {
         }
 
         console.log('Fetched property data:', data);
-        setProperty(data);
+        setProperty({
+          ...data,
+          priceThreeMonths: data.price_three_months,
+          priceSixMonths: data.price_six_months,
+          priceOneYear: data.price_one_year
+        });
         setIsLoading(false);
       } catch (error) {
         console.error('Error in fetchProperty:', error);
@@ -180,7 +185,12 @@ const EditProperty = () => {
         onSubmit={handlePropertySubmit}
         googleMapsLoaded={!!googleMapsApiKey}
         onPlaceSelect={onLoad}
-        initialData={property}
+        initialData={{
+          ...property,
+          priceThreeMonths: property.price_three_months,
+          priceSixMonths: property.price_six_months,
+          priceOneYear: property.price_one_year
+        }}
         mode="edit"
       />
     </div>
