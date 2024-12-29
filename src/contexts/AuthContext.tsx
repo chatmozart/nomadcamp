@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for changes on auth state (logged in, signed out, etc.)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state changed:', event);
-      if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+      if (event === 'SIGNED_OUT') {
         clearAuthData();
       } else {
         setUser(session?.user ?? null);
@@ -106,11 +106,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     try {
       console.log('Attempting sign out...');
+      // Clear auth data first to prevent JWT issues
+      clearAuthData();
+      
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      
-      // Clear all auth data regardless of the signOut result
-      clearAuthData();
       
       console.log('Sign out successful');
       toast({
@@ -119,9 +119,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
     } catch (error) {
       console.error('Sign out error:', error);
-      // Still clear auth data even if there's an error
-      clearAuthData();
-      
+      // Auth data is already cleared at this point
       toast({
         variant: "destructive",
         title: "Error signing out",
