@@ -19,6 +19,8 @@ interface Property {
   location: string;
   image_url: string;
   owner_id: string;
+  availability_start: string | null;
+  availability_end: string | null;
 }
 
 const PropertyDetails = () => {
@@ -150,6 +152,8 @@ const PropertyDetails = () => {
           priceSixMonths={property.price_six_months || undefined}
           priceOneYear={property.price_one_year || undefined}
           location={property.location}
+          availabilityStart={property.availability_start}
+          availabilityEnd={property.availability_end}
         />
       </div>
     </div>
