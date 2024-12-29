@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ExistingImagesGrid } from "./ExistingImagesGrid";
 import { AmenitiesSelection } from "./AmenitiesSelection";
 import { PropertyAvailabilityFields } from "./PropertyAvailabilityFields";
+import { usePropertyFormHandlers } from "./hooks/usePropertyFormHandlers";
 
 interface PropertyFormProps {
   onSubmit: (formData: {
@@ -63,11 +64,30 @@ export const PropertyForm = ({
   const [propertyPriceSixMonths, setPropertyPriceSixMonths] = useState(initialData?.priceSixMonths?.toString() || "");
   const [propertyPriceOneYear, setPropertyPriceOneYear] = useState(initialData?.priceOneYear?.toString() || "");
   const [propertyLocation, setPropertyLocation] = useState(initialData?.location || "");
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [selectedAmenityIds, setSelectedAmenityIds] = useState<string[]>([]);
+  const [availabilityStart, setAvailabilityStart] = useState(initialData?.availabilityStart || "");
+  const [availabilityEnd, setAvailabilityEnd] = useState(initialData?.availabilityEnd || "");
   const [contactName, setContactName] = useState(initialData?.contactName || "");
   const [contactEmail, setContactEmail] = useState(initialData?.contactEmail || "");
   const [contactWhatsapp, setContactWhatsapp] = useState(initialData?.contactWhatsapp || "");
+
+  const {
+    imageFiles,
+    previewUrls,
+    existingImages,
+    setExistingImages,
+    handlePlaceSelect,
+    handleImageChange,
+    removeImage,
+    handleExistingImageDelete,
+  } = usePropertyFormHandlers(setPropertyLocation, onPlaceSelect);
+
+  // Initialize existing images from initialData
+  useState(() => {
+    if (initialData?.existingImages) {
+      setExistingImages(initialData.existingImages);
+    }
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
