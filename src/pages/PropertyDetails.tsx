@@ -133,7 +133,7 @@ const PropertyDetails = () => {
         </div>
 
         {/* Image Gallery */}
-        <div className="px-4 mb-8">
+        <div className="px-4 mb-12">
           <Carousel className="w-full max-h-[45vh]">
             <CarouselContent>
               {property.images.map((image, index) => (
@@ -154,7 +154,7 @@ const PropertyDetails = () => {
         </div>
 
         {/* Main Content */}
-        <div className="px-4">
+        <div className="px-4 pt-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Left Column */}
             <div className="lg:col-span-2 space-y-8">
@@ -273,51 +273,51 @@ const PropertyDetails = () => {
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Host Section */}
-          <div className="mt-12 pb-12 border-t">
-            <div className="max-w-3xl pt-12">
-              <div className="flex items-center gap-4 mb-6">
-                <Avatar className="h-20 w-20">
-                  <AvatarImage src={property.host.image} alt={property.host.name} />
-                  <AvatarFallback>{property.host.name[0]}</AvatarFallback>
-                </Avatar>
+        {/* Host Section */}
+        <div className="mt-12 pb-12 border-t">
+          <div className="max-w-3xl pt-12">
+            <div className="flex items-center gap-4 mb-6">
+              <Avatar className="h-20 w-20">
+                <AvatarImage src={property.host.image} alt={property.host.name} />
+                <AvatarFallback>{property.host.name[0]}</AvatarFallback>
+              </Avatar>
+              <div>
+                <h2 className="text-2xl font-semibold">Hosted by {property.host.name}</h2>
+                <p className="text-muted-foreground">
+                  Joined in {property.host.joinedDate} · {property.host.totalReviews} reviews
+                </p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {property.host.isSuperhost && (
+                <div className="flex items-center gap-4">
+                  <Medal className="w-6 h-6 text-primary" />
+                  <div>
+                    <p className="font-medium">Superhost</p>
+                    <p className="text-sm text-muted-foreground">
+                      Superhosts are experienced, highly rated hosts.
+                    </p>
+                  </div>
+                </div>
+              )}
+              <div className="flex items-center gap-4">
+                <Key className="w-6 h-6" />
                 <div>
-                  <h2 className="text-2xl font-semibold">Hosted by {property.host.name}</h2>
-                  <p className="text-muted-foreground">
-                    Joined in {property.host.joinedDate} · {property.host.totalReviews} reviews
+                  <p className="font-medium">Great check-in experience</p>
+                  <p className="text-sm text-muted-foreground">
+                    100% of recent guests gave the check-in process a 5-star rating.
                   </p>
                 </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {property.host.isSuperhost && (
-                  <div className="flex items-center gap-4">
-                    <Medal className="w-6 h-6 text-primary" />
-                    <div>
-                      <p className="font-medium">Superhost</p>
-                      <p className="text-sm text-muted-foreground">
-                        Superhosts are experienced, highly rated hosts.
-                      </p>
-                    </div>
-                  </div>
-                )}
-                <div className="flex items-center gap-4">
-                  <Key className="w-6 h-6" />
-                  <div>
-                    <p className="font-medium">Great check-in experience</p>
-                    <p className="text-sm text-muted-foreground">
-                      100% of recent guests gave the check-in process a 5-star rating.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <Clock className="w-6 h-6" />
-                  <div>
-                    <p className="font-medium">Great communication</p>
-                    <p className="text-sm text-muted-foreground">
-                      {property.host.responseRate} response rate · Responds {property.host.responseTime}
-                    </p>
-                  </div>
+              <div className="flex items-center gap-4">
+                <Clock className="w-6 h-6" />
+                <div>
+                  <p className="font-medium">Great communication</p>
+                  <p className="text-sm text-muted-foreground">
+                    {property.host.responseRate} response rate · Responds {property.host.responseTime}
+                  </p>
                 </div>
               </div>
             </div>
