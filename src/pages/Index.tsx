@@ -15,18 +15,23 @@ const Index = () => {
   useEffect(() => {
     const fetchProperties = async () => {
       console.log('Fetching properties from Supabase...');
-      const { data, error } = await supabase
-        .from('properties')
-        .select('*');
+      try {
+        const { data, error } = await supabase
+          .from('properties')
+          .select('*');
 
-      if (error) {
-        console.error('Error fetching properties:', error);
-        return;
+        if (error) {
+          console.error('Error fetching properties:', error);
+          return;
+        }
+
+        console.log('Properties fetched successfully:', data);
+        setProperties(data || []);
+      } catch (error) {
+        console.error('Unexpected error fetching properties:', error);
+      } finally {
+        setIsLoading(false);
       }
-
-      console.log('Properties fetched successfully:', data);
-      setProperties(data || []);
-      setIsLoading(false);
     };
 
     fetchProperties();
@@ -63,7 +68,7 @@ const Index = () => {
             <p>No properties found.</p>
           ) : (
             properties.map((property) => {
-              console.log('Property data:', property);
+              console.log('Rendering property:', property);
               return (
                 <PropertyCard 
                   key={property.id}
