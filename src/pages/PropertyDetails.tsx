@@ -33,8 +33,8 @@ const PropertyDetails = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-6">
-        <h1 className="text-4xl font-semibold mb-6">{property.title}</h1>
+      <div className="container mx-auto px-4 pt-6 pb-2">
+        <h1 className="text-4xl font-semibold">{property.title}</h1>
       </div>
 
       {/* Full-width image grid section with reduced height */}
