@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Star, MapPin } from "lucide-react";
 
@@ -21,17 +20,18 @@ const PropertyDetails = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="px-4 py-6">
-          <h1 className="text-3xl font-bold">{property.title}</h1>
-          <div className="flex items-center mt-2">
-            <MapPin className="mr-2" />
-            <span>{property.location}</span>
-          </div>
-          <div className="flex items-center mt-2">
-            <Star className="mr-2" />
-            <span>{property.rating} ({property.reviews} reviews)</span>
-          </div>
-          <div className="mt-4">
-            <Button>Add to Favorites</Button>
+          <div className="flex items-center gap-6">
+            <h1 className="text-3xl font-bold">{property.title}</h1>
+            <div className="flex items-center gap-6">
+              <div className="flex items-center">
+                <MapPin className="mr-2" />
+                <span>{property.location}</span>
+              </div>
+              <div className="flex items-center">
+                <Star className="mr-2" />
+                <span>{property.rating} ({property.reviews} reviews)</span>
+              </div>
+            </div>
           </div>
         </div>
         <div className="h-[600px] w-full">
