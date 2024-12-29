@@ -1,5 +1,7 @@
 import { Card } from "@/components/ui/card";
-import { PropertyAvailabilityCard } from "./PropertyAvailabilityCard";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface PropertyBookingCardProps {
   price: number;
@@ -18,6 +20,8 @@ export const PropertyBookingCard = ({
   availabilityStart,
   availabilityEnd,
 }: PropertyBookingCardProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+
   console.log('Rendering PropertyBookingCard with prices and dates:', { 
     price, 
     priceThreeMonths, 
@@ -80,10 +84,34 @@ export const PropertyBookingCard = ({
               </div>
             </div>
           )}
+
+          <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+            <CollapsibleTrigger asChild>
+              <button className="w-full bg-primary text-white py-3 rounded-lg hover:bg-primary/90 transition-colors">
+                Book
+              </button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="space-y-4 pt-4">
+              <div className="space-y-4">
+                <Input
+                  type="text"
+                  placeholder="Name"
+                  className="w-full"
+                />
+                <Input
+                  type="email"
+                  placeholder="Email"
+                  className="w-full"
+                />
+                <Input
+                  type="tel"
+                  placeholder="WhatsApp Phone Number"
+                  className="w-full"
+                />
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
         </div>
-        <button className="w-full bg-primary text-white py-3 rounded-lg hover:bg-primary/90 transition-colors">
-          Reserve
-        </button>
       </Card>
     </div>
   );
