@@ -5,10 +5,12 @@ import { supabase } from "@/lib/supabase";
 import { PropertyForm } from "@/components/property/PropertyForm";
 import { useGoogleMaps } from "@/hooks/useGoogleMaps";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useNavigate } from "react-router-dom";
 
 const ListProperty = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
   const { googleMapsApiKey, isLoading } = useGoogleMaps();
 
@@ -80,6 +82,10 @@ const ListProperty = () => {
         title: "Property listed",
         description: "Your property has been listed successfully.",
       });
+
+      // Add redirect after successful submission
+      navigate('/profile');
+      
     } catch (error) {
       console.error("Error submitting property:", error);
       toast({
