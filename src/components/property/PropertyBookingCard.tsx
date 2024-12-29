@@ -1,5 +1,4 @@
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
@@ -28,13 +27,7 @@ export const PropertyBookingCard = ({
 }: PropertyBookingCardProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  console.log('Rendering PropertyBookingCard with prices and dates:', { 
-    price, 
-    priceThreeMonths, 
-    priceSixMonths, 
-    priceOneYear,
-    availabilityStart,
-    availabilityEnd,
+  console.log('Rendering PropertyBookingCard with contact info:', { 
     contactName,
     contactEmail,
     contactWhatsapp
@@ -102,27 +95,27 @@ export const PropertyBookingCard = ({
             </CollapsibleTrigger>
             <CollapsibleContent className="space-y-4 pt-4">
               <div className="space-y-4">
-                <Input
-                  type="text"
-                  value={contactName || ""}
-                  readOnly
-                  className="w-full bg-gray-50"
-                  placeholder="Contact Name"
-                />
-                <Input
-                  type="email"
-                  value={contactEmail || ""}
-                  readOnly
-                  className="w-full bg-gray-50"
-                  placeholder="Contact Email"
-                />
-                <Input
-                  type="tel"
-                  value={contactWhatsapp || ""}
-                  readOnly
-                  className="w-full bg-gray-50"
-                  placeholder="WhatsApp Number"
-                />
+                {contactName && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Contact Name</span>
+                    <span className="font-medium">{contactName}</span>
+                  </div>
+                )}
+                {contactEmail && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Email</span>
+                    <span className="font-medium">{contactEmail}</span>
+                  </div>
+                )}
+                {contactWhatsapp && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">WhatsApp</span>
+                    <span className="font-medium">{contactWhatsapp}</span>
+                  </div>
+                )}
+                {!contactName && !contactEmail && !contactWhatsapp && (
+                  <p className="text-gray-500 text-center">No contact information available</p>
+                )}
               </div>
             </CollapsibleContent>
           </Collapsible>
