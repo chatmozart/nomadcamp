@@ -5,9 +5,7 @@ drop bucket if exists "properties";
 
 -- Create the properties bucket
 insert into storage.buckets (id, name, public)
-values ('properties', 'properties', true)
-on conflict (id) do update 
-set public = true;
+values ('properties', 'properties', true);
 
 -- Allow public read access to all files in the bucket
 create policy "Public Access"
