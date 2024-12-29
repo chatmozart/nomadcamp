@@ -9,37 +9,33 @@ if (!supabaseUrl || !supabaseKey) {
 }
 
 console.log('Initializing Supabase client...');
+console.log('Using URL:', supabaseUrl);
+console.log('Using API key starting with:', supabaseKey.substring(0, 10) + '...');
 
 export const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: {
-    autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: true,
-    storage: window.localStorage,
     storageKey: 'supabase.auth.token',
+    storage: localStorage,
+    autoRefreshToken: true,
+    detectSessionInUrl: false,
   },
 });
 
-// Test the connection and session
+// Test the connection
 supabase.auth.getSession().then(({ data, error }) => {
   if (error) {
     console.error('Supabase connection error:', error);
+    // Clear any invalid sessions
+    localStorage.removeItem('supabase.auth.token');
   } else {
     console.log('Supabase connection successful');
     if (data.session) {
       console.log('User is authenticated');
-      // Verify the session is valid
-      supabase.auth.refreshSession().then(({ data: refreshData, error: refreshError }) => {
-        if (refreshError) {
-          console.error('Session refresh failed:', refreshError);
-          // Clear invalid session
-          supabase.auth.signOut();
-        } else if (refreshData.session) {
-          console.log('Session refreshed successfully');
-        }
-      });
     } else {
       console.log('No active session');
+      // Clear any stale tokens
+      localStorage.removeItem('supabase.auth.token');
     }
   }
 });

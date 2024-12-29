@@ -22,32 +22,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const clearAuthData = () => {
     console.log('Clearing all auth data...');
     localStorage.removeItem('supabase.auth.token');
-    localStorage.removeItem('supabase.auth.expires_at');
-    localStorage.removeItem('supabase.auth.refresh_token');
     setUser(null);
   };
 
   useEffect(() => {
     console.log('Initializing auth state...');
+    
     // Check active sessions and sets the user
     supabase.auth.getSession().then(({ data: { session }, error }) => {
       if (error) {
         console.error('Error getting session:', error);
         clearAuthData();
+      } else if (session) {
+        console.log('Active session found:', session.user.email);
+        setUser(session.user);
       } else {
-        console.log('Session check complete:', session ? 'Active session found' : 'No active session');
-        setUser(session?.user ?? null);
+        console.log('No active session');
+        clearAuthData();
       }
       setLoading(false);
     });
 
-    // Listen for changes on auth state (logged in, signed out, etc.)
+    // Listen for changes on auth state
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state changed:', event);
-      if (event === 'SIGNED_OUT') {
-        clearAuthData();
+      if (session) {
+        console.log('Session updated for user:', session.user.email);
+        setUser(session.user);
       } else {
-        setUser(session?.user ?? null);
+        console.log('Session ended');
+        clearAuthData();
       }
     });
 
@@ -59,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
-      console.log('Attempting sign in...');
+      console.log('Attempting sign in for:', email);
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -72,6 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
     } catch (error) {
       console.error('Sign in error:', error);
+      clearAuthData();
       toast({
         variant: "destructive",
         title: "Error signing in",
@@ -82,7 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, password: string) => {
     try {
-      console.log('Attempting sign up...');
+      console.log('Attempting sign up for:', email);
       const { error } = await supabase.auth.signUp({
         email,
         password,
