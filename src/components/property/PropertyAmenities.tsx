@@ -69,12 +69,6 @@ export const PropertyAmenities = ({
     );
   }
 
-  const displayAmenities = amenities?.filter(amenity => 
-    isEditing 
-      ? selectedAmenities.includes(amenity.id)
-      : propertyAmenities?.includes(amenity.id)
-  );
-
   const IconComponent = (iconName: string) => {
     const Icon = (icons as any)[iconName];
     return Icon ? <Icon className="w-6 h-6 text-gray-600" /> : null;
@@ -100,15 +94,20 @@ export const PropertyAmenities = ({
             </label>
           ))
         ) : (
-          displayAmenities?.map((amenity) => (
-            <div 
-              key={amenity.id} 
-              className="flex items-center gap-4 p-2"
-            >
-              {IconComponent(amenity.icon)}
-              <span className="text-sm text-gray-700">{amenity.name}</span>
-            </div>
-          ))
+          amenities?.map((amenity) => {
+            const isSelected = propertyAmenities?.includes(amenity.id);
+            return (
+              <div 
+                key={amenity.id} 
+                className={`flex items-center gap-4 p-2 ${!isSelected ? 'opacity-50' : ''}`}
+              >
+                {IconComponent(amenity.icon)}
+                <span className={`text-sm text-gray-700 ${!isSelected ? 'line-through' : ''}`}>
+                  {amenity.name}
+                </span>
+              </div>
+            );
+          })
         )}
       </div>
     </div>
