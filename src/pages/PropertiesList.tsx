@@ -58,9 +58,9 @@ const PropertiesList = () => {
                   title={property.title}
                   location={property.location}
                   price={property.price}
-                  rating={4.5} // Default rating until we implement a rating system
-                  reviews={0} // Default reviews until we implement a review system
-                  image={`https://mqgpycqviacxddgnwbxo.supabase.co/storage/v1/object/public/properties/${property.image_url}`}
+                  rating={4.5}
+                  reviews={0}
+                  image={property.image_url} // Pass just the image filename
                 />
               </div>
             ))
