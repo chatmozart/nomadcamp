@@ -22,6 +22,9 @@ export const PropertyBookingCard = ({
   priceOneYear,
   availabilityStart,
   availabilityEnd,
+  contactName,
+  contactEmail,
+  contactWhatsapp
 }: PropertyBookingCardProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -31,7 +34,10 @@ export const PropertyBookingCard = ({
     priceSixMonths, 
     priceOneYear,
     availabilityStart,
-    availabilityEnd 
+    availabilityEnd,
+    contactName,
+    contactEmail,
+    contactWhatsapp
   });
   
   return (
@@ -101,18 +107,21 @@ export const PropertyBookingCard = ({
                   value={contactName || ""}
                   readOnly
                   className="w-full bg-gray-50"
+                  placeholder="Contact Name"
                 />
                 <Input
                   type="email"
                   value={contactEmail || ""}
                   readOnly
                   className="w-full bg-gray-50"
+                  placeholder="Contact Email"
                 />
                 <Input
                   type="tel"
                   value={contactWhatsapp || ""}
                   readOnly
                   className="w-full bg-gray-50"
+                  placeholder="WhatsApp Number"
                 />
               </div>
             </CollapsibleContent>

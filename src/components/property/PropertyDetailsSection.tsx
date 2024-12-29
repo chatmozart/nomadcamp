@@ -12,6 +12,9 @@ interface PropertyDetailsSectionProps {
   location: string;
   availabilityStart?: string | null;
   availabilityEnd?: string | null;
+  contactName?: string;
+  contactEmail?: string;
+  contactWhatsapp?: string;
 }
 
 export const PropertyDetailsSection = ({ 
@@ -23,7 +26,10 @@ export const PropertyDetailsSection = ({
   priceOneYear,
   location,
   availabilityStart,
-  availabilityEnd
+  availabilityEnd,
+  contactName,
+  contactEmail,
+  contactWhatsapp
 }: PropertyDetailsSectionProps) => {
   console.log('PropertyDetailsSection rendering with data:', {
     price,
@@ -31,7 +37,10 @@ export const PropertyDetailsSection = ({
     priceSixMonths,
     priceOneYear,
     availabilityStart,
-    availabilityEnd
+    availabilityEnd,
+    contactName,
+    contactEmail,
+    contactWhatsapp
   });
 
   return (
@@ -56,9 +65,9 @@ export const PropertyDetailsSection = ({
           priceOneYear={priceOneYear}
           availabilityStart={availabilityStart}
           availabilityEnd={availabilityEnd}
-          contactName={property.contact_name}
-          contactEmail={property.contact_email}
-          contactWhatsapp={property.contact_whatsapp}
+          contactName={contactName}
+          contactEmail={contactEmail}
+          contactWhatsapp={contactWhatsapp}
         />
       </div>
 

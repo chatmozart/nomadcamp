@@ -21,6 +21,9 @@ interface Property {
   owner_id: string;
   availability_start: string | null;
   availability_end: string | null;
+  contact_name: string | null;
+  contact_email: string | null;
+  contact_whatsapp: string | null;
 }
 
 const PropertyDetails = () => {
@@ -57,7 +60,6 @@ const PropertyDetails = () => {
         console.log('Property details fetched:', propertyData);
         setProperty(propertyData);
 
-        // Fetch all images for this property
         const { data: imagesData, error: imagesError } = await supabase
           .from('property_images')
           .select('image_url')
@@ -154,6 +156,9 @@ const PropertyDetails = () => {
           location={property.location}
           availabilityStart={property.availability_start}
           availabilityEnd={property.availability_end}
+          contactName={property.contact_name || undefined}
+          contactEmail={property.contact_email || undefined}
+          contactWhatsapp={property.contact_whatsapp || undefined}
         />
       </div>
     </div>
