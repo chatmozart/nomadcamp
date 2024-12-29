@@ -24,13 +24,13 @@ const PropertyCard = ({
   console.log('PropertyCard - Starting render for ID:', id);
   console.log('PropertyCard - Raw image path:', image);
 
-  // Get the public URL for the image using Supabase storage
+  // Get a signed URL for the image using Supabase storage
   const { data } = supabase.storage
     .from('properties')
-    .getPublicUrl(image);
+    .createSignedUrl(image, 60 * 60); // URL valid for 1 hour
 
-  const imageUrl = data?.publicUrl;
-  console.log('PropertyCard - Generated Supabase URL:', imageUrl);
+  const imageUrl = data?.signedUrl;
+  console.log('PropertyCard - Generated Supabase signed URL:', imageUrl);
 
   // Function to handle image load error
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
