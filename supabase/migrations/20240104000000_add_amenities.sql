@@ -13,16 +13,28 @@ create table "public"."property_amenities" (
     primary key ("property_id", "amenity_id")
 );
 
--- Insert default amenities
+-- Insert default amenities with Lucide icon names
 insert into "public"."amenities" ("name", "icon") values
     ('WiFi', 'Wifi'),
-    ('Kitchen', 'Home'),
-    ('Free Parking', 'Car'),
     ('TV', 'Tv'),
-    ('Air Conditioning', 'Wind'),
-    ('Washing Machine', 'Shirt'),
+    ('Air conditioning', 'Wind'),
     ('Heating', 'Flame'),
-    ('Workspace', 'LayoutDashboard');
+    ('Kitchen', 'UtensilsCrossed'),
+    ('Washer', 'Shirt'),
+    ('Dryer', 'Fan'),
+    ('Free parking', 'Car'),
+    ('Dedicated workspace', 'LayoutDashboard'),
+    ('Pool', 'Waves'),
+    ('Hot tub', 'Bath'),
+    ('BBQ grill', 'Flame'),
+    ('Exercise equipment', 'Dumbbell'),
+    ('Security cameras', 'Camera'),
+    ('Smoke alarm', 'Bell'),
+    ('First aid kit', 'Heart'),
+    ('Fire extinguisher', 'Flame'),
+    ('Basic essentials', 'Package'),
+    ('Bed linens', 'BedDouble'),
+    ('Coffee maker', 'Coffee');
 
 -- Set up RLS policies
 alter table "public"."amenities" enable row level security;
