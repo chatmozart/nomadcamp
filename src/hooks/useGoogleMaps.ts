@@ -11,11 +11,12 @@ export const useGoogleMaps = () => {
     const fetchApiKey = async () => {
       try {
         setIsLoading(true);
-        console.log('Fetching Google Maps API key from Supabase secrets...');
+        console.log('Fetching Google Maps API key from Supabase config...');
         
-        const { data, error } = await supabase
-          .from('secrets')
-          .select('GOOGLE_MAPS_API_KEY')
+        const { data: config, error } = await supabase
+          .from('config')
+          .select('value')
+          .eq('key', 'GOOGLE_MAPS_API_KEY')
           .single();
 
         if (error) {
@@ -25,20 +26,21 @@ export const useGoogleMaps = () => {
             title: "Error",
             description: "Could not load Google Maps. Please try again later.",
           });
+          setIsLoading(false);
           return;
         }
 
-        if (data?.GOOGLE_MAPS_API_KEY) {
+        if (config?.value) {
           console.log('Successfully fetched Google Maps API key');
           // Load the Google Maps JavaScript API
           const script = document.createElement('script');
-          script.src = `https://maps.googleapis.com/maps/api/js?key=${data.GOOGLE_MAPS_API_KEY}&libraries=places`;
+          script.src = `https://maps.googleapis.com/maps/api/js?key=${config.value}&libraries=places`;
           script.async = true;
           script.defer = true;
           
           script.onload = () => {
             console.log('Google Maps JavaScript API loaded successfully');
-            setGoogleMapsApiKey(data.GOOGLE_MAPS_API_KEY);
+            setGoogleMapsApiKey(config.value);
             setIsLoading(false);
           };
 
@@ -54,7 +56,7 @@ export const useGoogleMaps = () => {
 
           document.head.appendChild(script);
         } else {
-          console.log('No Google Maps API key found in secrets');
+          console.log('No Google Maps API key found in config');
           toast({
             variant: "destructive",
             title: "Configuration Required",
