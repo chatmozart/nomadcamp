@@ -16,6 +16,7 @@ import {
   Home,
   Clock
 } from "lucide-react";
+import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -33,7 +34,7 @@ const properties = [
     location: "Malibu, California",
     price: 2200,
     rating: 4.9,
-    reviews: 128,
+    reviewCount: 128,
     description: "Experience luxury living in this stunning oceanfront villa. Perfect for digital nomads seeking inspiration with panoramic views of the Pacific Ocean. This fully furnished property includes a dedicated workspace, high-speed fiber internet, and all modern amenities.",
     highlights: [
       "Entire villa to yourself",
