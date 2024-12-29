@@ -1,43 +1,36 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, MapPin, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import PropertyCard from "@/components/PropertyCard";
 import SearchBar from "@/components/SearchBar";
 import CategoryFilter from "@/components/CategoryFilter";
+import { supabase } from "@/lib/supabase";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [properties, setProperties] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const properties = [
-    {
-      id: "1",
-      title: "Luxury Villa with Ocean View",
-      location: "Malibu, California",
-      price: 2200,
-      rating: 4.9,
-      reviews: 128,
-      image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80",
-    },
-    {
-      id: "2",
-      title: "Modern Downtown Loft",
-      location: "New York City, NY",
-      price: 1800,
-      rating: 4.8,
-      reviews: 96,
-      image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80",
-    },
-    {
-      id: "3",
-      title: "Cozy Mountain Cabin",
-      location: "Aspen, Colorado",
-      price: 1500,
-      rating: 4.95,
-      reviews: 156,
-      image: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&q=80",
-    },
-  ];
+  useEffect(() => {
+    const fetchProperties = async () => {
+      console.log('Fetching properties from Supabase...');
+      const { data, error } = await supabase
+        .from('properties')
+        .select('*');
+
+      if (error) {
+        console.error('Error fetching properties:', error);
+        return;
+      }
+
+      console.log('Properties fetched successfully:', data);
+      setProperties(data || []);
+      setIsLoading(false);
+    };
+
+    fetchProperties();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -64,9 +57,24 @@ const Index = () => {
         <CategoryFilter />
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
-          {properties.map((property) => (
-            <PropertyCard key={property.id} {...property} />
-          ))}
+          {isLoading ? (
+            <p>Loading properties...</p>
+          ) : properties.length === 0 ? (
+            <p>No properties found.</p>
+          ) : (
+            properties.map((property) => (
+              <PropertyCard 
+                key={property.id}
+                id={property.id}
+                title={property.title}
+                location={property.location}
+                price={property.price}
+                rating={4.5} // Default rating until we implement a rating system
+                reviews={0} // Default reviews until we implement a review system
+                image={`https://mqgpycqviacxddgnwbxo.supabase.co/storage/v1/object/public/properties/${property.image_url}`}
+              />
+            ))
+          )}
         </div>
       </div>
     </div>
