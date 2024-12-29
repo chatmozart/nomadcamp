@@ -9,7 +9,7 @@ const PropertiesList = () => {
   // Sample properties data - in a real app this would come from an API
   const properties = [
     {
-      id: 1,
+      id: "1",
       title: "Beachfront Villa with Private Pool",
       location: location || "",
       price: 1800,
@@ -18,7 +18,7 @@ const PropertiesList = () => {
       image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80",
     },
     {
-      id: 2,
+      id: "2",
       title: "Tropical Garden Bungalow",
       location: location || "",
       price: 1200,
@@ -27,7 +27,7 @@ const PropertiesList = () => {
       image: "https://images.unsplash.com/photo-1472396961693-142e6e269027?auto=format&fit=crop&q=80",
     },
     {
-      id: 3,
+      id: "3",
       title: "Modern Ocean View Apartment",
       location: location || "",
       price: 1500,
@@ -36,7 +36,7 @@ const PropertiesList = () => {
       image: "https://images.unsplash.com/photo-1482938289607-e9573fc25ebb?auto=format&fit=crop&q=80",
     },
     {
-      id: 4,
+      id: "4",
       title: "Luxury Mountain Retreat",
       location: location || "",
       price: 2200,
@@ -45,7 +45,7 @@ const PropertiesList = () => {
       image: "https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&q=80",
     },
     {
-      id: 5,
+      id: "5",
       title: "Peaceful Hillside Villa",
       location: location || "",
       price: 1900,

@@ -11,7 +11,7 @@ const Index = () => {
 
   const properties = [
     {
-      id: 1,
+      id: "1",
       title: "Luxury Villa with Ocean View",
       location: "Malibu, California",
       price: 2200,
@@ -20,7 +20,7 @@ const Index = () => {
       image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80",
     },
     {
-      id: 2,
+      id: "2",
       title: "Modern Downtown Loft",
       location: "New York City, NY",
       price: 1800,
@@ -29,7 +29,7 @@ const Index = () => {
       image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80",
     },
     {
-      id: 3,
+      id: "3",
       title: "Cozy Mountain Cabin",
       location: "Aspen, Colorado",
       price: 1500,
