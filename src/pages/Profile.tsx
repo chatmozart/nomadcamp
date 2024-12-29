@@ -12,6 +12,7 @@ interface Property {
   id: number;
   title: string;
   image_url: string;
+  imageSignedUrl?: string;
 }
 
 const Profile = () => {
@@ -60,7 +61,35 @@ const Profile = () => {
 
         if (!error && data) {
           console.log('Properties loaded:', data);
-          setProperties(data);
+          
+          // Generate signed URLs for each property image
+          const propertiesWithSignedUrls = await Promise.all(
+            data.map(async (property) => {
+              if (property.image_url) {
+                try {
+                  const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+                    .from('properties')
+                    .createSignedUrl(property.image_url, 60 * 60); // URL valid for 1 hour
+
+                  if (signedUrlError) {
+                    console.error('Error generating signed URL for property:', property.id, signedUrlError);
+                    return property;
+                  }
+
+                  return {
+                    ...property,
+                    imageSignedUrl: signedUrlData?.signedUrl
+                  };
+                } catch (error) {
+                  console.error('Failed to generate signed URL for property:', property.id, error);
+                  return property;
+                }
+              }
+              return property;
+            })
+          );
+
+          setProperties(propertiesWithSignedUrls);
         } else if (error) {
           console.error('Error fetching properties:', error);
         }
@@ -99,6 +128,11 @@ const Profile = () => {
         description: error instanceof Error ? error.message : "Failed to update profile",
       });
     }
+  };
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    console.error('Image failed to load, using placeholder');
+    e.currentTarget.src = '/placeholder.svg';
   };
 
   if (isLoading) {
@@ -160,9 +194,10 @@ const Profile = () => {
               >
                 {property.image_url ? (
                   <img
-                    src={`https://mqgpycqviacxddgnwbxo.supabase.co/storage/v1/object/public/properties/${property.image_url}`}
+                    src={property.imageSignedUrl || '/placeholder.svg'}
                     alt={property.title}
                     className="w-full h-full object-cover"
+                    onError={handleImageError}
                   />
                 ) : (
                   <div className="w-full h-full bg-gray-200 flex items-center justify-center">
