@@ -24,8 +24,8 @@ const PropertyCard = ({
   console.log('Rendering PropertyCard with ID:', id);
   console.log('Image path:', image);
   
-  // Construct the direct URL to the image in Supabase storage
-  const imageUrl = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/properties/${image}`;
+  // Construct the URL using the S3 connection URL
+  const imageUrl = `https://mqgpycqviacxddgnwbxo.supabase.co/storage/v1/object/public/properties/${image}`;
   console.log('Constructed image URL:', imageUrl);
   
   return (
