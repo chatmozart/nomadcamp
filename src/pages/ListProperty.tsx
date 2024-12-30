@@ -3,16 +3,21 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/lib/supabase";
 import { PropertyForm } from "@/components/property/PropertyForm";
+import { useNavigate } from "react-router-dom";
 
 const ListProperty = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handlePropertySubmit = async ({
     title,
     description,
     price,
+    priceThreeMonths,
+    priceSixMonths,
+    priceOneYear,
     location,
     imageFiles,
     amenityIds,
@@ -25,6 +30,9 @@ const ListProperty = () => {
     title: string;
     description: string;
     price: string;
+    priceThreeMonths: string;
+    priceSixMonths: string;
+    priceOneYear: string;
     location: string;
     imageFiles: File[];
     amenityIds: string[];
@@ -51,30 +59,40 @@ const ListProperty = () => {
         contactWhatsapp
       });
 
+      // Create the property data object, handling empty dates
+      const propertyData = {
+        title,
+        description,
+        price: parseFloat(price),
+        price_three_months: priceThreeMonths ? parseFloat(priceThreeMonths) : null,
+        price_six_months: priceSixMonths ? parseFloat(priceSixMonths) : null,
+        price_one_year: priceOneYear ? parseFloat(priceOneYear) : null,
+        location,
+        owner_id: user.id,
+        availability_start: availabilityStart || null,
+        availability_end: availabilityEnd || null,
+        contact_name: contactName || null,
+        contact_email: contactEmail || null,
+        contact_whatsapp: contactWhatsapp || null
+      };
+
+      console.log('Inserting property with data:', propertyData);
+
       const { data: propertyData, error: propertyError } = await supabase
         .from('properties')
-        .insert({
-          title,
-          description,
-          price: parseFloat(price),
-          location,
-          owner_id: user.id,
-          availability_start: availabilityStart,
-          availability_end: availabilityEnd,
-          contact_name: contactName || null,
-          contact_email: contactEmail || null,
-          contact_whatsapp: contactWhatsapp || null
-        })
+        .insert(propertyData)
         .select()
         .single();
 
       if (propertyError) {
+        console.error('Error creating property:', propertyError);
         throw propertyError;
       }
 
-      // Handle image uploads here if any
+      // Handle image uploads if any
       if (imageFiles.length > 0) {
-        for (const file of imageFiles) {
+        for (let i = 0; i < imageFiles.length; i++) {
+          const file = imageFiles[i];
           const fileExt = file.name.split('.').pop();
           const timestamp = Date.now();
           const randomStr = Math.random().toString(36).substring(2, 8);
@@ -85,15 +103,40 @@ const ListProperty = () => {
             .upload(fileName, file);
 
           if (uploadError) {
+            console.error('Error uploading image:', uploadError);
             throw uploadError;
           }
 
-          await supabase
+          // Create property image record
+          const { error: imageError } = await supabase
             .from('property_images')
             .insert({
               property_id: propertyData.id,
               image_url: fileName,
+              order: i
             });
+
+          if (imageError) {
+            console.error('Error creating image record:', imageError);
+            throw imageError;
+          }
+        }
+      }
+
+      // Insert property amenities
+      if (amenityIds.length > 0) {
+        const amenityRecords = amenityIds.map(amenityId => ({
+          property_id: propertyData.id,
+          amenity_id: amenityId
+        }));
+
+        const { error: amenitiesError } = await supabase
+          .from('property_amenities')
+          .insert(amenityRecords);
+
+        if (amenitiesError) {
+          console.error('Error creating amenity records:', amenitiesError);
+          throw amenitiesError;
         }
       }
 
@@ -101,6 +144,9 @@ const ListProperty = () => {
         title: "Success",
         description: "Property listed successfully",
       });
+
+      // Navigate to the property details page
+      navigate(`/property/${propertyData.id}`);
     } catch (error) {
       console.error("Error listing property:", error);
       toast({
@@ -118,7 +164,7 @@ const ListProperty = () => {
       <h1 className="text-2xl font-bold mb-8">List a Property</h1>
       <PropertyForm 
         onSubmit={handlePropertySubmit}
-        googleMapsLoaded={true} // Assuming Google Maps is always loaded for this page
+        googleMapsLoaded={true}
         onPlaceSelect={() => {}}
       />
     </div>
