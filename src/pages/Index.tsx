@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import PropertyCard from "@/components/PropertyCard";
 import SearchBar from "@/components/SearchBar";
 import CategoryFilter from "@/components/CategoryFilter";
@@ -90,7 +89,7 @@ const Index = () => {
       <div className="container mx-auto px-4 py-12">
         <CategoryFilter />
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr,400px] gap-8 mb-12">
           <div className="space-y-6">
             <h2 className="text-2xl font-semibold">All Locations</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -117,70 +116,13 @@ const Index = () => {
             </div>
           </div>
           
-          <div className="sticky top-24">
+          <div className="sticky top-24 h-[600px]">
             <PropertiesMap 
               properties={properties}
               onMarkerClick={handleMarkerClick}
               hoveredPropertyId={hoveredPropertyId}
             />
           </div>
-        </div>
-
-        <div className="space-y-16">
-          {isLoading ? (
-            <p>Loading properties...</p>
-          ) : Object.keys(groupedProperties).length === 0 ? (
-            <p>No properties found.</p>
-          ) : (
-            locationNames.map((category) => {
-              const categoryProperties = groupedProperties[category];
-              if (!categoryProperties?.length) return null;
-              
-              return (
-                <div key={category} className="space-y-6">
-                  <h2 className="text-2xl font-semibold">{category}</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {categoryProperties.map((property) => (
-                      <PropertyCard 
-                        key={property.id}
-                        id={property.id}
-                        title={property.title}
-                        location={property.location}
-                        location_category={property.locations?.name}
-                        price={property.price}
-                        price_three_months={property.price_three_months}
-                        price_six_months={property.price_six_months}
-                        price_one_year={property.price_one_year}
-                        image={property.image_url}
-                      />
-                    ))}
-                  </div>
-                </div>
-              );
-            })
-          )}
-          
-          {groupedProperties.Other?.length > 0 && (
-            <div className="space-y-6">
-              <h2 className="text-2xl font-semibold">Other Locations</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {groupedProperties.Other.map((property) => (
-                  <PropertyCard 
-                    key={property.id}
-                    id={property.id}
-                    title={property.title}
-                    location={property.location}
-                    location_category={property.locations?.name}
-                    price={property.price}
-                    price_three_months={property.price_three_months}
-                    price_six_months={property.price_six_months}
-                    price_one_year={property.price_one_year}
-                    image={property.image_url}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

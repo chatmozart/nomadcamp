@@ -85,15 +85,15 @@ export const PropertiesMap = ({ properties, onMarkerClick, hoveredPropertyId }: 
   }, [properties]);
 
   if (isLoadingApi || isGeocoding) {
-    return <div className="h-[400px] bg-muted flex items-center justify-center">Loading map...</div>;
+    return <div className="h-full bg-muted flex items-center justify-center">Loading map...</div>;
   }
 
   if (!mapCenter || markers.length === 0) {
-    return <div className="h-[400px] bg-muted flex items-center justify-center">Could not load map locations</div>;
+    return <div className="h-full bg-muted flex items-center justify-center">Could not load map locations</div>;
   }
 
   return (
-    <div className="h-[400px] w-full rounded-xl overflow-hidden">
+    <div className="h-full w-full rounded-xl overflow-hidden">
       <GoogleMap
         center={mapCenter}
         zoom={13}

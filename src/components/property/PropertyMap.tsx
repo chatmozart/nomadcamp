@@ -30,16 +30,11 @@ export const PropertyMap = ({ address }: PropertyMapProps) => {
         });
 
         if (result[0]?.geometry?.location) {
-          // Add random offset within 300 meters
-          const metersToLatDegrees = 0.00001 / 1.11; // Approximate conversion
-          const randomLat = (Math.random() - 0.5) * (300 * metersToLatDegrees * 2);
-          const randomLng = (Math.random() - 0.5) * (300 * metersToLatDegrees * 2);
-
           const location = {
-            lat: result[0].geometry.location.lat() + randomLat,
-            lng: result[0].geometry.location.lng() + randomLng
+            lat: result[0].geometry.location.lat(),
+            lng: result[0].geometry.location.lng()
           };
-          console.log('PropertyMap - Approximated coordinates:', location);
+          console.log('PropertyMap - Geocoded coordinates:', location);
           setCoordinates(location);
         }
       } catch (error) {
@@ -55,15 +50,15 @@ export const PropertyMap = ({ address }: PropertyMapProps) => {
   }, [address]);
 
   if (isLoadingApi || isGeocoding) {
-    return <div className="h-[400px] bg-muted flex items-center justify-center">Loading map...</div>;
+    return <div className="h-[600px] bg-muted flex items-center justify-center">Loading map...</div>;
   }
 
   if (!coordinates) {
-    return <div className="h-[400px] bg-muted flex items-center justify-center">Could not load map location</div>;
+    return <div className="h-[600px] bg-muted flex items-center justify-center">Could not load map location</div>;
   }
 
   return (
-    <div className="h-[400px] w-full">
+    <div className="h-[600px] w-full">
       <GoogleMap
         center={coordinates}
         zoom={14}
