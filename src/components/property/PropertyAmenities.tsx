@@ -23,7 +23,7 @@ export const PropertyAmenities = ({
   selectedAmenities = [],
   onAmenityChange
 }: PropertyAmenitiesProps) => {
-  const { data: amenities, isLoading, error } = useQuery({
+  const { data: amenities, isLoading: amenitiesLoading } = useQuery({
     queryKey: ['amenities'],
     queryFn: async () => {
       console.log('Fetching amenities');
@@ -41,7 +41,7 @@ export const PropertyAmenities = ({
     }
   });
 
-  const { data: propertyAmenities, isLoading: isLoadingPropertyAmenities, error: propertyAmenitiesError } = useQuery({
+  const { data: propertyAmenities, isLoading: propertyAmenitiesLoading } = useQuery({
     queryKey: ['property-amenities', propertyId],
     queryFn: async () => {
       if (!propertyId) return [];
@@ -62,17 +62,9 @@ export const PropertyAmenities = ({
     enabled: !!propertyId
   });
 
-  if (error || propertyAmenitiesError) {
-    console.error('Error loading amenities:', error || propertyAmenitiesError);
-    return (
-      <div className="py-6 border-b">
-        <h3 className="text-xl font-semibold mb-4">What this place offers</h3>
-        <div className="text-red-500">Error loading amenities. Please try again later.</div>
-      </div>
-    );
-  }
+  const isLoading = amenitiesLoading || (propertyAmenitiesLoading && !isEditing);
 
-  if (isLoading || (isLoadingPropertyAmenities && !isEditing)) {
+  if (isLoading) {
     return (
       <div className="py-6 border-b">
         <h3 className="text-xl font-semibold mb-4">What this place offers</h3>
@@ -95,7 +87,7 @@ export const PropertyAmenities = ({
     return (
       <div className="py-6 border-b">
         <h3 className="text-xl font-semibold mb-4">What this place offers</h3>
-        <div className="text-gray-500">No amenities available.</div>
+        <div className="text-gray-500">No amenities data available.</div>
       </div>
     );
   }
