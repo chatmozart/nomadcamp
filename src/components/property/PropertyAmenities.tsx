@@ -59,7 +59,7 @@ export const PropertyAmenities = ({
       console.log('Fetched property amenities:', data);
       return data.map(pa => pa.amenity_id);
     },
-    enabled: !!propertyId && !isEditing
+    enabled: !!propertyId
   });
 
   if (error || propertyAmenitiesError) {
