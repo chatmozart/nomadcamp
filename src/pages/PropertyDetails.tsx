@@ -43,7 +43,12 @@ const PropertyDetails = () => {
         console.log('Fetching property details for ID:', id);
         const { data: propertyData, error: propertyError } = await supabase
           .from('properties')
-          .select('*')
+          .select(`
+            *,
+            locations (
+              name
+            )
+          `)
           .eq('id', id)
           .single();
 
@@ -106,6 +111,7 @@ const PropertyDetails = () => {
           <PropertyHeader 
             title={property.title}
             location={property.location}
+            location_category={property.locations?.name}
             isOwner={isOwner}
             propertyId={property.id}
           />

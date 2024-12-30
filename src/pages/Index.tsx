@@ -20,7 +20,12 @@ const Index = () => {
       try {
         const { data, error } = await supabase
           .from('properties')
-          .select('*')
+          .select(`
+            *,
+            locations (
+              name
+            )
+          `)
           .order('created_at', { ascending: false });
 
         if (error) {
@@ -88,6 +93,7 @@ const Index = () => {
                         id={property.id}
                         title={property.title}
                         location={property.location}
+                        location_category={property.locations?.name}
                         price={property.price}
                         price_three_months={property.price_three_months}
                         price_six_months={property.price_six_months}
@@ -111,6 +117,7 @@ const Index = () => {
                     id={property.id}
                     title={property.title}
                     location={property.location}
+                    location_category={property.locations?.name}
                     price={property.price}
                     price_three_months={property.price_three_months}
                     price_six_months={property.price_six_months}

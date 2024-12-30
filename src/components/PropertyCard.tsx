@@ -7,6 +7,7 @@ interface PropertyCardProps {
   id: string;
   title: string;
   location: string;
+  location_category?: string;
   price: number;
   image: string | null;
   price_three_months?: number | null;
@@ -18,6 +19,7 @@ const PropertyCard = ({
   id,
   title,
   location,
+  location_category,
   price,
   image,
   price_three_months,
@@ -38,7 +40,6 @@ const PropertyCard = ({
   };
 
   const cheapestPrice = getCheapestPrice();
-  const formattedLocation = location.split(',')[0].trim();
 
   return (
     <Link to={`/property/${id}`} className="block">
@@ -57,7 +58,7 @@ const PropertyCard = ({
               <h3 className="font-semibold text-lg">{title}</h3>
               <div className="flex items-center text-muted-foreground mt-1">
                 <MapPin className="w-4 h-4 mr-1" />
-                <span className="text-sm">{formattedLocation}</span>
+                <span className="text-sm">{location_category || location.split(',')[0].trim()}</span>
               </div>
             </div>
           </div>

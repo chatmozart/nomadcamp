@@ -10,6 +10,8 @@ import { ExistingImagesGrid } from "./ExistingImagesGrid";
 import { AmenitiesSelection } from "./AmenitiesSelection";
 import { PropertyAvailabilityFields } from "./PropertyAvailabilityFields";
 import { usePropertyFormHandlers } from "./hooks/usePropertyFormHandlers";
+import { useLocations } from "@/hooks/useLocations";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface PropertyFormProps {
   onSubmit: (formData: {
@@ -20,6 +22,7 @@ interface PropertyFormProps {
     priceSixMonths: string;
     priceOneYear: string;
     location: string;
+    location_id: string;
     imageFiles: File[];
     amenityIds: string[];
     availabilityStart: string;
@@ -39,6 +42,7 @@ interface PropertyFormProps {
     priceSixMonths?: number;
     priceOneYear?: number;
     location: string;
+    location_id?: number;
     existingImages?: string[];
     availabilityStart?: string;
     availabilityEnd?: string;
@@ -64,6 +68,7 @@ export const PropertyForm = ({
   const [propertyPriceSixMonths, setPropertyPriceSixMonths] = useState(initialData?.priceSixMonths?.toString() || "");
   const [propertyPriceOneYear, setPropertyPriceOneYear] = useState(initialData?.priceOneYear?.toString() || "");
   const [propertyLocation, setPropertyLocation] = useState(initialData?.location || "");
+  const [selectedLocationId, setSelectedLocationId] = useState<string>(initialData?.location_id?.toString() || "");
   const [selectedAmenityIds, setSelectedAmenityIds] = useState<string[]>([]);
   const [availabilityStart, setAvailabilityStart] = useState(initialData?.availabilityStart || "");
   const [availabilityEnd, setAvailabilityEnd] = useState(initialData?.availabilityEnd || "");
@@ -71,6 +76,7 @@ export const PropertyForm = ({
   const [contactEmail, setContactEmail] = useState(initialData?.contactEmail || "");
   const [contactWhatsapp, setContactWhatsapp] = useState(initialData?.contactWhatsapp || "");
 
+  const { data: locations, isLoading: isLoadingLocations } = useLocations();
   const {
     imageFiles,
     previewUrls,
@@ -112,6 +118,15 @@ export const PropertyForm = ({
       return;
     }
 
+    if (!selectedLocationId) {
+      toast({
+        variant: "destructive",
+        title: "Location Required",
+        description: "Please select a location category",
+      });
+      return;
+    }
+
     // Validate that at least one price is provided
     if (!propertyPrice && !propertyPriceThreeMonths && !propertyPriceSixMonths && !propertyPriceOneYear) {
       toast({
@@ -126,7 +141,8 @@ export const PropertyForm = ({
       images: imageFiles,
       amenities: selectedAmenityIds,
       availability: { start: availabilityStart, end: availabilityEnd },
-      contact: { name: contactName, email: contactEmail, whatsapp: contactWhatsapp }
+      contact: { name: contactName, email: contactEmail, whatsapp: contactWhatsapp },
+      location_id: selectedLocationId
     });
 
     await onSubmit({
@@ -137,6 +153,7 @@ export const PropertyForm = ({
       priceSixMonths: propertyPriceSixMonths,
       priceOneYear: propertyPriceOneYear,
       location: propertyLocation,
+      location_id: selectedLocationId,
       imageFiles,
       amenityIds: selectedAmenityIds,
       availabilityStart,
@@ -154,6 +171,7 @@ export const PropertyForm = ({
       setPropertyPriceSixMonths("");
       setPropertyPriceOneYear("");
       setPropertyLocation("");
+      setSelectedLocationId("");
       setImageFiles([]);
       setPreviewUrls([]);
       setSelectedAmenityIds([]);
@@ -176,6 +194,26 @@ export const PropertyForm = ({
           placeholder="Enter property title"
           required
         />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="locationCategory">Location Category</Label>
+        <Select
+          value={selectedLocationId}
+          onValueChange={setSelectedLocationId}
+          required
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select a location" />
+          </SelectTrigger>
+          <SelectContent>
+            {locations?.map((location) => (
+              <SelectItem key={location.id} value={location.id.toString()}>
+                {location.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="space-y-2">
