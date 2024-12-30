@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import { GoogleMap, Marker } from "@react-google-maps/api";
+import { GoogleMap } from "@react-google-maps/api";
 import { useGoogleMaps } from "@/hooks/useGoogleMaps";
+import { PropertyMapMarker } from "./PropertyMapMarker";
+import { getApproximateLocation, defaultMapOptions } from "@/utils/mapUtils";
 
 interface Property {
   id: string;
@@ -42,17 +44,21 @@ export const PropertiesMap = ({ properties, onMarkerClick, hoveredPropertyId }: 
             });
 
             if (result[0]?.geometry?.location) {
-              // Add random offset within 300 meters for privacy
-              const metersToLatDegrees = 0.00001 / 1.11;
-              const randomLat = (Math.random() - 0.5) * (300 * metersToLatDegrees * 2);
-              const randomLng = (Math.random() - 0.5) * (300 * metersToLatDegrees * 2);
-
-              const location = {
-                lat: result[0].geometry.location.lat() + randomLat,
-                lng: result[0].geometry.location.lng() + randomLng,
-                id: property.id
+              const exactLocation = {
+                lat: result[0].geometry.location.lat(),
+                lng: result[0].geometry.location.lng()
               };
-              markersData.push(location);
+              
+              // Get approximate location within 100 meters
+              const approximateLocation = getApproximateLocation(
+                exactLocation.lat,
+                exactLocation.lng
+              );
+
+              markersData.push({
+                ...approximateLocation,
+                id: property.id
+              });
             }
           } catch (error) {
             console.error(`Error geocoding property ${property.id}:`, error);
@@ -62,7 +68,6 @@ export const PropertiesMap = ({ properties, onMarkerClick, hoveredPropertyId }: 
         console.log('PropertiesMap - Geocoded markers:', markersData);
         setMarkers(markersData);
 
-        // Set map center to the average of all markers
         if (markersData.length > 0) {
           const center = markersData.reduce(
             (acc, curr) => ({
@@ -93,110 +98,21 @@ export const PropertiesMap = ({ properties, onMarkerClick, hoveredPropertyId }: 
     return <div className="h-[400px] bg-muted flex items-center justify-center">Could not load map locations</div>;
   }
 
-  const mapStyles = [
-    {
-      "elementType": "geometry",
-      "stylers": [{ "color": "#f1f1f1" }]
-    },
-    {
-      "elementType": "labels.text.fill",
-      "stylers": [{ "color": "#8A898C" }]
-    },
-    {
-      "elementType": "labels.text.stroke",
-      "stylers": [{ "color": "#f1f1f1" }]
-    },
-    {
-      "featureType": "administrative",
-      "elementType": "geometry.stroke",
-      "stylers": [{ "color": "#c8c8c9" }]
-    },
-    {
-      "featureType": "administrative.land_parcel",
-      "elementType": "labels.text.fill",
-      "stylers": [{ "color": "#8A898C" }]
-    },
-    {
-      "featureType": "landscape",
-      "elementType": "geometry",
-      "stylers": [{ "color": "#f1f1f1" }]
-    },
-    {
-      "featureType": "poi",
-      "elementType": "geometry",
-      "stylers": [{ "color": "#e5e5e5" }]
-    },
-    {
-      "featureType": "poi",
-      "elementType": "labels.text.fill",
-      "stylers": [{ "color": "#8A898C" }]
-    },
-    {
-      "featureType": "poi.park",
-      "elementType": "geometry",
-      "stylers": [{ "color": "#e5e5e5" }]
-    },
-    {
-      "featureType": "road",
-      "elementType": "geometry",
-      "stylers": [{ "color": "#ffffff" }]
-    },
-    {
-      "featureType": "road.arterial",
-      "elementType": "geometry",
-      "stylers": [{ "color": "#ffffff" }]
-    },
-    {
-      "featureType": "road.highway",
-      "elementType": "geometry",
-      "stylers": [{ "color": "#dadada" }]
-    },
-    {
-      "featureType": "road.highway",
-      "elementType": "labels.text.fill",
-      "stylers": [{ "color": "#8A898C" }]
-    },
-    {
-      "featureType": "water",
-      "elementType": "geometry",
-      "stylers": [{ "color": "#0EA5E9" }]
-    },
-    {
-      "featureType": "water",
-      "elementType": "labels.text.fill",
-      "stylers": [{ "color": "#33C3F0" }]
-    }
-  ];
-
   return (
     <div className="h-[400px] w-full rounded-xl overflow-hidden">
       <GoogleMap
         center={mapCenter}
         zoom={13}
         mapContainerStyle={{ width: '100%', height: '100%' }}
-        options={{
-          styles: mapStyles,
-          zoomControl: true,
-          mapTypeControl: false,
-          scaleControl: false,
-          streetViewControl: false,
-          rotateControl: false,
-          fullscreenControl: false,
-          disableDefaultUI: true
-        }}
+        options={defaultMapOptions}
       >
         {markers.map((marker) => (
-          <Marker
+          <PropertyMapMarker
             key={marker.id}
             position={{ lat: marker.lat, lng: marker.lng }}
+            propertyId={marker.id}
+            isHovered={hoveredPropertyId === marker.id}
             onClick={() => onMarkerClick?.(marker.id)}
-            icon={{
-              url: hoveredPropertyId === marker.id 
-                ? "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-                : "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
-              scaledSize: new google.maps.Size(32, 32)
-            }}
-            animation={hoveredPropertyId === marker.id ? google.maps.Animation.BOUNCE : undefined}
           />
         ))}
       </GoogleMap>
