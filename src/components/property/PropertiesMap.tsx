@@ -93,12 +93,92 @@ export const PropertiesMap = ({ properties, onMarkerClick, hoveredPropertyId }: 
     return <div className="h-[400px] bg-muted flex items-center justify-center">Could not load map locations</div>;
   }
 
+  const mapStyles = [
+    {
+      "elementType": "geometry",
+      "stylers": [{ "color": "#f5f5f5" }]
+    },
+    {
+      "elementType": "labels.icon",
+      "stylers": [{ "visibility": "off" }]
+    },
+    {
+      "elementType": "labels.text.fill",
+      "stylers": [{ "color": "#616161" }]
+    },
+    {
+      "elementType": "labels.text.stroke",
+      "stylers": [{ "color": "#f5f5f5" }]
+    },
+    {
+      "featureType": "administrative.land_parcel",
+      "stylers": [{ "visibility": "off" }]
+    },
+    {
+      "featureType": "administrative.land_parcel",
+      "elementType": "labels.text.fill",
+      "stylers": [{ "color": "#bdbdbd" }]
+    },
+    {
+      "featureType": "road",
+      "elementType": "geometry",
+      "stylers": [{ "color": "#ffffff" }]
+    },
+    {
+      "featureType": "road.arterial",
+      "elementType": "labels",
+      "stylers": [{ "visibility": "off" }]
+    },
+    {
+      "featureType": "road.highway",
+      "elementType": "geometry",
+      "stylers": [{ "color": "#dadada" }]
+    },
+    {
+      "featureType": "road.highway",
+      "elementType": "labels",
+      "stylers": [{ "visibility": "off" }]
+    },
+    {
+      "featureType": "road.local",
+      "stylers": [{ "visibility": "off" }]
+    },
+    {
+      "featureType": "poi",
+      "stylers": [{ "visibility": "off" }]
+    },
+    {
+      "featureType": "transit",
+      "stylers": [{ "visibility": "off" }]
+    },
+    {
+      "featureType": "water",
+      "elementType": "geometry",
+      "stylers": [{ "color": "#e9e9e9" }]
+    },
+    {
+      "featureType": "water",
+      "elementType": "labels.text.fill",
+      "stylers": [{ "color": "#9e9e9e" }]
+    }
+  ];
+
   return (
     <div className="h-[400px] w-full rounded-xl overflow-hidden">
       <GoogleMap
         center={mapCenter}
         zoom={13}
         mapContainerStyle={{ width: '100%', height: '100%' }}
+        options={{
+          styles: mapStyles,
+          zoomControl: true,
+          mapTypeControl: false,
+          scaleControl: false,
+          streetViewControl: false,
+          rotateControl: false,
+          fullscreenControl: false,
+          disableDefaultUI: true
+        }}
       >
         {markers.map((marker) => (
           <Marker
