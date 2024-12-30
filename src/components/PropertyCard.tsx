@@ -29,6 +29,13 @@ const PropertyCard = ({
       console.log('PropertyCard - Starting to load image URL for ID:', id);
       console.log('PropertyCard - Raw image path:', image);
       
+      // Don't attempt to get signed URL if image is null/undefined
+      if (!image) {
+        console.log('PropertyCard - No image provided, using placeholder');
+        setImageUrl(null);
+        return;
+      }
+
       try {
         const { data, error } = await supabase.storage
           .from('properties')
@@ -36,6 +43,7 @@ const PropertyCard = ({
 
         if (error) {
           console.error('PropertyCard - Error generating signed URL:', error);
+          setImageUrl(null);
           return;
         }
 
@@ -43,6 +51,7 @@ const PropertyCard = ({
         setImageUrl(data?.signedUrl || null);
       } catch (error) {
         console.error('PropertyCard - Failed to generate signed URL:', error);
+        setImageUrl(null);
       }
     };
 
