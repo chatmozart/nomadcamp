@@ -28,18 +28,30 @@ const PropertiesList = () => {
         }
         
         console.log('Searching for location:', searchLocation);
-        query = query.ilike('location', `%${searchLocation}%`);
+        // Fetch all properties and filter them using the same logic as the index page
+        const { data, error } = await query;
+
+        if (error) {
+          console.error('Error fetching properties:', error);
+          return;
+        }
+
+        // Filter properties using the same categorization logic as the index page
+        const filteredProperties = data?.filter(property => {
+          const category = getPropertyCategory(property.location);
+          return category === searchLocation;
+        }) || [];
+
+        console.log('Filtered properties:', filteredProperties);
+        setProperties(filteredProperties);
+      } else {
+        const { data, error } = await query;
+        if (error) {
+          console.error('Error fetching properties:', error);
+          return;
+        }
+        setProperties(data || []);
       }
-
-      const { data, error } = await query;
-
-      if (error) {
-        console.error('Error fetching properties:', error);
-        return;
-      }
-
-      console.log('Properties fetched successfully:', data);
-      setProperties(data || []);
       setIsLoading(false);
     };
 
@@ -77,6 +89,9 @@ const PropertiesList = () => {
                   rating={4.5}
                   reviews={0}
                   image={property.image_url}
+                  price_three_months={property.price_three_months}
+                  price_six_months={property.price_six_months}
+                  price_one_year={property.price_one_year}
                 />
               </div>
             ))
