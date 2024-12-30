@@ -29,39 +29,26 @@ export const getDisplayLocation = (urlLocation: string | undefined): string => {
     return getUrlFriendlyLocation(locationPart) === urlLocation;
   });
   
-  return fullCategory || urlLocation.split('-')
+  return fullCategory ? fullCategory.split(' - ')[0] : urlLocation.split('-')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 };
 
-export const getPropertyCategory = (location: string): LocationCategory | null => {
-  console.log('Categorizing location:', location);
-  
-  // Convert location to lowercase for case-insensitive matching
-  const normalizedLocation = location.toLowerCase();
-  
-  // Find matching category
-  const category = LOCATION_CATEGORIES.find(cat => {
-    const locationPart = cat.split(' - ')[0].toLowerCase();
-    return normalizedLocation.includes(locationPart);
-  });
-  
-  console.log('Matched category:', category || 'None');
-  return category || null;
-};
-
 export const groupPropertiesByLocation = (properties: any[]) => {
-  console.log('Grouping properties by location...');
+  console.log('Grouping properties by location...', properties);
   
   const grouped = properties.reduce((acc, property) => {
-    const category = getPropertyCategory(property.location);
-    if (category) {
-      const locationName = category.split(' - ')[0];
+    // Use the location name from the locations table relationship
+    if (property.locations?.name) {
+      const locationName = property.locations.name.split(' - ')[0];
+      console.log('Grouping property under location:', locationName, property);
+      
       if (!acc[locationName]) {
         acc[locationName] = [];
       }
       acc[locationName].push(property);
     } else {
+      console.log('Property without location category, adding to Other:', property);
       if (!acc.Other) {
         acc.Other = [];
       }

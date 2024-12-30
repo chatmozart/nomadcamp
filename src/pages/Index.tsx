@@ -36,6 +36,7 @@ const Index = () => {
         
         // Group the properties by location
         const grouped = groupPropertiesByLocation(data || []);
+        console.log('Grouped properties:', grouped);
         setGroupedProperties(grouped);
       } catch (error) {
         console.error('Unexpected error fetching properties:', error);
