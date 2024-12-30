@@ -89,6 +89,9 @@ const Index = () => {
                         title={property.title}
                         location={property.location}
                         price={property.price}
+                        price_three_months={property.price_three_months}
+                        price_six_months={property.price_six_months}
+                        price_one_year={property.price_one_year}
                         rating={4.5}
                         reviews={0}
                         image={property.image_url}
@@ -111,6 +114,9 @@ const Index = () => {
                     title={property.title}
                     location={property.location}
                     price={property.price}
+                    price_three_months={property.price_three_months}
+                    price_six_months={property.price_six_months}
+                    price_one_year={property.price_one_year}
                     rating={4.5}
                     reviews={0}
                     image={property.image_url}

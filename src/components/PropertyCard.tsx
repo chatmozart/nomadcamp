@@ -11,6 +11,9 @@ interface PropertyCardProps {
   rating: number;
   reviews: number;
   image: string;
+  price_three_months?: number | null;
+  price_six_months?: number | null;
+  price_one_year?: number | null;
 }
 
 const PropertyCard = ({
@@ -21,9 +24,24 @@ const PropertyCard = ({
   rating,
   reviews,
   image,
+  price_three_months,
+  price_six_months,
+  price_one_year,
 }: PropertyCardProps) => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   
+  // Calculate the cheapest price per month
+  const getCheapestPrice = () => {
+    const prices = [
+      price, // Monthly price
+      price_three_months ? price_three_months / 3 : null, // 3-month price per month
+      price_six_months ? price_six_months / 6 : null, // 6-month price per month
+      price_one_year ? price_one_year / 12 : null, // Yearly price per month
+    ].filter((p): p is number => p !== null);
+
+    return Math.min(...prices);
+  };
+
   useEffect(() => {
     const loadImageUrl = async () => {
       console.log('PropertyCard - Starting to load image URL for ID:', id);
@@ -95,6 +113,8 @@ const PropertyCard = ({
     });
   };
 
+  const cheapestPrice = getCheapestPrice();
+
   return (
     <Link to={`/property/${id}`} className="block">
       <div className="property-card rounded-xl overflow-hidden bg-card transition-transform hover:scale-[1.02]">
@@ -124,7 +144,7 @@ const PropertyCard = ({
             </div>
           </div>
           <div className="mt-4">
-            <span className="font-semibold text-lg">${price}</span>
+            <span className="font-semibold text-lg">${cheapestPrice}</span>
             <span className="text-muted-foreground"> / month</span>
           </div>
         </div>
