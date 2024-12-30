@@ -21,11 +21,11 @@ export const usePropertyFormHandlers = (
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     
-    if (imageFiles.length + files.length > 10) {
+    if (imageFiles.length + files.length > 20) {
       toast({
         variant: "destructive",
         title: "Too many images",
-        description: "Maximum 10 images allowed per property",
+        description: "Maximum 20 images allowed per property",
       });
       return;
     }
