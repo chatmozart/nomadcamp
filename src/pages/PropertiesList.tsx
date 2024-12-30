@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import PropertyCard from "@/components/PropertyCard";
+import { PropertiesMap } from "@/components/property/PropertiesMap";
 import { supabase } from "@/lib/supabase";
 import { getPropertyCategory } from "@/utils/locationUtils";
 
@@ -8,6 +9,7 @@ const PropertiesList = () => {
   const { location } = useParams();
   const [properties, setProperties] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null);
   
   console.log("Current location param:", location);
 
@@ -67,12 +69,36 @@ const PropertiesList = () => {
       .join(' ');
   };
 
+  const handleMarkerClick = (propertyId: string) => {
+    setSelectedPropertyId(propertyId);
+    // Scroll to the property card
+    const element = document.getElementById(`property-${propertyId}`);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Add a temporary highlight effect
+      element.classList.add('ring-2', 'ring-primary', 'ring-offset-2');
+      setTimeout(() => {
+        element.classList.remove('ring-2', 'ring-primary', 'ring-offset-2');
+      }, 2000);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-6 sm:py-12">
         <h1 className="text-2xl sm:text-4xl font-bold mb-4 sm:mb-8 fade-in px-2">
           Properties in {getDisplayLocation(location)}
         </h1>
+        
+        {/* Map Section */}
+        <div className="mb-8">
+          <PropertiesMap 
+            properties={properties}
+            onMarkerClick={handleMarkerClick}
+          />
+        </div>
+
+        {/* Properties Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
           {isLoading ? (
             <p>Loading properties...</p>
@@ -80,7 +106,11 @@ const PropertiesList = () => {
             <p>No properties found in this location.</p>
           ) : (
             properties.map((property) => (
-              <div key={property.id} className="px-2 sm:px-0">
+              <div 
+                key={property.id} 
+                id={`property-${property.id}`}
+                className={`px-2 sm:px-0 transition-all duration-300`}
+              >
                 <PropertyCard
                   id={property.id}
                   title={property.title}
