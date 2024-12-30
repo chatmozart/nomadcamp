@@ -18,6 +18,10 @@ interface PropertyData {
   contact_email: string | null;
   contact_whatsapp: string | null;
   owner_id: string;
+  location_id: number | null;
+  locations: {
+    name: string;
+  } | null;
 }
 
 export const usePropertyData = (propertyId: string | undefined) => {
@@ -35,10 +39,15 @@ export const usePropertyData = (propertyId: string | undefined) => {
       try {
         console.log('Fetching property with ID:', propertyId);
         
-        // Fetch property details
+        // Fetch property details with locations join
         const { data: propertyData, error: propertyError } = await supabase
           .from('properties')
-          .select('*')
+          .select(`
+            *,
+            locations (
+              name
+            )
+          `)
           .eq('id', propertyId)
           .single();
 
@@ -72,18 +81,7 @@ export const usePropertyData = (propertyId: string | undefined) => {
         console.log('Fetched property data:', propertyData);
         console.log('Fetched property images:', imagesData);
 
-        setProperty({
-          ...propertyData,
-          price_three_months: propertyData.price_three_months,
-          price_six_months: propertyData.price_six_months,
-          price_one_year: propertyData.price_one_year,
-          availability_start: propertyData.availability_start,
-          availability_end: propertyData.availability_end,
-          contact_name: propertyData.contact_name,
-          contact_email: propertyData.contact_email,
-          contact_whatsapp: propertyData.contact_whatsapp
-        });
-        
+        setProperty(propertyData);
         setPropertyImages(imagesData.map(img => img.image_url));
         setIsLoading(false);
       } catch (error) {

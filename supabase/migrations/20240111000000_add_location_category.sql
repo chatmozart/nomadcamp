@@ -5,7 +5,7 @@ CREATE TABLE locations (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
 
--- Add location_id to properties
+-- Add location_id to properties with foreign key constraint
 ALTER TABLE properties ADD COLUMN location_id INTEGER REFERENCES locations(id);
 
 -- Insert predefined locations
@@ -24,3 +24,5 @@ ALTER TABLE locations ENABLE ROW LEVEL SECURITY;
 -- Allow public read access to locations
 CREATE POLICY "Allow public read access to locations" ON locations
   FOR SELECT TO public USING (true);
+
+-- Update the query in usePropertyData to include the locations join
