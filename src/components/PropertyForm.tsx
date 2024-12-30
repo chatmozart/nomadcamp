@@ -6,10 +6,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Autocomplete } from "@react-google-maps/api";
 import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { ExistingImagesGrid } from "./ExistingImagesGrid";
-import { AmenitiesSelection } from "./AmenitiesSelection";
-import { PropertyAvailabilityFields } from "./PropertyAvailabilityFields";
-import { usePropertyFormHandlers } from "./hooks/usePropertyFormHandlers";
+import { ExistingImagesGrid } from "@/components/property/ExistingImagesGrid";
+import { AmenitiesSelection } from "@/components/property/AmenitiesSelection";
+import { PropertyAvailabilityFields } from "@/components/property/PropertyAvailabilityFields";
+import { usePropertyFormHandlers } from "@/components/property/hooks/usePropertyFormHandlers";
 import { useLocations } from "@/hooks/useLocations";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
