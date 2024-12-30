@@ -1,7 +1,6 @@
 import { MapPin, Star } from "lucide-react";
 import { Link } from "react-router-dom";
-import { supabase } from "@/lib/supabase";
-import { useEffect, useState } from "react";
+import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 
 interface PropertyCardProps {
   id: string;
@@ -28,89 +27,16 @@ const PropertyCard = ({
   price_six_months,
   price_one_year,
 }: PropertyCardProps) => {
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  
   // Calculate the cheapest price per month
   const getCheapestPrice = () => {
     const monthlyPrices = [
-      price, // Monthly price
-      price_three_months ? Math.round(price_three_months / 3) : null, // 3-month price per month
-      price_six_months ? Math.round(price_six_months / 6) : null, // 6-month price per month
-      price_one_year ? Math.round(price_one_year / 12) : null, // Yearly price per month
+      price,
+      price_three_months,
+      price_six_months,
+      price_one_year,
     ].filter((p): p is number => p !== null);
 
     return Math.min(...monthlyPrices);
-  };
-
-  useEffect(() => {
-    const loadImageUrl = async () => {
-      console.log('PropertyCard - Starting to load image URL for ID:', id);
-      
-      try {
-        // Always try to get the first image from property_images table first
-        const { data: imageData, error: imageError } = await supabase
-          .from('property_images')
-          .select('image_url')
-          .eq('property_id', id)
-          .order('order', { ascending: true })
-          .limit(1)
-          .single();
-
-        if (!imageError && imageData?.image_url) {
-          console.log('PropertyCard - Found image in property_images:', imageData.image_url);
-          const { data: signedUrlData, error: signedUrlError } = await supabase.storage
-            .from('properties')
-            .createSignedUrl(imageData.image_url, 60 * 60);
-
-          if (!signedUrlError && signedUrlData) {
-            console.log('PropertyCard - Generated signed URL from property_images:', signedUrlData.signedUrl);
-            setImageUrl(signedUrlData.signedUrl);
-            return;
-          }
-        }
-
-        // Fallback to the direct image path if no property_images or error occurred
-        if (image) {
-          console.log('PropertyCard - Falling back to direct image path:', image);
-          const { data: directSignedUrlData, error: directSignedUrlError } = await supabase.storage
-            .from('properties')
-            .createSignedUrl(image, 60 * 60);
-
-          if (!directSignedUrlError && directSignedUrlData) {
-            console.log('PropertyCard - Generated signed URL from direct path:', directSignedUrlData.signedUrl);
-            setImageUrl(directSignedUrlData.signedUrl);
-            return;
-          }
-        }
-
-        console.log('PropertyCard - No valid image found, using placeholder');
-        setImageUrl(null);
-      } catch (error) {
-        console.error('PropertyCard - Failed to load image:', error);
-        setImageUrl(null);
-      }
-    };
-
-    loadImageUrl();
-  }, [id, image]);
-
-  // Function to handle image load error
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    console.error('PropertyCard - Image failed to load:', {
-      id,
-      imageUrl,
-      originalImage: image,
-      error: e
-    });
-    e.currentTarget.src = '/placeholder.svg';
-  };
-
-  // Function to handle successful image load
-  const handleImageLoad = () => {
-    console.log('PropertyCard - Image loaded successfully:', {
-      id,
-      imageUrl
-    });
   };
 
   const cheapestPrice = getCheapestPrice();
@@ -119,13 +45,11 @@ const PropertyCard = ({
     <Link to={`/property/${id}`} className="block">
       <div className="property-card rounded-xl overflow-hidden bg-card transition-transform hover:scale-[1.02]">
         <div className="relative aspect-[4/3]">
-          <img
-            src={imageUrl || '/placeholder.svg'}
+          <ImageWithFallback
+            src={image}
             alt={title}
             className="w-full h-full object-cover"
-            loading="lazy"
-            onError={handleImageError}
-            onLoad={handleImageLoad}
+            containerClassName="w-full h-full"
           />
         </div>
         <div className="p-4">
