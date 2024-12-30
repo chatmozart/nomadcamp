@@ -5,6 +5,23 @@ import { supabase } from "@/lib/supabase";
 import { PropertyForm } from "@/components/property/PropertyForm";
 import { useNavigate } from "react-router-dom";
 
+interface PropertyResponse {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  price_three_months: number | null;
+  price_six_months: number | null;
+  price_one_year: number | null;
+  location: string;
+  owner_id: string;
+  availability_start: string | null;
+  availability_end: string | null;
+  contact_name: string | null;
+  contact_email: string | null;
+  contact_whatsapp: string | null;
+}
+
 const ListProperty = () => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -60,7 +77,7 @@ const ListProperty = () => {
       });
 
       // Create the property data object, handling empty dates
-      const propertyData = {
+      const propertyInput = {
         title,
         description,
         price: parseFloat(price),
@@ -76,11 +93,11 @@ const ListProperty = () => {
         contact_whatsapp: contactWhatsapp || null
       };
 
-      console.log('Inserting property with data:', propertyData);
+      console.log('Inserting property with data:', propertyInput);
 
       const { data: propertyData, error: propertyError } = await supabase
         .from('properties')
-        .insert(propertyData)
+        .insert(propertyInput)
         .select()
         .single();
 
@@ -88,6 +105,8 @@ const ListProperty = () => {
         console.error('Error creating property:', propertyError);
         throw propertyError;
       }
+
+      const property = propertyData as PropertyResponse;
 
       // Handle image uploads if any
       if (imageFiles.length > 0) {
@@ -111,7 +130,7 @@ const ListProperty = () => {
           const { error: imageError } = await supabase
             .from('property_images')
             .insert({
-              property_id: propertyData.id,
+              property_id: property.id,
               image_url: fileName,
               order: i
             });
@@ -126,7 +145,7 @@ const ListProperty = () => {
       // Insert property amenities
       if (amenityIds.length > 0) {
         const amenityRecords = amenityIds.map(amenityId => ({
-          property_id: propertyData.id,
+          property_id: property.id,
           amenity_id: amenityId
         }));
 
@@ -146,7 +165,7 @@ const ListProperty = () => {
       });
 
       // Navigate to the property details page
-      navigate(`/property/${propertyData.id}`);
+      navigate(`/property/${property.id}`);
     } catch (error) {
       console.error("Error listing property:", error);
       toast({
