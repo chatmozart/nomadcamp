@@ -1,31 +1,29 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { LOCATION_CATEGORIES } from "@/utils/locationUtils";
 
 const CategoryFilter = () => {
   const [activeCategory, setActiveCategory] = useState("All");
   const navigate = useNavigate();
   
-  const categories = [
-    "All",
-    "Koh Phangan",
-    "Chiang Mai",
-    "Bali",
-    "Lisbon",
-    "Tenerife",
-    "Santa Teresa",
-    "Tamarindo"
-  ];
+  const categories = ["All", ...LOCATION_CATEGORIES];
 
   const handleCategoryClick = (category: string) => {
     setActiveCategory(category);
     if (category === "All") {
       navigate("/");
     } else {
-      // Convert category to URL-friendly format with special case for Koh Phangan
-      const locationParam = category === "Koh Phangan" 
-        ? "ko-pha-ngan"
-        : category.toLowerCase().replace(/\s+/g, '-');
+      // Convert category to URL-friendly format
+      const getUrlFriendlyLocation = (location: string) => {
+        if (location === "Koh Phangan") {
+          return "ko-pha-ngan";
+        }
+        return location.toLowerCase().replace(/\s+/g, '-');
+      };
+      
+      const locationParam = getUrlFriendlyLocation(category);
+      console.log('Navigating to location:', locationParam);
       navigate(`/properties/${locationParam}`);
     }
   };
