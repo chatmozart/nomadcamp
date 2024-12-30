@@ -40,25 +40,25 @@ export const PropertyBookingCard = ({
           <div className="space-y-4">
             <h3 className="text-xl font-semibold">Price</h3>
             <div className="flex justify-between items-center">
-              <span>1 month</span>
+              <span>Monthly rate (1 month contract)</span>
               <span className="text-2xl font-bold">{price.toLocaleString()}฿</span>
             </div>
             {priceThreeMonths && (
               <div className="flex justify-between items-center">
-                <span>3 months</span>
-                <span className="text-2xl font-bold">{priceThreeMonths.toLocaleString()}฿</span>
+                <span>Monthly rate (3 month contract)</span>
+                <span className="text-2xl font-bold">{Math.round(priceThreeMonths / 3).toLocaleString()}฿</span>
               </div>
             )}
             {priceSixMonths && (
               <div className="flex justify-between items-center">
-                <span>6 months</span>
-                <span className="text-2xl font-bold">{priceSixMonths.toLocaleString()}฿</span>
+                <span>Monthly rate (6 month contract)</span>
+                <span className="text-2xl font-bold">{Math.round(priceSixMonths / 6).toLocaleString()}฿</span>
               </div>
             )}
             {priceOneYear && (
               <div className="flex justify-between items-center">
-                <span>12 months</span>
-                <span className="text-2xl font-bold">{priceOneYear.toLocaleString()}฿</span>
+                <span>Monthly rate (12 month contract)</span>
+                <span className="text-2xl font-bold">{Math.round(priceOneYear / 12).toLocaleString()}฿</span>
               </div>
             )}
           </div>
