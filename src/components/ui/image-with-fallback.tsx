@@ -27,6 +27,14 @@ export const ImageWithFallback = ({
         return;
       }
 
+      // If the URL is already a full URL (e.g., from the carousel), use it directly
+      if (src.startsWith('http')) {
+        console.log('ImageWithFallback - Using direct URL:', src);
+        setSignedUrl(src);
+        setError(false);
+        return;
+      }
+
       try {
         console.log('ImageWithFallback - Getting signed URL for:', src);
         const { data, error } = await supabase.storage
