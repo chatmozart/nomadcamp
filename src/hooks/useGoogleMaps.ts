@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 
+const SCRIPT_ID = 'google-maps-script';
+
 export const useGoogleMaps = () => {
   const [googleMapsApiKey, setGoogleMapsApiKey] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
@@ -30,29 +32,38 @@ export const useGoogleMaps = () => {
 
         if (data?.apiKey) {
           console.log('Successfully received API key from Edge Function');
-          // Load the Google Maps JavaScript API
-          const script = document.createElement('script');
-          script.src = `https://maps.googleapis.com/maps/api/js?key=${data.apiKey}&libraries=places`;
-          script.async = true;
-          script.defer = true;
           
-          script.onload = () => {
-            console.log('Google Maps JavaScript API loaded successfully');
+          // Check if script already exists
+          if (!document.getElementById(SCRIPT_ID)) {
+            const script = document.createElement('script');
+            script.id = SCRIPT_ID;
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${data.apiKey}&libraries=places&callback=initMap`;
+            script.async = true;
+            script.defer = true;
+            
+            // Define the callback function
+            window.initMap = () => {
+              console.log('Google Maps JavaScript API loaded successfully');
+              setGoogleMapsApiKey(data.apiKey);
+              setIsLoading(false);
+            };
+
+            script.onerror = (e) => {
+              console.error('Failed to load Google Maps JavaScript API:', e);
+              toast({
+                variant: "destructive",
+                title: "Error",
+                description: "Failed to load Google Maps. Please check your internet connection.",
+              });
+              setIsLoading(false);
+            };
+
+            document.head.appendChild(script);
+          } else {
+            // If script already exists, just update the API key
             setGoogleMapsApiKey(data.apiKey);
             setIsLoading(false);
-          };
-
-          script.onerror = (e) => {
-            console.error('Failed to load Google Maps JavaScript API:', e);
-            toast({
-              variant: "destructive",
-              title: "Error",
-              description: "Failed to load Google Maps. Please check your internet connection.",
-            });
-            setIsLoading(false);
-          };
-
-          document.head.appendChild(script);
+          }
         } else {
           console.log('No Google Maps API key found in Edge Function response');
           toast({
@@ -77,10 +88,16 @@ export const useGoogleMaps = () => {
 
     // Cleanup function
     return () => {
-      const scripts = document.querySelectorAll('script[src*="maps.googleapis.com"]');
-      scripts.forEach(script => script.remove());
+      delete window.initMap;
     };
   }, [toast]);
 
   return { googleMapsApiKey, isLoading };
 };
+
+// Add the initMap to the window object type
+declare global {
+  interface Window {
+    initMap: () => void;
+  }
+}
