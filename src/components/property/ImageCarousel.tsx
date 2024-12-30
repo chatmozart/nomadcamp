@@ -28,7 +28,7 @@ export const ImageCarousel = ({ images, title }: ImageCarouselProps) => {
             console.log('Fetching signed URL for:', imageUrl);
             const { data, error } = await supabase.storage
               .from('properties')
-              .createSignedUrl(imageUrl, 86400); // 24 hours expiry
+              .createSignedUrl(imageUrl, 2592000); // 30 days expiry
 
             if (error) {
               console.error('Error getting signed URL:', error);
