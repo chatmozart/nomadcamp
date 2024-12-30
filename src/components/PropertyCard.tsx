@@ -42,8 +42,8 @@ const PropertyCard = ({
   const cheapestPrice = getCheapestPrice();
 
   return (
-    <Link to={`/property/${id}`} className="block">
-      <div className="property-card rounded-xl overflow-hidden bg-card transition-transform hover:scale-[1.02]">
+    <Link to={`/property/${id}`} className="block h-full">
+      <div className="property-card rounded-xl overflow-hidden bg-card h-full flex flex-col">
         <div className="relative aspect-[4/3]">
           <ImageWithFallback
             src={displayImageUrl}
@@ -52,14 +52,12 @@ const PropertyCard = ({
             containerClassName="w-full h-full"
           />
         </div>
-        <div className="p-4">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h3 className="font-semibold text-lg">{title}</h3>
-              <div className="flex items-center text-muted-foreground mt-1">
-                <MapPin className="w-4 h-4 mr-1" />
-                <span className="text-sm">{location_category || location.split(',')[0].trim()}</span>
-              </div>
+        <div className="p-4 flex flex-col flex-1">
+          <div className="flex-1">
+            <h3 className="font-semibold text-lg line-clamp-2 min-h-[3.2rem]">{title}</h3>
+            <div className="flex items-center text-muted-foreground mt-1">
+              <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
+              <span className="text-sm truncate">{location_category || location.split(',')[0].trim()}</span>
             </div>
           </div>
           <div className="mt-4">
