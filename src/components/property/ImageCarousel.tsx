@@ -102,7 +102,7 @@ export const ImageCarousel = ({ images, title }: ImageCarouselProps) => {
                 className={`w-2 h-2 rounded-full ${
                   index === currentIndex ? "bg-white" : "bg-white/50"
                 }`}
-                onClick={() => setImageSrc(index)}
+                onClick={() => setCurrentIndex(index)}
               />
             ))}
           </div>
