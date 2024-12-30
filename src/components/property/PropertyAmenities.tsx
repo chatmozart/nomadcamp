@@ -41,7 +41,7 @@ export const PropertyAmenities = ({
     }
   });
 
-  const { data: propertyAmenities, isLoading: propertyAmenitiesLoading } = useQuery({
+  const { data: propertyAmenities = [], isLoading: propertyAmenitiesLoading } = useQuery({
     queryKey: ['property-amenities', propertyId],
     queryFn: async () => {
       if (!propertyId) return [];
@@ -54,7 +54,7 @@ export const PropertyAmenities = ({
       
       if (error) {
         console.error('Error fetching property amenities:', error);
-        throw error;
+        return []; // Return empty array instead of throwing
       }
       console.log('Fetched property amenities:', data);
       return data.map(pa => pa.amenity_id);
