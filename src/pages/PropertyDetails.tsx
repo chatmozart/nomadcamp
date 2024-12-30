@@ -24,6 +24,7 @@ interface Property {
   contact_name: string | null;
   contact_email: string | null;
   contact_whatsapp: string | null;
+  location_id: number | null;
   locations: {
     name: string;
   } | null;
