@@ -116,13 +116,15 @@ const Index = () => {
             </div>
           </div>
           
-          <div className="sticky top-24 h-[600px]">
-            <PropertiesMap 
-              properties={properties}
-              onMarkerClick={handleMarkerClick}
-              hoveredPropertyId={hoveredPropertyId}
-            />
-          </div>
+          {!isLoading && properties.length > 0 && (
+            <div className="sticky top-24 h-[600px]">
+              <PropertiesMap 
+                properties={properties}
+                onMarkerClick={handleMarkerClick}
+                hoveredPropertyId={hoveredPropertyId}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>
