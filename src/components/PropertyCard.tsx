@@ -32,14 +32,14 @@ const PropertyCard = ({
   
   // Calculate the cheapest price per month
   const getCheapestPrice = () => {
-    const prices = [
+    const monthlyPrices = [
       price, // Monthly price
-      price_three_months ? price_three_months / 3 : null, // 3-month price per month
-      price_six_months ? price_six_months / 6 : null, // 6-month price per month
-      price_one_year ? price_one_year / 12 : null, // Yearly price per month
+      price_three_months ? Math.round(price_three_months / 3) : null, // 3-month price per month
+      price_six_months ? Math.round(price_six_months / 6) : null, // 6-month price per month
+      price_one_year ? Math.round(price_one_year / 12) : null, // Yearly price per month
     ].filter((p): p is number => p !== null);
 
-    return Math.min(...prices);
+    return Math.min(...monthlyPrices);
   };
 
   useEffect(() => {
