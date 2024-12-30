@@ -190,46 +190,46 @@ export const PropertyForm = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="propertyPrice">Price per Month (฿)</Label>
+        <Label htmlFor="propertyPrice">Monthly Price - 1 Month Contract (฿)</Label>
         <Input
           id="propertyPrice"
           type="number"
           value={propertyPrice}
           onChange={(e) => setPropertyPrice(e.target.value)}
-          placeholder="Enter monthly price"
+          placeholder="Enter monthly price for 1-month contract"
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="propertyPriceThreeMonths">Price for 3 Months (฿)</Label>
+        <Label htmlFor="propertyPriceThreeMonths">Monthly Price - 3 Month Contract (฿)</Label>
         <Input
           id="propertyPriceThreeMonths"
           type="number"
           value={propertyPriceThreeMonths}
           onChange={(e) => setPropertyPriceThreeMonths(e.target.value)}
-          placeholder="Enter 3-month price"
+          placeholder="Enter monthly price for 3-month contract"
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="propertyPriceSixMonths">Price for 6 Months (฿)</Label>
+        <Label htmlFor="propertyPriceSixMonths">Monthly Price - 6 Month Contract (฿)</Label>
         <Input
           id="propertyPriceSixMonths"
           type="number"
           value={propertyPriceSixMonths}
           onChange={(e) => setPropertyPriceSixMonths(e.target.value)}
-          placeholder="Enter 6-month price"
+          placeholder="Enter monthly price for 6-month contract"
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="propertyPriceOneYear">Price for 12 Months (฿)</Label>
+        <Label htmlFor="propertyPriceOneYear">Monthly Price - 12 Month Contract (฿)</Label>
         <Input
           id="propertyPriceOneYear"
           type="number"
           value={propertyPriceOneYear}
           onChange={(e) => setPropertyPriceOneYear(e.target.value)}
-          placeholder="Enter yearly price"
+          placeholder="Enter monthly price for yearly contract"
         />
       </div>
 
