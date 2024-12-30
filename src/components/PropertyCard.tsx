@@ -44,7 +44,7 @@ const PropertyCard = ({
   return (
     <Link to={`/property/${id}`} className="block h-full">
       <div className="property-card rounded-xl overflow-hidden bg-card h-full flex flex-col">
-        <div className="relative aspect-[4/3]">
+        <div className="relative aspect-[16/9]">
           <ImageWithFallback
             src={displayImageUrl}
             alt={title}
@@ -52,22 +52,22 @@ const PropertyCard = ({
             containerClassName="w-full h-full"
           />
         </div>
-        <div className="p-4 flex flex-col flex-1">
+        <div className="p-3 flex flex-col flex-1">
           <div className="flex-1">
-            <h3 className="font-semibold text-lg line-clamp-2 min-h-[3.2rem]">{title}</h3>
-            <div className="flex items-center text-muted-foreground mt-1">
-              <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
+            <h3 className="font-semibold text-base line-clamp-2 min-h-[2.5rem]">{title}</h3>
+            <div className="flex items-center text-muted-foreground mt-0.5">
+              <MapPin className="w-3.5 h-3.5 mr-1 flex-shrink-0" />
               <span className="text-sm truncate">{location_category || location.split(',')[0].trim()}</span>
             </div>
           </div>
-          <div className="mt-4">
+          <div className="mt-2">
             {cheapestPrice ? (
               <>
-                <span className="font-semibold text-lg">฿{cheapestPrice.toLocaleString()}</span>
-                <span className="text-muted-foreground"> / month</span>
+                <span className="font-semibold text-base">฿{cheapestPrice.toLocaleString()}</span>
+                <span className="text-muted-foreground text-sm"> / month</span>
               </>
             ) : (
-              <span className="text-muted-foreground">Contact for pricing</span>
+              <span className="text-muted-foreground text-sm">Contact for pricing</span>
             )}
           </div>
         </div>
