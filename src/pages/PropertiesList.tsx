@@ -86,8 +86,6 @@ const PropertiesList = () => {
                   title={property.title}
                   location={property.location}
                   price={property.price}
-                  rating={4.5}
-                  reviews={0}
                   image={property.image_url}
                   price_three_months={property.price_three_months}
                   price_six_months={property.price_six_months}
