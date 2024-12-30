@@ -27,17 +27,9 @@ const PropertyCard = ({
   useEffect(() => {
     const loadImageUrl = async () => {
       console.log('PropertyCard - Starting to load image URL for ID:', id);
-      console.log('PropertyCard - Raw image path:', image);
       
-      // Don't attempt to get signed URL if image is null/undefined
-      if (!image) {
-        console.log('PropertyCard - No image provided, using placeholder');
-        setImageUrl(null);
-        return;
-      }
-
       try {
-        // First, try to get the first image from property_images table
+        // Always try to get the first image from property_images table first
         const { data: imageData, error: imageError } = await supabase
           .from('property_images')
           .select('image_url')
@@ -46,38 +38,37 @@ const PropertyCard = ({
           .limit(1)
           .single();
 
-        if (imageError) {
-          console.log('PropertyCard - No property_images found, using direct image path');
-          // If no property_images found, try the direct image path
-          const { data, error } = await supabase.storage
-            .from('properties')
-            .createSignedUrl(image, 60 * 60); // URL valid for 1 hour
-
-          if (error) {
-            console.error('PropertyCard - Error generating signed URL:', error);
-            setImageUrl(null);
-            return;
-          }
-
-          console.log('PropertyCard - Generated Supabase signed URL:', data?.signedUrl);
-          setImageUrl(data?.signedUrl || null);
-        } else {
-          // If property_images found, get signed URL for the first image
-          const { data, error } = await supabase.storage
+        if (!imageError && imageData?.image_url) {
+          console.log('PropertyCard - Found image in property_images:', imageData.image_url);
+          const { data: signedUrlData, error: signedUrlError } = await supabase.storage
             .from('properties')
             .createSignedUrl(imageData.image_url, 60 * 60);
 
-          if (error) {
-            console.error('PropertyCard - Error generating signed URL for property_images:', error);
-            setImageUrl(null);
+          if (!signedUrlError && signedUrlData) {
+            console.log('PropertyCard - Generated signed URL from property_images:', signedUrlData.signedUrl);
+            setImageUrl(signedUrlData.signedUrl);
             return;
           }
-
-          console.log('PropertyCard - Generated Supabase signed URL from property_images:', data?.signedUrl);
-          setImageUrl(data?.signedUrl || null);
         }
+
+        // Fallback to the direct image path if no property_images or error occurred
+        if (image) {
+          console.log('PropertyCard - Falling back to direct image path:', image);
+          const { data: directSignedUrlData, error: directSignedUrlError } = await supabase.storage
+            .from('properties')
+            .createSignedUrl(image, 60 * 60);
+
+          if (!directSignedUrlError && directSignedUrlData) {
+            console.log('PropertyCard - Generated signed URL from direct path:', directSignedUrlData.signedUrl);
+            setImageUrl(directSignedUrlData.signedUrl);
+            return;
+          }
+        }
+
+        console.log('PropertyCard - No valid image found, using placeholder');
+        setImageUrl(null);
       } catch (error) {
-        console.error('PropertyCard - Failed to generate signed URL:', error);
+        console.error('PropertyCard - Failed to load image:', error);
         setImageUrl(null);
       }
     };
