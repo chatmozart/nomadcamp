@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
+import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 
 interface ImageCarouselProps {
   images: string[];
@@ -57,15 +58,10 @@ export const ImageCarousel = ({ images, title }: ImageCarouselProps) => {
     setCurrentIndex((prev) => (prev === signedUrls.length - 1 ? 0 : prev + 1));
   };
 
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    console.error('Image failed to load, using placeholder');
-    e.currentTarget.src = '/placeholder.svg';
-  };
-
   if (!signedUrls.length) {
     return (
-      <img
-        src="/placeholder.svg"
+      <ImageWithFallback
+        src={null}
         alt={title}
         className="w-full h-[600px] object-cover"
       />
@@ -74,11 +70,10 @@ export const ImageCarousel = ({ images, title }: ImageCarouselProps) => {
 
   return (
     <div className="relative">
-      <img
+      <ImageWithFallback
         src={signedUrls[currentIndex]}
         alt={`${title} - Image ${currentIndex + 1}`}
         className="w-full h-[600px] object-cover"
-        onError={handleImageError}
       />
       
       {signedUrls.length > 1 && (
@@ -107,7 +102,7 @@ export const ImageCarousel = ({ images, title }: ImageCarouselProps) => {
                 className={`w-2 h-2 rounded-full ${
                   index === currentIndex ? "bg-white" : "bg-white/50"
                 }`}
-                onClick={() => setCurrentIndex(index)}
+                onClick={() => setImageSrc(index)}
               />
             ))}
           </div>

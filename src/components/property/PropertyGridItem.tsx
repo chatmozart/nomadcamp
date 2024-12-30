@@ -8,8 +8,6 @@ interface PropertyGridItemProps {
 }
 
 export const PropertyGridItem = ({ id, title, imageUrl }: PropertyGridItemProps) => {
-  console.log('PropertyGridItem - Rendering with imageUrl:', imageUrl);
-
   return (
     <Link 
       to={`/property/${id}`}

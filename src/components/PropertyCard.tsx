@@ -27,7 +27,6 @@ const PropertyCard = ({
   price_six_months,
   price_one_year,
 }: PropertyCardProps) => {
-  // Calculate the cheapest price per month
   const getCheapestPrice = () => {
     const monthlyPrices = [
       price,
