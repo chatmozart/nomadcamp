@@ -19,9 +19,6 @@ interface PropertyData {
   contact_whatsapp: string | null;
   owner_id: string;
   location_id: number | null;
-  locations: {
-    name: string;
-  } | null;
 }
 
 export const usePropertyData = (propertyId: string | undefined) => {
@@ -39,15 +36,10 @@ export const usePropertyData = (propertyId: string | undefined) => {
       try {
         console.log('Fetching property with ID:', propertyId);
         
-        // Fetch property details with locations join
+        // Temporarily fetch without locations join
         const { data: propertyData, error: propertyError } = await supabase
           .from('properties')
-          .select(`
-            *,
-            locations (
-              name
-            )
-          `)
+          .select('*')
           .eq('id', propertyId)
           .single();
 
