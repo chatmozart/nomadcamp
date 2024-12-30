@@ -23,7 +23,7 @@ export const PropertyAmenities = ({
   selectedAmenities = [],
   onAmenityChange
 }: PropertyAmenitiesProps) => {
-  const { data: amenities, isLoading } = useQuery({
+  const { data: amenities, isLoading, error } = useQuery({
     queryKey: ['amenities'],
     queryFn: async () => {
       console.log('Fetching amenities');
@@ -32,13 +32,16 @@ export const PropertyAmenities = ({
         .select('*')
         .order('name');
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching amenities:', error);
+        throw error;
+      }
       console.log('Fetched amenities:', data);
       return data as Amenity[];
     }
   });
 
-  const { data: propertyAmenities, isLoading: isLoadingPropertyAmenities } = useQuery({
+  const { data: propertyAmenities, isLoading: isLoadingPropertyAmenities, error: propertyAmenitiesError } = useQuery({
     queryKey: ['property-amenities', propertyId],
     queryFn: async () => {
       if (!propertyId) return [];
@@ -49,12 +52,25 @@ export const PropertyAmenities = ({
         .select('amenity_id')
         .eq('property_id', propertyId);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching property amenities:', error);
+        throw error;
+      }
       console.log('Fetched property amenities:', data);
       return data.map(pa => pa.amenity_id);
     },
     enabled: !!propertyId && !isEditing
   });
+
+  if (error || propertyAmenitiesError) {
+    console.error('Error loading amenities:', error || propertyAmenitiesError);
+    return (
+      <div className="py-6 border-b">
+        <h3 className="text-xl font-semibold mb-4">What this place offers</h3>
+        <div className="text-red-500">Error loading amenities. Please try again later.</div>
+      </div>
+    );
+  }
 
   if (isLoading || (isLoadingPropertyAmenities && !isEditing)) {
     return (
@@ -73,6 +89,16 @@ export const PropertyAmenities = ({
     const Icon = (icons as any)[iconName];
     return Icon ? <Icon className="w-6 h-6 text-gray-600" /> : null;
   };
+
+  if (!amenities || amenities.length === 0) {
+    console.log('No amenities found in the database');
+    return (
+      <div className="py-6 border-b">
+        <h3 className="text-xl font-semibold mb-4">What this place offers</h3>
+        <div className="text-gray-500">No amenities available.</div>
+      </div>
+    );
+  }
 
   return (
     <div className="py-6 border-b">

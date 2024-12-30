@@ -61,3 +61,11 @@ create policy "Property owners can manage property amenities"
             and properties.owner_id = auth.uid()
         )
     );
+
+-- Ensure the amenities are actually inserted by checking
+do $$
+begin
+    if not exists (select 1 from amenities limit 1) then
+        raise notice 'No amenities found, something went wrong with the insertion';
+    end if;
+end $$;
