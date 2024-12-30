@@ -9,7 +9,7 @@ interface PropertyHeaderProps {
   propertyId?: string;
 }
 
-export const PropertyHeader = ({ title, location }: PropertyHeaderProps) => {
+export const PropertyHeader = ({ title, location, isOwner, propertyId }: PropertyHeaderProps) => {
   return (
     <div className="flex justify-between items-start mb-6">
       <div className="pt-4">

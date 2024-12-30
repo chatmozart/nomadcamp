@@ -34,7 +34,7 @@ export const PropertyAmenities = ({
       
       if (error) {
         console.error('Error fetching amenities:', error);
-        throw error;
+        return [];
       }
       console.log('Fetched amenities:', data);
       return data as Amenity[];
@@ -54,7 +54,7 @@ export const PropertyAmenities = ({
       
       if (error) {
         console.error('Error fetching property amenities:', error);
-        return []; // Return empty array instead of throwing
+        return [];
       }
       console.log('Fetched property amenities:', data);
       return data.map(pa => pa.amenity_id);
@@ -77,13 +77,7 @@ export const PropertyAmenities = ({
     );
   }
 
-  const IconComponent = (iconName: string) => {
-    const Icon = (icons as any)[iconName];
-    return Icon ? <Icon className="w-6 h-6 text-gray-600" /> : null;
-  };
-
   if (!amenities || amenities.length === 0) {
-    console.log('No amenities found in the database');
     return (
       <div className="py-6 border-b">
         <h3 className="text-xl font-semibold mb-4">What this place offers</h3>
@@ -91,6 +85,11 @@ export const PropertyAmenities = ({
       </div>
     );
   }
+
+  const IconComponent = (iconName: string) => {
+    const Icon = (icons as any)[iconName];
+    return Icon ? <Icon className="w-6 h-6 text-gray-600" /> : null;
+  };
 
   return (
     <div className="py-6 border-b">

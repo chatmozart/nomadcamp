@@ -20,6 +20,7 @@ interface PropertyActionsProps {
 }
 
 export const PropertyActions = ({ isOwner, propertyId, onDelete }: PropertyActionsProps) => {
+  // Early return if not owner
   if (!isOwner) return null;
 
   return (
