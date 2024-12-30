@@ -1,8 +1,7 @@
 import { MapPin, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ImageWithFallback } from "@/components/ui/image-with-fallback";
-import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
+import { useSupabaseImage } from "@/hooks/useSupabaseImage";
 
 interface PropertyCardProps {
   id: string;
@@ -29,65 +28,7 @@ const PropertyCard = ({
   price_six_months,
   price_one_year,
 }: PropertyCardProps) => {
-  const [signedUrls, setSignedUrls] = useState<string[]>([]);
-  const [mainImageUrl, setMainImageUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    const getImages = async () => {
-      try {
-        // First try to get the main image if it exists
-        if (image) {
-          console.log('PropertyCard: Fetching main image:', image);
-          if (image.startsWith('http')) {
-            setMainImageUrl(image);
-          } else {
-            const { data: mainImageData, error: mainImageError } = await supabase.storage
-              .from('properties')
-              .createSignedUrl(image, 2592000);
-            
-            if (!mainImageError && mainImageData) {
-              setMainImageUrl(mainImageData.signedUrl);
-            }
-          }
-        }
-
-        // Then fetch additional images from property_images table
-        console.log('PropertyCard: Fetching additional images for property:', id);
-        const { data: propertyImages, error: propertyImagesError } = await supabase
-          .from('property_images')
-          .select('image_url')
-          .eq('property_id', id)
-          .order('order', { ascending: true })
-          .limit(1);
-
-        if (propertyImagesError) {
-          console.error('PropertyCard: Error fetching property images:', propertyImagesError);
-          return;
-        }
-
-        if (propertyImages && propertyImages.length > 0) {
-          console.log('PropertyCard: Found additional images:', propertyImages);
-          const firstAdditionalImage = propertyImages[0].image_url;
-          
-          if (firstAdditionalImage.startsWith('http')) {
-            setSignedUrls([firstAdditionalImage]);
-          } else {
-            const { data: signedUrlData, error: signedUrlError } = await supabase.storage
-              .from('properties')
-              .createSignedUrl(firstAdditionalImage, 2592000);
-            
-            if (!signedUrlError && signedUrlData) {
-              setSignedUrls([signedUrlData.signedUrl]);
-            }
-          }
-        }
-      } catch (error) {
-        console.error('PropertyCard: Error in getImages:', error);
-      }
-    };
-
-    getImages();
-  }, [image, id]);
+  const { displayImageUrl } = useSupabaseImage(id, image);
 
   const getCheapestPrice = () => {
     const monthlyPrices = [
@@ -101,7 +42,6 @@ const PropertyCard = ({
   };
 
   const cheapestPrice = getCheapestPrice();
-  const displayImageUrl = mainImageUrl || signedUrls[0] || null;
 
   return (
     <Link to={`/property/${id}`} className="block">
