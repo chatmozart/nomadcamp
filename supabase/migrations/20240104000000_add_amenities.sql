@@ -40,11 +40,17 @@ insert into "public"."amenities" ("name", "icon") values
 alter table "public"."amenities" enable row level security;
 alter table "public"."property_amenities" enable row level security;
 
+-- Allow public read access to amenities
 create policy "Anyone can read amenities"
     on amenities for select
-    to authenticated
     using (true);
 
+-- Allow public read access to property amenities
+create policy "Anyone can read property amenities"
+    on property_amenities for select
+    using (true);
+
+-- Property owners can manage property amenities
 create policy "Property owners can manage property amenities"
     on property_amenities for all
     to authenticated
