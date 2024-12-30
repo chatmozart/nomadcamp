@@ -19,7 +19,7 @@ export const PropertyGridItem = ({ id, title, imageUrl }: PropertyGridItemProps)
       className="flex flex-col space-y-2"
     >
       <h3 className="font-medium text-sm truncate">{title}</h3>
-      <div className="relative aspect-square rounded-lg overflow-hidden hover:opacity-90 transition-opacity">
+      <div className="relative aspect-square rounded-lg overflow-hidden bg-gray-100">
         {imageUrl ? (
           <img
             src={imageUrl}
@@ -28,8 +28,8 @@ export const PropertyGridItem = ({ id, title, imageUrl }: PropertyGridItemProps)
             onError={handleImageError}
           />
         ) : (
-          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-            <Home className="w-8 h-8 text-gray-400" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Home className="w-12 h-12 text-gray-400" />
           </div>
         )}
       </div>
