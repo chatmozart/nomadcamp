@@ -10,6 +10,7 @@ const PropertiesList = () => {
   const [properties, setProperties] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null);
+  const [hoveredPropertyId, setHoveredPropertyId] = useState<string | null>(null);
   
   console.log("Current location param:", location);
 
@@ -60,7 +61,6 @@ const PropertiesList = () => {
     fetchProperties();
   }, [location]);
 
-  // Get the display location for the title
   const getDisplayLocation = (urlLocation: string | undefined) => {
     if (!urlLocation) return 'All Properties';
     if (urlLocation === 'ko-pha-ngan') return 'Koh Phangan';
@@ -95,6 +95,7 @@ const PropertiesList = () => {
           <PropertiesMap 
             properties={properties}
             onMarkerClick={handleMarkerClick}
+            hoveredPropertyId={hoveredPropertyId}
           />
         </div>
 
@@ -110,6 +111,8 @@ const PropertiesList = () => {
                 key={property.id} 
                 id={`property-${property.id}`}
                 className={`px-2 sm:px-0 transition-all duration-300`}
+                onMouseEnter={() => setHoveredPropertyId(property.id)}
+                onMouseLeave={() => setHoveredPropertyId(null)}
               >
                 <PropertyCard
                   id={property.id}

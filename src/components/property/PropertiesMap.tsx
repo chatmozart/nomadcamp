@@ -11,9 +11,10 @@ interface Property {
 interface PropertiesMapProps {
   properties: Property[];
   onMarkerClick?: (propertyId: string) => void;
+  hoveredPropertyId?: string | null;
 }
 
-export const PropertiesMap = ({ properties, onMarkerClick }: PropertiesMapProps) => {
+export const PropertiesMap = ({ properties, onMarkerClick, hoveredPropertyId }: PropertiesMapProps) => {
   const [markers, setMarkers] = useState<{ lat: number; lng: number; id: string }[]>([]);
   const { isLoading: isLoadingApi } = useGoogleMaps();
   const [isGeocoding, setIsGeocoding] = useState(true);
@@ -104,6 +105,13 @@ export const PropertiesMap = ({ properties, onMarkerClick }: PropertiesMapProps)
             key={marker.id}
             position={{ lat: marker.lat, lng: marker.lng }}
             onClick={() => onMarkerClick?.(marker.id)}
+            icon={{
+              url: hoveredPropertyId === marker.id 
+                ? "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+                : "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
+              scaledSize: new google.maps.Size(32, 32)
+            }}
+            animation={hoveredPropertyId === marker.id ? google.maps.Animation.BOUNCE : undefined}
           />
         ))}
       </GoogleMap>
