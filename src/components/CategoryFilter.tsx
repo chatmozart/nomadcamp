@@ -22,8 +22,10 @@ const CategoryFilter = () => {
     if (category === "All") {
       navigate("/");
     } else {
-      // Convert category to URL-friendly format
-      const locationParam = category.toLowerCase().replace(/\s+/g, '-');
+      // Convert category to URL-friendly format with special case for Koh Phangan
+      const locationParam = category === "Koh Phangan" 
+        ? "ko-pha-ngan"
+        : category.toLowerCase().replace(/\s+/g, '-');
       navigate(`/properties/${locationParam}`);
     }
   };
