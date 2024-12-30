@@ -44,13 +44,15 @@ const PropertyCard = ({
   return (
     <Link to={`/property/${id}`} className="block h-full">
       <div className="property-card rounded-xl overflow-hidden bg-card h-full flex flex-col">
-        <div className="relative aspect-[3/2]">
-          <ImageWithFallback
-            src={displayImageUrl}
-            alt={title}
-            className="w-full h-full object-cover"
-            containerClassName="w-full h-full"
-          />
+        <div className="relative w-full pb-[66.67%]">
+          <div className="absolute inset-0">
+            <ImageWithFallback
+              src={displayImageUrl}
+              alt={title}
+              className="w-full h-full object-cover"
+              containerClassName="w-full h-full"
+            />
+          </div>
         </div>
         <div className="p-2 flex flex-col flex-1">
           <div className="flex-1">
