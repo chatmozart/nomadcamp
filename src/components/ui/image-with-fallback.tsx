@@ -21,7 +21,11 @@ export const ImageWithFallback = ({
 
   useEffect(() => {
     const getSignedUrl = async () => {
-      if (!src) return;
+      if (!src) {
+        console.log('ImageWithFallback - No source provided');
+        setError(true);
+        return;
+      }
 
       try {
         console.log('ImageWithFallback - Getting signed URL for:', src);
@@ -44,6 +48,10 @@ export const ImageWithFallback = ({
       }
     };
 
+    // Reset states when src changes
+    setError(false);
+    setSignedUrl(null);
+    
     getSignedUrl();
   }, [src]);
 

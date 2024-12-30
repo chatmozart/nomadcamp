@@ -16,7 +16,7 @@ export const PropertyGridItem = ({ id, title, imageUrl }: PropertyGridItemProps)
       <h3 className="font-medium text-sm truncate">{title}</h3>
       <div className="relative aspect-square rounded-lg overflow-hidden">
         <ImageWithFallback
-          src={imageUrl || null}
+          src={imageUrl}
           alt={title}
           className="w-full h-full object-cover"
           containerClassName="w-full h-full"
