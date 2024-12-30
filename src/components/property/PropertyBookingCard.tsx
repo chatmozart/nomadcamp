@@ -40,25 +40,37 @@ export const PropertyBookingCard = ({
           <div className="space-y-4">
             <h3 className="text-xl font-semibold">Price</h3>
             <div className="flex justify-between items-center">
-              <span>Monthly rate (1 month contract)</span>
-              <span className="text-2xl font-bold">{price.toLocaleString()}฿</span>
+              <span>1 month contract</span>
+              <div className="text-right">
+                <div className="text-2xl font-bold">{price.toLocaleString()}฿</div>
+                <div className="text-sm text-muted-foreground">monthly rate</div>
+              </div>
             </div>
             {priceThreeMonths && (
               <div className="flex justify-between items-center">
-                <span>Monthly rate (3 month contract)</span>
-                <span className="text-2xl font-bold">{Math.round(priceThreeMonths / 3).toLocaleString()}฿</span>
+                <span>3 month contract</span>
+                <div className="text-right">
+                  <div className="text-2xl font-bold">{Math.round(priceThreeMonths / 3).toLocaleString()}฿</div>
+                  <div className="text-sm text-muted-foreground">monthly rate</div>
+                </div>
               </div>
             )}
             {priceSixMonths && (
               <div className="flex justify-between items-center">
-                <span>Monthly rate (6 month contract)</span>
-                <span className="text-2xl font-bold">{Math.round(priceSixMonths / 6).toLocaleString()}฿</span>
+                <span>6 month contract</span>
+                <div className="text-right">
+                  <div className="text-2xl font-bold">{Math.round(priceSixMonths / 6).toLocaleString()}฿</div>
+                  <div className="text-sm text-muted-foreground">monthly rate</div>
+                </div>
               </div>
             )}
             {priceOneYear && (
               <div className="flex justify-between items-center">
-                <span>Monthly rate (12 month contract)</span>
-                <span className="text-2xl font-bold">{Math.round(priceOneYear / 12).toLocaleString()}฿</span>
+                <span>12 month contract</span>
+                <div className="text-right">
+                  <div className="text-2xl font-bold">{Math.round(priceOneYear / 12).toLocaleString()}฿</div>
+                  <div className="text-sm text-muted-foreground">monthly rate</div>
+                </div>
               </div>
             )}
           </div>
