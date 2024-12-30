@@ -8,7 +8,7 @@ interface PropertyData {
   title: string;
   description: string;
   price: number;
-  location: string;
+  location: string; // Google Maps location
   price_three_months: number | null;
   price_six_months: number | null;
   price_one_year: number | null;
@@ -18,7 +18,10 @@ interface PropertyData {
   contact_email: string | null;
   contact_whatsapp: string | null;
   owner_id: string;
-  location_id: number | null;
+  location_category_id: number | null;
+  locations?: {
+    name: string;
+  } | null;
 }
 
 export const usePropertyData = (propertyId: string | undefined) => {
@@ -36,10 +39,14 @@ export const usePropertyData = (propertyId: string | undefined) => {
       try {
         console.log('Fetching property with ID:', propertyId);
         
-        // Temporarily fetch without locations join
         const { data: propertyData, error: propertyError } = await supabase
           .from('properties')
-          .select('*')
+          .select(`
+            *,
+            locations (
+              name
+            )
+          `)
           .eq('id', propertyId)
           .single();
 
