@@ -11,7 +11,7 @@ interface PropertyCardProps {
   price: number;
   rating: number;
   reviews: number;
-  image: string;
+  image: string | null;
   price_three_months?: number | null;
   price_six_months?: number | null;
   price_one_year?: number | null;
@@ -30,40 +30,63 @@ const PropertyCard = ({
   price_one_year,
 }: PropertyCardProps) => {
   const [signedUrls, setSignedUrls] = useState<string[]>([]);
+  const [mainImageUrl, setMainImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    const getSignedUrls = async () => {
-      if (!image) {
-        console.log('PropertyCard: No image provided for property:', id);
-        return;
-      }
-
+    const getImages = async () => {
       try {
-        // If it's already a full URL, use it directly
-        if (image.startsWith('http')) {
-          console.log('PropertyCard: Using direct URL:', image);
-          setSignedUrls([image]);
+        // First try to get the main image if it exists
+        if (image) {
+          console.log('PropertyCard: Fetching main image:', image);
+          if (image.startsWith('http')) {
+            setMainImageUrl(image);
+          } else {
+            const { data: mainImageData, error: mainImageError } = await supabase.storage
+              .from('properties')
+              .createSignedUrl(image, 2592000);
+            
+            if (!mainImageError && mainImageData) {
+              setMainImageUrl(mainImageData.signedUrl);
+            }
+          }
+        }
+
+        // Then fetch additional images from property_images table
+        console.log('PropertyCard: Fetching additional images for property:', id);
+        const { data: propertyImages, error: propertyImagesError } = await supabase
+          .from('property_images')
+          .select('image_url')
+          .eq('property_id', id)
+          .order('order', { ascending: true })
+          .limit(1);
+
+        if (propertyImagesError) {
+          console.error('PropertyCard: Error fetching property images:', propertyImagesError);
           return;
         }
 
-        console.log('PropertyCard: Fetching signed URL for path:', image);
-        const { data, error } = await supabase.storage
-          .from('properties')
-          .createSignedUrl(image, 2592000); // 30 days expiry
-
-        if (error) {
-          console.error('PropertyCard: Error getting signed URL:', error);
-          return;
+        if (propertyImages && propertyImages.length > 0) {
+          console.log('PropertyCard: Found additional images:', propertyImages);
+          const firstAdditionalImage = propertyImages[0].image_url;
+          
+          if (firstAdditionalImage.startsWith('http')) {
+            setSignedUrls([firstAdditionalImage]);
+          } else {
+            const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+              .from('properties')
+              .createSignedUrl(firstAdditionalImage, 2592000);
+            
+            if (!signedUrlError && signedUrlData) {
+              setSignedUrls([signedUrlData.signedUrl]);
+            }
+          }
         }
-
-        console.log('PropertyCard: Successfully got signed URL:', data.signedUrl);
-        setSignedUrls([data.signedUrl]);
       } catch (error) {
-        console.error('PropertyCard: Error in getSignedUrls:', error);
+        console.error('PropertyCard: Error in getImages:', error);
       }
     };
 
-    getSignedUrls();
+    getImages();
   }, [image, id]);
 
   const getCheapestPrice = () => {
@@ -78,13 +101,14 @@ const PropertyCard = ({
   };
 
   const cheapestPrice = getCheapestPrice();
+  const displayImageUrl = mainImageUrl || signedUrls[0] || null;
 
   return (
     <Link to={`/property/${id}`} className="block">
       <div className="property-card rounded-xl overflow-hidden bg-card transition-transform hover:scale-[1.02]">
         <div className="relative aspect-[4/3]">
           <ImageWithFallback
-            src={signedUrls[0] || null}
+            src={displayImageUrl}
             alt={title}
             className="w-full h-full object-cover"
             containerClassName="w-full h-full"
