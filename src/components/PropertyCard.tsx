@@ -1,6 +1,8 @@
 import { MapPin, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ImageWithFallback } from "@/components/ui/image-with-fallback";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 
 interface PropertyCardProps {
   id: string;
@@ -27,6 +29,46 @@ const PropertyCard = ({
   price_six_months,
   price_one_year,
 }: PropertyCardProps) => {
+  const [signedImageUrl, setSignedImageUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getSignedUrl = async () => {
+      if (!image) {
+        console.log('PropertyCard: No image provided for property:', id);
+        return;
+      }
+
+      // If it's already a full URL, use it directly
+      if (image.startsWith('http')) {
+        console.log('PropertyCard: Using direct URL:', image);
+        setSignedImageUrl(image);
+        return;
+      }
+
+      try {
+        // Clean the path - remove any leading slashes or 'properties/' prefix
+        const cleanPath = image.replace(/^\/*(properties\/)*/, '');
+        console.log('PropertyCard: Fetching signed URL for path:', cleanPath);
+
+        const { data, error } = await supabase.storage
+          .from('properties')
+          .createSignedUrl(cleanPath, 3600); // 1 hour expiry
+
+        if (error) {
+          console.error('PropertyCard: Error getting signed URL:', error);
+          return;
+        }
+
+        console.log('PropertyCard: Successfully got signed URL:', data.signedUrl);
+        setSignedImageUrl(data.signedUrl);
+      } catch (error) {
+        console.error('PropertyCard: Error processing image:', error);
+      }
+    };
+
+    getSignedUrl();
+  }, [image, id]);
+
   const getCheapestPrice = () => {
     const monthlyPrices = [
       price,
@@ -45,7 +87,7 @@ const PropertyCard = ({
       <div className="property-card rounded-xl overflow-hidden bg-card transition-transform hover:scale-[1.02]">
         <div className="relative aspect-[4/3]">
           <ImageWithFallback
-            src={image}
+            src={signedImageUrl}
             alt={title}
             className="w-full h-full object-cover"
             containerClassName="w-full h-full"
