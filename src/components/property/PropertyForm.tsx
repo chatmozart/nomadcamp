@@ -112,6 +112,16 @@ export const PropertyForm = ({
       return;
     }
 
+    // Add validation to ensure at least one price is provided
+    if (!propertyPrice && !propertyPriceThreeMonths && !propertyPriceSixMonths && !propertyPriceOneYear) {
+      toast({
+        variant: "destructive",
+        title: "Price Required",
+        description: "Please provide at least one price option",
+      });
+      return;
+    }
+
     console.log('Submitting form with data:', {
       images: imageFiles,
       amenities: selectedAmenityIds,
@@ -187,7 +197,6 @@ export const PropertyForm = ({
           value={propertyPrice}
           onChange={(e) => setPropertyPrice(e.target.value)}
           placeholder="Enter monthly price"
-          required
         />
       </div>
 
