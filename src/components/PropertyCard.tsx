@@ -49,7 +49,7 @@ const PropertyCard = ({
         console.log('PropertyCard: Fetching signed URL for path:', image);
         const { data, error } = await supabase.storage
           .from('properties')
-          .createSignedUrl(image, 60 * 60); // 1 hour expiry
+          .createSignedUrl(image, 86400); // 24 hours expiry
 
         if (error) {
           console.error('PropertyCard: Error getting signed URL:', error);
