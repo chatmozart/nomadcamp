@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import PropertyCard from "@/components/PropertyCard";
 import { PropertiesMap } from "@/components/property/PropertiesMap";
 import { supabase } from "@/lib/supabase";
-import { getPropertyCategory, getDisplayLocation, LOCATION_CATEGORIES } from "@/utils/locationUtils";
+import { getDisplayLocation, LOCATION_CATEGORIES } from "@/utils/locationUtils";
 
 const PropertiesList = () => {
   const { location } = useParams();
@@ -17,7 +17,16 @@ const PropertiesList = () => {
   useEffect(() => {
     const fetchProperties = async () => {
       console.log('Fetching properties for location:', location);
-      const { data, error } = await supabase.from('properties').select('*');
+      
+      // Include the locations relationship in the query
+      const { data, error } = await supabase
+        .from('properties')
+        .select(`
+          *,
+          locations (
+            name
+          )
+        `);
       
       if (error) {
         console.error('Error fetching properties:', error);
@@ -35,9 +44,10 @@ const PropertiesList = () => {
         
         console.log('Matching category:', matchingCategory);
 
+        // Filter properties based on their location category from the database
         const filteredProperties = data.filter(property => {
-          const propertyCategory = getPropertyCategory(property.location);
-          console.log('Property location:', property.location, 'Category:', propertyCategory);
+          const propertyCategory = property.locations?.name;
+          console.log('Property location category:', propertyCategory);
           return propertyCategory === matchingCategory;
         });
 
