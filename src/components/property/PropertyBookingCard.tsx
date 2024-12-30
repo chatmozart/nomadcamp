@@ -27,10 +27,11 @@ export const PropertyBookingCard = ({
 }: PropertyBookingCardProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  console.log('Rendering PropertyBookingCard with contact info:', { 
-    contactName,
-    contactEmail,
-    contactWhatsapp
+  console.log('Rendering PropertyBookingCard with prices:', { 
+    price,
+    priceThreeMonths,
+    priceSixMonths,
+    priceOneYear
   });
   
   return (
@@ -50,7 +51,7 @@ export const PropertyBookingCard = ({
               <div className="flex justify-between items-center">
                 <span>3 month contract</span>
                 <div className="text-right">
-                  <div className="text-2xl font-bold">{Math.round(priceThreeMonths / 3).toLocaleString()}฿</div>
+                  <div className="text-2xl font-bold">{priceThreeMonths.toLocaleString()}฿</div>
                   <div className="text-sm text-muted-foreground">monthly rate</div>
                 </div>
               </div>
@@ -59,7 +60,7 @@ export const PropertyBookingCard = ({
               <div className="flex justify-between items-center">
                 <span>6 month contract</span>
                 <div className="text-right">
-                  <div className="text-2xl font-bold">{Math.round(priceSixMonths / 6).toLocaleString()}฿</div>
+                  <div className="text-2xl font-bold">{priceSixMonths.toLocaleString()}฿</div>
                   <div className="text-sm text-muted-foreground">monthly rate</div>
                 </div>
               </div>
@@ -68,7 +69,7 @@ export const PropertyBookingCard = ({
               <div className="flex justify-between items-center">
                 <span>12 month contract</span>
                 <div className="text-right">
-                  <div className="text-2xl font-bold">{Math.round(priceOneYear / 12).toLocaleString()}฿</div>
+                  <div className="text-2xl font-bold">{priceOneYear.toLocaleString()}฿</div>
                   <div className="text-sm text-muted-foreground">monthly rate</div>
                 </div>
               </div>
