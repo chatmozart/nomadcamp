@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { GoogleMap } from "@react-google-maps/api";
 import { useGoogleMaps } from "@/hooks/useGoogleMaps";
 import { PropertyMapMarker } from "./PropertyMapMarker";
-import { getApproximateLocation, defaultMapOptions } from "@/utils/mapUtils";
+import { defaultMapOptions } from "@/utils/mapUtils";
 
 interface Property {
   id: string;
@@ -44,19 +44,13 @@ export const PropertiesMap = ({ properties, onMarkerClick, hoveredPropertyId }: 
             });
 
             if (result[0]?.geometry?.location) {
-              const exactLocation = {
+              const location = {
                 lat: result[0].geometry.location.lat(),
                 lng: result[0].geometry.location.lng()
               };
               
-              // Get approximate location within 100 meters
-              const approximateLocation = getApproximateLocation(
-                exactLocation.lat,
-                exactLocation.lng
-              );
-
               markersData.push({
-                ...approximateLocation,
+                ...location,
                 id: property.id
               });
             }
