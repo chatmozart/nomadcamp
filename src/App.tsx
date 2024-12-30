@@ -12,8 +12,21 @@ import PropertiesList from "./pages/PropertiesList";
 import Profile from "./pages/Profile";
 import ListProperty from "./pages/ListProperty";
 import EditProperty from "./pages/EditProperty";
+import { useEffect } from "react";
 
 const queryClient = new QueryClient();
+
+// ScrollToTop component to handle scroll behavior
+const ScrollToTop = () => {
+  const location = useLocation();
+  
+  useEffect(() => {
+    console.log('Route changed, scrolling to top');
+    window.scrollTo(0, 0);
+  }, [location]);
+
+  return null;
+};
 
 const Header = () => {
   const location = useLocation();
@@ -41,6 +54,7 @@ const App = () => (
     <AuthProvider>
       <TooltipProvider>
         <BrowserRouter>
+          <ScrollToTop />
           <Header />
           <div>
             <Toaster />
