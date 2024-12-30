@@ -8,7 +8,8 @@ interface PropertyData {
   title: string;
   description: string;
   price: number;
-  location: string; // Google Maps location
+  location: string;
+  location_category_id: number;
   price_three_months: number | null;
   price_six_months: number | null;
   price_one_year: number | null;
@@ -18,7 +19,6 @@ interface PropertyData {
   contact_email: string | null;
   contact_whatsapp: string | null;
   owner_id: string;
-  location_category_id: number | null;
   locations?: {
     name: string;
   } | null;
@@ -55,6 +55,8 @@ export const usePropertyData = (propertyId: string | undefined) => {
           throw propertyError;
         }
 
+        console.log('Fetched property data:', propertyData);
+
         if (propertyData.owner_id !== user?.id) {
           toast({
             variant: "destructive",
@@ -76,9 +78,6 @@ export const usePropertyData = (propertyId: string | undefined) => {
           console.error('Error fetching property images:', imagesError);
           throw imagesError;
         }
-
-        console.log('Fetched property data:', propertyData);
-        console.log('Fetched property images:', imagesData);
 
         setProperty(propertyData);
         setPropertyImages(imagesData.map(img => img.image_url));

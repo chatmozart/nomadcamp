@@ -16,6 +16,8 @@ const EditProperty = () => {
   const { googleMapsApiKey, isLoading: isLoadingMaps } = useGoogleMaps();
   const { property, propertyImages, isLoading } = usePropertyData(id);
 
+  console.log('Property data in EditProperty:', property);
+
   const handlePropertySubmit = async (formData: {
     title: string;
     description: string;
@@ -24,6 +26,7 @@ const EditProperty = () => {
     priceSixMonths: string;
     priceOneYear: string;
     location: string;
+    location_category_id: string;
     imageFiles: File[];
     amenityIds: string[];
     availabilityStart: string;
@@ -35,13 +38,14 @@ const EditProperty = () => {
     if (!user || !id) return;
 
     try {
-      console.log('Submitting form with amenities:', formData.amenityIds);
+      console.log('Submitting form with data:', formData);
 
       const updateData = {
         title: formData.title,
         description: formData.description,
         price: parseFloat(formData.price),
         location: formData.location,
+        location_category_id: parseInt(formData.location_category_id),
         price_three_months: formData.priceThreeMonths ? parseFloat(formData.priceThreeMonths) : null,
         price_six_months: formData.priceSixMonths ? parseFloat(formData.priceSixMonths) : null,
         price_one_year: formData.priceOneYear ? parseFloat(formData.priceOneYear) : null,
@@ -173,6 +177,7 @@ const EditProperty = () => {
           priceSixMonths: property.price_six_months,
           priceOneYear: property.price_one_year,
           location: property.location,
+          location_category_id: property.location_category_id,
           existingImages: propertyImages,
           availabilityStart: property.availability_start,
           availabilityEnd: property.availability_end,
