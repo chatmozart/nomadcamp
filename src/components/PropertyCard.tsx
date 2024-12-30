@@ -44,7 +44,7 @@ const PropertyCard = ({
   return (
     <Link to={`/property/${id}`} className="block h-full">
       <div className="property-card rounded-xl overflow-hidden bg-card h-full flex flex-col">
-        <div className="relative aspect-[16/9]">
+        <div className="relative aspect-[3/2]">
           <ImageWithFallback
             src={displayImageUrl}
             alt={title}
@@ -52,22 +52,22 @@ const PropertyCard = ({
             containerClassName="w-full h-full"
           />
         </div>
-        <div className="p-3 flex flex-col flex-1">
+        <div className="p-2 flex flex-col flex-1">
           <div className="flex-1">
-            <h3 className="font-semibold text-base line-clamp-2 min-h-[2.5rem]">{title}</h3>
+            <h3 className="font-semibold text-sm line-clamp-2 min-h-[2.2rem]">{title}</h3>
             <div className="flex items-center text-muted-foreground mt-0.5">
-              <MapPin className="w-3.5 h-3.5 mr-1 flex-shrink-0" />
-              <span className="text-sm truncate">{location_category || location.split(',')[0].trim()}</span>
+              <MapPin className="w-3 h-3 mr-1 flex-shrink-0" />
+              <span className="text-xs truncate">{location_category || location.split(',')[0].trim()}</span>
             </div>
           </div>
-          <div className="mt-2">
+          <div className="mt-1">
             {cheapestPrice ? (
               <>
-                <span className="font-semibold text-base">฿{cheapestPrice.toLocaleString()}</span>
-                <span className="text-muted-foreground text-sm"> / month</span>
+                <span className="font-semibold text-sm">฿{cheapestPrice.toLocaleString()}</span>
+                <span className="text-muted-foreground text-xs"> / month</span>
               </>
             ) : (
-              <span className="text-muted-foreground text-sm">Contact for pricing</span>
+              <span className="text-muted-foreground text-xs">Contact for pricing</span>
             )}
           </div>
         </div>
