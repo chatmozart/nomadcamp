@@ -1,8 +1,6 @@
-import { useState, useEffect } from "react";
 import { MapPin, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ImageWithFallback } from "@/components/ui/image-with-fallback";
-import { supabase } from "@/lib/supabase";
 
 interface PropertyCardProps {
   id: string;
@@ -29,33 +27,6 @@ const PropertyCard = ({
   price_six_months,
   price_one_year,
 }: PropertyCardProps) => {
-  const [signedUrl, setSignedUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    const getSignedUrl = async () => {
-      if (!image) return;
-
-      try {
-        console.log('PropertyCard: Fetching signed URL for:', image);
-        const { data, error } = await supabase.storage
-          .from('properties')
-          .createSignedUrl(image, 60 * 60);
-
-        if (error) {
-          console.error('PropertyCard: Error getting signed URL:', error);
-          return;
-        }
-
-        console.log('PropertyCard: Received signed URL:', data.signedUrl);
-        setSignedUrl(data.signedUrl);
-      } catch (error) {
-        console.error('PropertyCard: Error in getSignedUrl:', error);
-      }
-    };
-
-    getSignedUrl();
-  }, [image]);
-
   const getCheapestPrice = () => {
     const monthlyPrices = [
       price,
@@ -74,7 +45,7 @@ const PropertyCard = ({
       <div className="property-card rounded-xl overflow-hidden bg-card transition-transform hover:scale-[1.02]">
         <div className="relative aspect-[4/3]">
           <ImageWithFallback
-            src={signedUrl}
+            src={image}
             alt={title}
             className="w-full h-full object-cover"
             containerClassName="w-full h-full"
