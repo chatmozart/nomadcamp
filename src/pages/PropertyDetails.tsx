@@ -24,6 +24,9 @@ interface Property {
   contact_name: string | null;
   contact_email: string | null;
   contact_whatsapp: string | null;
+  locations: {
+    name: string;
+  } | null;
 }
 
 const PropertyDetails = () => {
@@ -156,15 +159,15 @@ const PropertyDetails = () => {
           id={property.id}
           description={property.description}
           price={property.price}
-          priceThreeMonths={property.price_three_months || undefined}
-          priceSixMonths={property.price_six_months || undefined}
-          priceOneYear={property.price_one_year || undefined}
+          priceThreeMonths={property.price_three_months}
+          priceSixMonths={property.price_six_months}
+          priceOneYear={property.price_one_year}
           location={property.location}
           availabilityStart={property.availability_start}
           availabilityEnd={property.availability_end}
-          contactName={property.contact_name || undefined}
-          contactEmail={property.contact_email || undefined}
-          contactWhatsapp={property.contact_whatsapp || undefined}
+          contactName={property.contact_name}
+          contactEmail={property.contact_email}
+          contactWhatsapp={property.contact_whatsapp}
         />
       </div>
     </div>
