@@ -29,30 +29,27 @@ const PropertyCard = ({
   price_six_months,
   price_one_year,
 }: PropertyCardProps) => {
-  const [signedImageUrl, setSignedImageUrl] = useState<string | null>(null);
+  const [signedUrls, setSignedUrls] = useState<string[]>([]);
 
   useEffect(() => {
-    const getSignedUrl = async () => {
+    const getSignedUrls = async () => {
       if (!image) {
         console.log('PropertyCard: No image provided for property:', id);
         return;
       }
 
-      // If it's already a full URL, use it directly
-      if (image.startsWith('http')) {
-        console.log('PropertyCard: Using direct URL:', image);
-        setSignedImageUrl(image);
-        return;
-      }
-
       try {
-        // Clean the path - remove any leading slashes or 'properties/' prefix
-        const cleanPath = image.replace(/^\/*(properties\/)*/, '');
-        console.log('PropertyCard: Fetching signed URL for path:', cleanPath);
+        // If it's already a full URL, use it directly
+        if (image.startsWith('http')) {
+          console.log('PropertyCard: Using direct URL:', image);
+          setSignedUrls([image]);
+          return;
+        }
 
+        console.log('PropertyCard: Fetching signed URL for path:', image);
         const { data, error } = await supabase.storage
           .from('properties')
-          .createSignedUrl(cleanPath, 3600); // 1 hour expiry
+          .createSignedUrl(image, 60 * 60); // 1 hour expiry
 
         if (error) {
           console.error('PropertyCard: Error getting signed URL:', error);
@@ -60,13 +57,13 @@ const PropertyCard = ({
         }
 
         console.log('PropertyCard: Successfully got signed URL:', data.signedUrl);
-        setSignedImageUrl(data.signedUrl);
+        setSignedUrls([data.signedUrl]);
       } catch (error) {
-        console.error('PropertyCard: Error processing image:', error);
+        console.error('PropertyCard: Error in getSignedUrls:', error);
       }
     };
 
-    getSignedUrl();
+    getSignedUrls();
   }, [image, id]);
 
   const getCheapestPrice = () => {
@@ -87,7 +84,7 @@ const PropertyCard = ({
       <div className="property-card rounded-xl overflow-hidden bg-card transition-transform hover:scale-[1.02]">
         <div className="relative aspect-[4/3]">
           <ImageWithFallback
-            src={signedImageUrl}
+            src={signedUrls[0] || null}
             alt={title}
             className="w-full h-full object-cover"
             containerClassName="w-full h-full"
