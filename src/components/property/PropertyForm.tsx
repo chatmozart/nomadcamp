@@ -1,17 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Autocomplete } from "@react-google-maps/api";
 import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { ExistingImagesGrid } from "./ExistingImagesGrid";
-import { AmenitiesSelection } from "./AmenitiesSelection";
-import { PropertyAvailabilityFields } from "./PropertyAvailabilityFields";
+import { ExistingImagesGrid } from "@/components/property/ExistingImagesGrid";
+import { AmenitiesSelection } from "@/components/property/AmenitiesSelection";
+import { PropertyAvailabilityFields } from "@/components/property/PropertyAvailabilityFields";
+import { PropertyLocationFields } from "@/components/property/PropertyLocationFields";
 import { usePropertyFormHandlers } from "./hooks/usePropertyFormHandlers";
-import { useLocations } from "@/hooks/useLocations";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface PropertyFormProps {
   onSubmit: (formData: {
@@ -22,7 +20,7 @@ interface PropertyFormProps {
     priceSixMonths: string;
     priceOneYear: string;
     location: string;
-    location_id: string;
+    location_category_id: string;
     imageFiles: File[];
     amenityIds: string[];
     availabilityStart: string;
@@ -42,7 +40,7 @@ interface PropertyFormProps {
     priceSixMonths?: number;
     priceOneYear?: number;
     location: string;
-    location_id?: number;
+    location_category_id?: number;
     existingImages?: string[];
     availabilityStart?: string;
     availabilityEnd?: string;
@@ -68,7 +66,9 @@ export const PropertyForm = ({
   const [propertyPriceSixMonths, setPropertyPriceSixMonths] = useState(initialData?.priceSixMonths?.toString() || "");
   const [propertyPriceOneYear, setPropertyPriceOneYear] = useState(initialData?.priceOneYear?.toString() || "");
   const [propertyLocation, setPropertyLocation] = useState(initialData?.location || "");
-  const [selectedLocationId, setSelectedLocationId] = useState<string>(initialData?.location_id?.toString() || "");
+  const [selectedLocationCategoryId, setSelectedLocationCategoryId] = useState<string>(
+    initialData?.location_category_id?.toString() || ""
+  );
   const [selectedAmenityIds, setSelectedAmenityIds] = useState<string[]>([]);
   const [availabilityStart, setAvailabilityStart] = useState(initialData?.availabilityStart || "");
   const [availabilityEnd, setAvailabilityEnd] = useState(initialData?.availabilityEnd || "");
@@ -76,7 +76,8 @@ export const PropertyForm = ({
   const [contactEmail, setContactEmail] = useState(initialData?.contactEmail || "");
   const [contactWhatsapp, setContactWhatsapp] = useState(initialData?.contactWhatsapp || "");
 
-  const { data: locations, isLoading: isLoadingLocations } = useLocations();
+  console.log('Initial location category ID:', initialData?.location_category_id);
+
   const {
     imageFiles,
     previewUrls,
@@ -90,12 +91,11 @@ export const PropertyForm = ({
     handleExistingImageDelete,
   } = usePropertyFormHandlers(setPropertyLocation, onPlaceSelect);
 
-  // Initialize existing images from initialData
-  useState(() => {
+  useEffect(() => {
     if (initialData?.existingImages) {
       setExistingImages(initialData.existingImages);
     }
-  });
+  }, [initialData?.existingImages, setExistingImages]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,10 +118,10 @@ export const PropertyForm = ({
       return;
     }
 
-    if (!selectedLocationId) {
+    if (!selectedLocationCategoryId) {
       toast({
         variant: "destructive",
-        title: "Location Required",
+        title: "Location Category Required",
         description: "Please select a location category",
       });
       return;
@@ -138,11 +138,8 @@ export const PropertyForm = ({
     }
 
     console.log('Submitting form with data:', {
-      images: imageFiles,
-      amenities: selectedAmenityIds,
-      availability: { start: availabilityStart, end: availabilityEnd },
-      contact: { name: contactName, email: contactEmail, whatsapp: contactWhatsapp },
-      location_id: selectedLocationId
+      location_category_id: selectedLocationCategoryId,
+      location: propertyLocation
     });
 
     await onSubmit({
@@ -153,7 +150,7 @@ export const PropertyForm = ({
       priceSixMonths: propertyPriceSixMonths,
       priceOneYear: propertyPriceOneYear,
       location: propertyLocation,
-      location_id: selectedLocationId,
+      location_category_id: selectedLocationCategoryId,
       imageFiles,
       amenityIds: selectedAmenityIds,
       availabilityStart,
@@ -164,6 +161,7 @@ export const PropertyForm = ({
     });
 
     if (mode === 'create') {
+      // Reset form fields
       setPropertyTitle("");
       setPropertyDescription("");
       setPropertyPrice("");
@@ -171,7 +169,7 @@ export const PropertyForm = ({
       setPropertyPriceSixMonths("");
       setPropertyPriceOneYear("");
       setPropertyLocation("");
-      setSelectedLocationId("");
+      setSelectedLocationCategoryId("");
       setImageFiles([]);
       setPreviewUrls([]);
       setSelectedAmenityIds([]);
@@ -196,25 +194,14 @@ export const PropertyForm = ({
         />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="locationCategory">Location Category</Label>
-        <Select
-          value={selectedLocationId}
-          onValueChange={setSelectedLocationId}
-          required
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select a location" />
-          </SelectTrigger>
-          <SelectContent>
-            {locations?.map((location) => (
-              <SelectItem key={location.id} value={location.id.toString()}>
-                {location.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      <PropertyLocationFields
+        locationCategory={selectedLocationCategoryId}
+        location={propertyLocation}
+        onLocationCategoryChange={setSelectedLocationCategoryId}
+        onLocationChange={setPropertyLocation}
+        googleMapsLoaded={googleMapsLoaded}
+        onPlaceSelect={onPlaceSelect}
+      />
 
       <div className="space-y-2">
         <Label htmlFor="propertyDescription">Description</Label>
@@ -227,6 +214,7 @@ export const PropertyForm = ({
         />
       </div>
 
+      {/* Price fields */}
       <div className="space-y-2">
         <Label htmlFor="propertyPrice">Monthly Price - 1 Month Contract (฿)</Label>
         <Input
@@ -271,37 +259,7 @@ export const PropertyForm = ({
         />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="propertyLocation">Location</Label>
-        {googleMapsLoaded ? (
-          <Autocomplete
-            onLoad={onPlaceSelect}
-            onPlaceChanged={() => {
-              const autocomplete = document.querySelector('input#propertyLocation') as HTMLInputElement;
-              if (autocomplete) {
-                setPropertyLocation(autocomplete.value);
-              }
-            }}
-          >
-            <Input
-              id="propertyLocation"
-              value={propertyLocation}
-              onChange={(e) => setPropertyLocation(e.target.value)}
-              placeholder="Enter location"
-              required
-            />
-          </Autocomplete>
-        ) : (
-          <Input
-            id="propertyLocation"
-            value={propertyLocation}
-            onChange={(e) => setPropertyLocation(e.target.value)}
-            placeholder="Enter location"
-            required
-          />
-        )}
-      </div>
-
+      {/* Image upload section */}
       <div className="space-y-2">
         <Label htmlFor="propertyImages">Property Images {mode === 'create' && '(at least 1 required)'}</Label>
         
