@@ -41,7 +41,7 @@ export const ImageWithFallback = ({
 
         const { data, error: signedUrlError } = await supabase.storage
           .from('properties')
-          .createSignedUrl(cleanPath, 60 * 60);
+          .createSignedUrl(cleanPath, 2592000); // 30 days expiry
 
         if (signedUrlError) {
           console.error('ImageWithFallback: Error getting signed URL:', signedUrlError);
