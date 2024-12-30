@@ -32,7 +32,7 @@ export const PropertiesGrid = ({ properties }: PropertiesGridProps) => {
             key={property.id}
             id={property.id}
             title={property.title}
-            imageUrl={property.imageSignedUrl}
+            image_url={property.imageSignedUrl || ''}
           />
         ))}
       </div>
