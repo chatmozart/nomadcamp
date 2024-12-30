@@ -20,7 +20,6 @@ const PropertiesList = () => {
       let query = supabase.from('properties').select('*');
       
       if (location) {
-        // Convert URL-friendly format back to display format and handle special cases
         let searchLocation;
         if (location === 'ko-pha-ngan') {
           searchLocation = 'Koh Phangan';
@@ -31,7 +30,6 @@ const PropertiesList = () => {
         }
         
         console.log('Searching for location:', searchLocation);
-        // Fetch all properties and filter them using the same logic as the index page
         const { data, error } = await query;
 
         if (error) {
@@ -39,7 +37,6 @@ const PropertiesList = () => {
           return;
         }
 
-        // Filter properties using the same categorization logic as the index page
         const filteredProperties = data?.filter(property => {
           const category = getPropertyCategory(property.location);
           return category === searchLocation;
@@ -71,11 +68,9 @@ const PropertiesList = () => {
 
   const handleMarkerClick = (propertyId: string) => {
     setSelectedPropertyId(propertyId);
-    // Scroll to the property card
     const element = document.getElementById(`property-${propertyId}`);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // Add a temporary highlight effect
       element.classList.add('ring-2', 'ring-primary', 'ring-offset-2');
       setTimeout(() => {
         element.classList.remove('ring-2', 'ring-primary', 'ring-offset-2');
@@ -85,48 +80,54 @@ const PropertiesList = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-6 sm:py-12">
+      <div className="container mx-auto py-6 sm:py-12">
         <h1 className="text-2xl sm:text-4xl font-bold mb-4 sm:mb-8 fade-in px-2">
           Properties in {getDisplayLocation(location)}
         </h1>
         
-        {/* Map Section */}
-        <div className="mb-8">
-          <PropertiesMap 
-            properties={properties}
-            onMarkerClick={handleMarkerClick}
-            hoveredPropertyId={hoveredPropertyId}
-          />
-        </div>
+        <div className="flex gap-8">
+          {/* Properties Grid */}
+          <div className="flex-1">
+            <div className="grid grid-cols-2 gap-4 sm:gap-8">
+              {isLoading ? (
+                <p>Loading properties...</p>
+              ) : properties.length === 0 ? (
+                <p>No properties found in this location.</p>
+              ) : (
+                properties.map((property) => (
+                  <div 
+                    key={property.id} 
+                    id={`property-${property.id}`}
+                    className="transition-all duration-300"
+                    onMouseEnter={() => setHoveredPropertyId(property.id)}
+                    onMouseLeave={() => setHoveredPropertyId(null)}
+                  >
+                    <PropertyCard
+                      id={property.id}
+                      title={property.title}
+                      location={property.location}
+                      price={property.price}
+                      image={property.image_url}
+                      price_three_months={property.price_three_months}
+                      price_six_months={property.price_six_months}
+                      price_one_year={property.price_one_year}
+                    />
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
 
-        {/* Properties Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
-          {isLoading ? (
-            <p>Loading properties...</p>
-          ) : properties.length === 0 ? (
-            <p>No properties found in this location.</p>
-          ) : (
-            properties.map((property) => (
-              <div 
-                key={property.id} 
-                id={`property-${property.id}`}
-                className={`px-2 sm:px-0 transition-all duration-300`}
-                onMouseEnter={() => setHoveredPropertyId(property.id)}
-                onMouseLeave={() => setHoveredPropertyId(null)}
-              >
-                <PropertyCard
-                  id={property.id}
-                  title={property.title}
-                  location={property.location}
-                  price={property.price}
-                  image={property.image_url}
-                  price_three_months={property.price_three_months}
-                  price_six_months={property.price_six_months}
-                  price_one_year={property.price_one_year}
-                />
-              </div>
-            ))
-          )}
+          {/* Map Section */}
+          <div className="w-[600px] sticky top-24">
+            <div className="h-[800px]">
+              <PropertiesMap 
+                properties={properties}
+                onMarkerClick={handleMarkerClick}
+                hoveredPropertyId={hoveredPropertyId}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>
