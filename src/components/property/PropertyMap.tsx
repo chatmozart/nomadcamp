@@ -30,11 +30,16 @@ export const PropertyMap = ({ address }: PropertyMapProps) => {
         });
 
         if (result[0]?.geometry?.location) {
+          // Add random offset within 300 meters
+          const metersToLatDegrees = 0.00001 / 1.11; // Approximate conversion
+          const randomLat = (Math.random() - 0.5) * (300 * metersToLatDegrees * 2);
+          const randomLng = (Math.random() - 0.5) * (300 * metersToLatDegrees * 2);
+
           const location = {
-            lat: result[0].geometry.location.lat(),
-            lng: result[0].geometry.location.lng()
+            lat: result[0].geometry.location.lat() + randomLat,
+            lng: result[0].geometry.location.lng() + randomLng
           };
-          console.log('PropertyMap - Geocoded coordinates:', location);
+          console.log('PropertyMap - Approximated coordinates:', location);
           setCoordinates(location);
         }
       } catch (error) {

@@ -1,4 +1,4 @@
-import { MapPin, Star } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 import { useSupabaseImage } from "@/hooks/useSupabaseImage";
@@ -8,8 +8,6 @@ interface PropertyCardProps {
   title: string;
   location: string;
   price: number;
-  rating: number;
-  reviews: number;
   image: string | null;
   price_three_months?: number | null;
   price_six_months?: number | null;
@@ -21,8 +19,6 @@ const PropertyCard = ({
   title,
   location,
   price,
-  rating,
-  reviews,
   image,
   price_three_months,
   price_six_months,
@@ -38,10 +34,11 @@ const PropertyCard = ({
       price_one_year,
     ].filter((p): p is number => p !== null);
 
-    return Math.min(...monthlyPrices);
+    return monthlyPrices.length > 0 ? Math.min(...monthlyPrices) : null;
   };
 
   const cheapestPrice = getCheapestPrice();
+  const formattedLocation = location.split(',')[0].trim();
 
   return (
     <Link to={`/property/${id}`} className="block">
@@ -60,18 +57,19 @@ const PropertyCard = ({
               <h3 className="font-semibold text-lg">{title}</h3>
               <div className="flex items-center text-muted-foreground mt-1">
                 <MapPin className="w-4 h-4 mr-1" />
-                <span className="text-sm">{location}</span>
+                <span className="text-sm">{formattedLocation}</span>
               </div>
-            </div>
-            <div className="flex items-center">
-              <Star className="w-4 h-4 text-primary fill-current" />
-              <span className="ml-1 font-medium">{rating}</span>
-              <span className="text-muted-foreground text-sm ml-1">({reviews})</span>
             </div>
           </div>
           <div className="mt-4">
-            <span className="font-semibold text-lg">฿{cheapestPrice.toLocaleString()}</span>
-            <span className="text-muted-foreground"> / month</span>
+            {cheapestPrice ? (
+              <>
+                <span className="font-semibold text-lg">฿{cheapestPrice.toLocaleString()}</span>
+                <span className="text-muted-foreground"> / month</span>
+              </>
+            ) : (
+              <span className="text-muted-foreground">Contact for pricing</span>
+            )}
           </div>
         </div>
       </div>

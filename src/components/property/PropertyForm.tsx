@@ -112,7 +112,7 @@ export const PropertyForm = ({
       return;
     }
 
-    // Add validation to ensure at least one price is provided
+    // Validate that at least one price is provided
     if (!propertyPrice && !propertyPriceThreeMonths && !propertyPriceSixMonths && !propertyPriceOneYear) {
       toast({
         variant: "destructive",

@@ -5,10 +5,10 @@ import { PropertyMap } from "@/components/property/PropertyMap";
 interface PropertyDetailsSectionProps {
   id: string;
   description: string;
-  price: number;
-  priceThreeMonths?: number;
-  priceSixMonths?: number;
-  priceOneYear?: number;
+  price: number | null;
+  priceThreeMonths?: number | null;
+  priceSixMonths?: number | null;
+  priceOneYear?: number | null;
   location: string;
   availabilityStart?: string | null;
   availabilityEnd?: string | null;
@@ -31,17 +31,7 @@ export const PropertyDetailsSection = ({
   contactEmail,
   contactWhatsapp
 }: PropertyDetailsSectionProps) => {
-  console.log('PropertyDetailsSection rendering with data:', {
-    price,
-    priceThreeMonths,
-    priceSixMonths,
-    priceOneYear,
-    availabilityStart,
-    availabilityEnd,
-    contactName,
-    contactEmail,
-    contactWhatsapp
-  });
+  const formattedLocation = location.split(',')[0].trim();
 
   return (
     <div className="grid grid-cols-3 gap-12 px-4 py-8">
@@ -73,7 +63,7 @@ export const PropertyDetailsSection = ({
 
       <div className="col-span-3 -mx-4">
         <h3 className="text-xl font-semibold mb-4 px-4">Map</h3>
-        <PropertyMap address={location} />
+        <PropertyMap address={formattedLocation} />
       </div>
     </div>
   );
