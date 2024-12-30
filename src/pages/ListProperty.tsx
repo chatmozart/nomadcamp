@@ -4,6 +4,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/lib/supabase";
 import { PropertyForm } from "@/components/property/PropertyForm";
 import { useNavigate } from "react-router-dom";
+import { useGoogleMaps } from "@/hooks/useGoogleMaps";
 
 interface PropertyResponse {
   id: string;
@@ -27,6 +28,11 @@ const ListProperty = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { isLoading: isLoadingMaps } = useGoogleMaps();
+
+  const handlePlaceSelect = (autocomplete: google.maps.places.Autocomplete) => {
+    console.log('Place selected:', autocomplete.getPlace());
+  };
 
   const handlePropertySubmit = async ({
     title,
@@ -183,8 +189,8 @@ const ListProperty = () => {
       <h1 className="text-2xl font-bold mb-8">List a Property</h1>
       <PropertyForm 
         onSubmit={handlePropertySubmit}
-        googleMapsLoaded={true}
-        onPlaceSelect={() => {}}
+        googleMapsLoaded={!isLoadingMaps}
+        onPlaceSelect={handlePlaceSelect}
       />
     </div>
   );
