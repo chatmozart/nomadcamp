@@ -47,7 +47,7 @@ export const PropertyMap = ({ address }: PropertyMapProps) => {
     if (window.google && address) {
       geocodeAddress();
     }
-  }, [address, window.google]);
+  }, [address]);
 
   if (isLoadingApi || isGeocoding) {
     return <div className="h-[400px] bg-muted flex items-center justify-center">Loading map...</div>;

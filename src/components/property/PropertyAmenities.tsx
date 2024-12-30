@@ -77,6 +77,11 @@ export const PropertyAmenities = ({
     );
   }
 
+  const IconComponent = (iconName: string) => {
+    const Icon = (icons as any)[iconName];
+    return Icon ? <Icon className="w-6 h-6 text-gray-600" /> : null;
+  };
+
   if (!amenities || amenities.length === 0) {
     return (
       <div className="py-6 border-b">
@@ -85,11 +90,6 @@ export const PropertyAmenities = ({
       </div>
     );
   }
-
-  const IconComponent = (iconName: string) => {
-    const Icon = (icons as any)[iconName];
-    return Icon ? <Icon className="w-6 h-6 text-gray-600" /> : null;
-  };
 
   return (
     <div className="py-6 border-b">
