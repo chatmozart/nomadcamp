@@ -96,28 +96,45 @@ export const PropertiesMap = ({ properties, onMarkerClick, hoveredPropertyId }: 
   const mapStyles = [
     {
       "elementType": "geometry",
-      "stylers": [{ "color": "#f5f5f5" }]
-    },
-    {
-      "elementType": "labels.icon",
-      "stylers": [{ "visibility": "off" }]
+      "stylers": [{ "color": "#f1f1f1" }]
     },
     {
       "elementType": "labels.text.fill",
-      "stylers": [{ "color": "#616161" }]
+      "stylers": [{ "color": "#8A898C" }]
     },
     {
       "elementType": "labels.text.stroke",
-      "stylers": [{ "color": "#f5f5f5" }]
+      "stylers": [{ "color": "#f1f1f1" }]
     },
     {
-      "featureType": "administrative.land_parcel",
-      "stylers": [{ "visibility": "off" }]
+      "featureType": "administrative",
+      "elementType": "geometry.stroke",
+      "stylers": [{ "color": "#c8c8c9" }]
     },
     {
       "featureType": "administrative.land_parcel",
       "elementType": "labels.text.fill",
-      "stylers": [{ "color": "#bdbdbd" }]
+      "stylers": [{ "color": "#8A898C" }]
+    },
+    {
+      "featureType": "landscape",
+      "elementType": "geometry",
+      "stylers": [{ "color": "#f1f1f1" }]
+    },
+    {
+      "featureType": "poi",
+      "elementType": "geometry",
+      "stylers": [{ "color": "#e5e5e5" }]
+    },
+    {
+      "featureType": "poi",
+      "elementType": "labels.text.fill",
+      "stylers": [{ "color": "#8A898C" }]
+    },
+    {
+      "featureType": "poi.park",
+      "elementType": "geometry",
+      "stylers": [{ "color": "#e5e5e5" }]
     },
     {
       "featureType": "road",
@@ -126,8 +143,8 @@ export const PropertiesMap = ({ properties, onMarkerClick, hoveredPropertyId }: 
     },
     {
       "featureType": "road.arterial",
-      "elementType": "labels",
-      "stylers": [{ "visibility": "off" }]
+      "elementType": "geometry",
+      "stylers": [{ "color": "#ffffff" }]
     },
     {
       "featureType": "road.highway",
@@ -136,30 +153,18 @@ export const PropertiesMap = ({ properties, onMarkerClick, hoveredPropertyId }: 
     },
     {
       "featureType": "road.highway",
-      "elementType": "labels",
-      "stylers": [{ "visibility": "off" }]
-    },
-    {
-      "featureType": "road.local",
-      "stylers": [{ "visibility": "off" }]
-    },
-    {
-      "featureType": "poi",
-      "stylers": [{ "visibility": "off" }]
-    },
-    {
-      "featureType": "transit",
-      "stylers": [{ "visibility": "off" }]
+      "elementType": "labels.text.fill",
+      "stylers": [{ "color": "#8A898C" }]
     },
     {
       "featureType": "water",
       "elementType": "geometry",
-      "stylers": [{ "color": "#e9e9e9" }]
+      "stylers": [{ "color": "#0EA5E9" }]
     },
     {
       "featureType": "water",
       "elementType": "labels.text.fill",
-      "stylers": [{ "color": "#9e9e9e" }]
+      "stylers": [{ "color": "#33C3F0" }]
     }
   ];
 
