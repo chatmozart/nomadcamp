@@ -14,8 +14,15 @@ export const ImageCarousel = ({ images, title }: ImageCarouselProps) => {
 
   useEffect(() => {
     const getSignedUrls = async () => {
+      const validImages = images.filter(img => img !== null && img !== undefined);
+      
+      if (validImages.length === 0) {
+        console.log('No valid images to process');
+        return;
+      }
+
       const urls = await Promise.all(
-        images.map(async (imageUrl) => {
+        validImages.map(async (imageUrl) => {
           try {
             console.log('Fetching signed URL for:', imageUrl);
             const { data, error } = await supabase.storage
