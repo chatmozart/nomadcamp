@@ -23,7 +23,14 @@ export const getPropertyCategory = (location: string): LocationCategory | null =
     'ko phangan',
     'koh pha ngan',
     'kohphangan',
-    'kophangan'
+    'kophangan',
+    'ko pha-ngan',  // Added hyphenated version
+    'koh pha-ngan', // Added hyphenated version
+    'ko phangan',   // Added without space
+    'koh phangan',  // Added without space
+    'phangan',      // Added just the island name
+    'pha ngan',     // Added space version
+    'pha-ngan'      // Added hyphenated version
   ];
   
   if (kohPhanganVariations.some(variant => 
