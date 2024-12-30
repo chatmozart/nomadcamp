@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search, MapPin, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import PropertyCard from "@/components/PropertyCard";
 import SearchBar from "@/components/SearchBar";
 import CategoryFilter from "@/components/CategoryFilter";
@@ -49,6 +47,9 @@ const Index = () => {
     fetchProperties();
   }, []);
 
+  // Get location names without country for display
+  const locationNames = LOCATION_CATEGORIES.map(cat => cat.split(' - ')[0]);
+
   return (
     <div className="min-h-screen bg-background">
       <div className="relative h-[70vh] bg-gradient-to-r from-gray-900/90 to-gray-900/70 flex items-center justify-center">
@@ -79,7 +80,7 @@ const Index = () => {
           ) : Object.keys(groupedProperties).length === 0 ? (
             <p>No properties found.</p>
           ) : (
-            LOCATION_CATEGORIES.map((category) => {
+            locationNames.map((category) => {
               const categoryProperties = groupedProperties[category];
               if (!categoryProperties?.length) return null;
               

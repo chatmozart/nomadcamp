@@ -1,27 +1,20 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LOCATION_CATEGORIES } from "@/utils/locationUtils";
+import { LOCATION_CATEGORIES, getUrlFriendlyLocation } from "@/utils/locationUtils";
 
 const CategoryFilter = () => {
   const [activeCategory, setActiveCategory] = useState("All");
   const navigate = useNavigate();
   
-  const categories = ["All", ...LOCATION_CATEGORIES];
+  // Extract just the location names without the country for display
+  const categories = ["All", ...LOCATION_CATEGORIES.map(cat => cat.split(' - ')[0])];
 
   const handleCategoryClick = (category: string) => {
     setActiveCategory(category);
     if (category === "All") {
       navigate("/");
     } else {
-      // Convert category to URL-friendly format
-      const getUrlFriendlyLocation = (location: string) => {
-        if (location === "Koh Phangan") {
-          return "ko-pha-ngan";
-        }
-        return location.toLowerCase().replace(/\s+/g, '-');
-      };
-      
       const locationParam = getUrlFriendlyLocation(category);
       console.log('Navigating to location:', locationParam);
       navigate(`/properties/${locationParam}`);

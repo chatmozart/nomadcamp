@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import PropertyCard from "@/components/PropertyCard";
 import { PropertiesMap } from "@/components/property/PropertiesMap";
 import { supabase } from "@/lib/supabase";
-import { getPropertyCategory } from "@/utils/locationUtils";
+import { getPropertyCategory, getDisplayLocation } from "@/utils/locationUtils";
 
 const PropertiesList = () => {
   const { location } = useParams();
@@ -20,16 +20,8 @@ const PropertiesList = () => {
       let query = supabase.from('properties').select('*');
       
       if (location) {
-        let searchLocation;
-        if (location === 'ko-pha-ngan') {
-          searchLocation = 'Koh Phangan';
-        } else {
-          searchLocation = location.split('-')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ');
-        }
-        
-        console.log('Searching for location:', searchLocation);
+        const displayLocation = getDisplayLocation(location);
+        console.log('Searching for location:', displayLocation);
         const { data, error } = await query;
 
         if (error) {
@@ -39,7 +31,7 @@ const PropertiesList = () => {
 
         const filteredProperties = data?.filter(property => {
           const category = getPropertyCategory(property.location);
-          return category === searchLocation;
+          return category?.split(' - ')[0] === displayLocation;
         }) || [];
 
         console.log('Filtered properties:', filteredProperties);
@@ -57,14 +49,6 @@ const PropertiesList = () => {
 
     fetchProperties();
   }, [location]);
-
-  const getDisplayLocation = (urlLocation: string | undefined) => {
-    if (!urlLocation) return 'All Properties';
-    if (urlLocation === 'ko-pha-ngan') return 'Koh Phangan';
-    return urlLocation.split('-')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-  };
 
   const handleMarkerClick = (propertyId: string) => {
     setSelectedPropertyId(propertyId);
@@ -86,7 +70,6 @@ const PropertiesList = () => {
         </h1>
         
         <div className="flex gap-8">
-          {/* Properties Grid */}
           <div className="flex-1">
             <div className="grid grid-cols-2 gap-4 sm:gap-8">
               {isLoading ? (
@@ -118,7 +101,6 @@ const PropertiesList = () => {
             </div>
           </div>
 
-          {/* Map Section */}
           <div className="w-[600px] sticky top-24">
             <div className="h-[800px]">
               <PropertiesMap 
