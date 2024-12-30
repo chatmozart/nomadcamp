@@ -12,8 +12,6 @@ const PropertiesList = () => {
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null);
   const [hoveredPropertyId, setHoveredPropertyId] = useState<string | null>(null);
   
-  console.log("Current location param:", location);
-
   useEffect(() => {
     const fetchProperties = async () => {
       console.log('Fetching properties for location:', location);
@@ -81,9 +79,9 @@ const PropertiesList = () => {
           Properties in {getDisplayLocation(location)}
         </h1>
         
-        <div className="flex gap-8">
-          <div className="flex-1">
-            <div className="grid grid-cols-2 gap-4 sm:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr,400px] gap-8">
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {isLoading ? (
                 <p>Loading properties...</p>
               ) : properties.length === 0 ? (
@@ -113,14 +111,12 @@ const PropertiesList = () => {
             </div>
           </div>
 
-          <div className="w-[600px] sticky top-24">
-            <div className="h-[800px]">
-              <PropertiesMap 
-                properties={properties}
-                onMarkerClick={handleMarkerClick}
-                hoveredPropertyId={hoveredPropertyId}
-              />
-            </div>
+          <div className="sticky top-24 h-[600px]">
+            <PropertiesMap 
+              properties={properties}
+              onMarkerClick={handleMarkerClick}
+              hoveredPropertyId={hoveredPropertyId}
+            />
           </div>
         </div>
       </div>
