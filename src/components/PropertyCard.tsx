@@ -144,7 +144,7 @@ const PropertyCard = ({
             </div>
           </div>
           <div className="mt-4">
-            <span className="font-semibold text-lg">${cheapestPrice}</span>
+            <span className="font-semibold text-lg">฿{cheapestPrice.toLocaleString()}</span>
             <span className="text-muted-foreground"> / month</span>
           </div>
         </div>
