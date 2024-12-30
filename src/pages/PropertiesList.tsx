@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import PropertyCard from "@/components/PropertyCard";
 import { PropertiesMap } from "@/components/property/PropertiesMap";
 import { supabase } from "@/lib/supabase";
-import { getPropertyCategory, getDisplayLocation } from "@/utils/locationUtils";
+import { getPropertyCategory, getDisplayLocation, LOCATION_CATEGORIES } from "@/utils/locationUtils";
 
 const PropertiesList = () => {
   const { location } = useParams();
@@ -17,31 +17,33 @@ const PropertiesList = () => {
   useEffect(() => {
     const fetchProperties = async () => {
       console.log('Fetching properties for location:', location);
-      let query = supabase.from('properties').select('*');
+      const { data, error } = await supabase.from('properties').select('*');
       
-      if (location) {
+      if (error) {
+        console.error('Error fetching properties:', error);
+        return;
+      }
+
+      if (location && data) {
         const displayLocation = getDisplayLocation(location);
         console.log('Searching for location:', displayLocation);
-        const { data, error } = await query;
+        
+        // Find the full category (with country) that matches the URL location
+        const matchingCategory = LOCATION_CATEGORIES.find(category => 
+          category.split(' - ')[0].toLowerCase() === displayLocation.toLowerCase()
+        );
+        
+        console.log('Matching category:', matchingCategory);
 
-        if (error) {
-          console.error('Error fetching properties:', error);
-          return;
-        }
-
-        const filteredProperties = data?.filter(property => {
-          const category = getPropertyCategory(property.location);
-          return category?.split(' - ')[0] === displayLocation;
-        }) || [];
+        const filteredProperties = data.filter(property => {
+          const propertyCategory = getPropertyCategory(property.location);
+          console.log('Property location:', property.location, 'Category:', propertyCategory);
+          return propertyCategory === matchingCategory;
+        });
 
         console.log('Filtered properties:', filteredProperties);
         setProperties(filteredProperties);
       } else {
-        const { data, error } = await query;
-        if (error) {
-          console.error('Error fetching properties:', error);
-          return;
-        }
         setProperties(data || []);
       }
       setIsLoading(false);
