@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
-import { GoogleMap } from "@react-google-maps/api";
-import { useGoogleMaps } from "@/hooks/useGoogleMaps";
+import { BaseMap } from "./BaseMap";
 import { PropertyMapMarker } from "./PropertyMapMarker";
-import { defaultMapOptions } from "@/utils/mapUtils";
 
 interface Property {
   id: string;
@@ -18,7 +16,6 @@ interface PropertiesMapProps {
 
 export const PropertiesMap = ({ properties, onMarkerClick, hoveredPropertyId }: PropertiesMapProps) => {
   const [markers, setMarkers] = useState<{ lat: number; lng: number; id: string }[]>([]);
-  const { isLoading: isLoadingApi } = useGoogleMaps();
   const [isGeocoding, setIsGeocoding] = useState(true);
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null);
 
@@ -84,7 +81,7 @@ export const PropertiesMap = ({ properties, onMarkerClick, hoveredPropertyId }: 
     }
   }, [properties]);
 
-  if (isLoadingApi || isGeocoding) {
+  if (isGeocoding) {
     return <div className="h-full bg-muted flex items-center justify-center">Loading map...</div>;
   }
 
@@ -93,23 +90,20 @@ export const PropertiesMap = ({ properties, onMarkerClick, hoveredPropertyId }: 
   }
 
   return (
-    <div className="h-full w-full rounded-xl overflow-hidden">
-      <GoogleMap
-        center={mapCenter}
-        zoom={13}
-        mapContainerStyle={{ width: '100%', height: '100%' }}
-        options={defaultMapOptions}
-      >
-        {markers.map((marker) => (
-          <PropertyMapMarker
-            key={marker.id}
-            position={{ lat: marker.lat, lng: marker.lng }}
-            propertyId={marker.id}
-            isHovered={hoveredPropertyId === marker.id}
-            onClick={() => onMarkerClick?.(marker.id)}
-          />
-        ))}
-      </GoogleMap>
-    </div>
+    <BaseMap 
+      center={mapCenter} 
+      zoom={13}
+      className="h-full w-full rounded-xl overflow-hidden"
+    >
+      {markers.map((marker) => (
+        <PropertyMapMarker
+          key={marker.id}
+          position={{ lat: marker.lat, lng: marker.lng }}
+          propertyId={marker.id}
+          isHovered={hoveredPropertyId === marker.id}
+          onClick={() => onMarkerClick?.(marker.id)}
+        />
+      ))}
+    </BaseMap>
   );
 };

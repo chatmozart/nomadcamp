@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { GoogleMap, Marker } from "@react-google-maps/api";
-import { useGoogleMaps } from "@/hooks/useGoogleMaps";
+import { Marker } from "@react-google-maps/api";
+import { BaseMap } from "./BaseMap";
 
 interface PropertyMapProps {
   address: string;
@@ -8,7 +8,6 @@ interface PropertyMapProps {
 
 export const PropertyMap = ({ address }: PropertyMapProps) => {
   const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(null);
-  const { isLoading: isLoadingApi } = useGoogleMaps();
   const [isGeocoding, setIsGeocoding] = useState(true);
 
   useEffect(() => {
@@ -49,7 +48,7 @@ export const PropertyMap = ({ address }: PropertyMapProps) => {
     }
   }, [address]);
 
-  if (isLoadingApi || isGeocoding) {
+  if (isGeocoding) {
     return <div className="h-[600px] bg-muted flex items-center justify-center">Loading map...</div>;
   }
 
@@ -58,14 +57,8 @@ export const PropertyMap = ({ address }: PropertyMapProps) => {
   }
 
   return (
-    <div className="h-[600px] w-full">
-      <GoogleMap
-        center={coordinates}
-        zoom={14}
-        mapContainerStyle={{ width: '100%', height: '100%' }}
-      >
-        <Marker position={coordinates} />
-      </GoogleMap>
-    </div>
+    <BaseMap center={coordinates} zoom={14}>
+      <Marker position={coordinates} />
+    </BaseMap>
   );
 };
