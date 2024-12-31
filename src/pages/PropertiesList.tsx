@@ -11,36 +11,43 @@ const PropertiesList = () => {
   const [hoveredPropertyId, setHoveredPropertyId] = useState<string | null>(null);
 
   const fetchProperties = async (locationId: string | null = null) => {
-    let query = supabase
-      .from('properties')
-      .select(`
-        *,
-        locations (
-          name
-        )
-      `);
+    try {
+      console.log('Fetching properties with locationId:', locationId);
+      let query = supabase
+        .from('properties')
+        .select(`
+          *,
+          locations (
+            name
+          )
+        `);
 
-    // If locationId is provided, filter by location
-    if (locationId) {
-      query = query.eq('location_category_id', locationId);
+      // If locationId is provided, filter by location
+      if (locationId) {
+        query = query.eq('location_category_id', locationId);
+      }
+
+      // Only show published properties unless user is the owner
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        query = query.eq('published', true);
+      } else {
+        query = query.or(`published.eq.true,owner_id.eq.${user.id}`);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('Error fetching properties:', error);
+        throw error;
+      }
+
+      console.log('Fetched properties:', data);
+      return data;
+    } catch (error) {
+      console.error('Error in fetchProperties:', error);
+      return [];
     }
-
-    // Only show published properties unless user is the owner
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      query = query.eq('published', true);
-    } else {
-      query = query.or(`published.eq.true,owner_id.eq.${user.id}`);
-    }
-
-    const { data, error } = await query;
-
-    if (error) {
-      console.error('Error fetching properties:', error);
-      throw error;
-    }
-
-    return data;
   };
 
   useEffect(() => {
