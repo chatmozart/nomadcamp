@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
@@ -6,11 +6,26 @@ import { format } from "date-fns";
 
 interface DateFilterProps {
   onDateChange: (date: string | null, isExact: boolean) => void;
+  initialDate?: string | null;
+  initialIsExact?: boolean;
 }
 
-export const DateFilter = ({ onDateChange }: DateFilterProps) => {
-  const [dateType, setDateType] = useState<"approximate" | "exact">("approximate");
-  const [selectedDate, setSelectedDate] = useState<string>("");
+export const DateFilter = ({ 
+  onDateChange, 
+  initialDate = null, 
+  initialIsExact = false 
+}: DateFilterProps) => {
+  const [dateType, setDateType] = useState<"approximate" | "exact">(
+    initialIsExact ? "exact" : "approximate"
+  );
+  const [selectedDate, setSelectedDate] = useState<string>(initialDate || "");
+
+  useEffect(() => {
+    if (initialDate) {
+      setSelectedDate(initialDate);
+      onDateChange(initialDate, initialIsExact);
+    }
+  }, [initialDate, initialIsExact]);
 
   const handleDateTypeChange = (value: "approximate" | "exact") => {
     setDateType(value);
@@ -29,7 +44,7 @@ export const DateFilter = ({ onDateChange }: DateFilterProps) => {
   return (
     <div className="space-y-4">
       <RadioGroup
-        defaultValue="approximate"
+        defaultValue={dateType}
         value={dateType}
         onValueChange={(value: "approximate" | "exact") => handleDateTypeChange(value)}
       >

@@ -15,8 +15,14 @@ const SearchBar = () => {
   const { isLoading } = useGoogleMaps();
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [isExactDate, setIsExactDate] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string | null>(() => {
+    const saved = localStorage.getItem('selectedDate');
+    return saved ? saved : null;
+  });
+  const [isExactDate, setIsExactDate] = useState<boolean>(() => {
+    const saved = localStorage.getItem('isExactDate');
+    return saved ? JSON.parse(saved) : false;
+  });
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const navigate = useNavigate();
@@ -54,6 +60,16 @@ const SearchBar = () => {
       }
     };
   }, [navigate, isLoading]);
+
+  // Save filters to localStorage whenever they change
+  useEffect(() => {
+    if (selectedDate) {
+      localStorage.setItem('selectedDate', selectedDate);
+    } else {
+      localStorage.removeItem('selectedDate');
+    }
+    localStorage.setItem('isExactDate', JSON.stringify(isExactDate));
+  }, [selectedDate, isExactDate]);
 
   const handleSearch = () => {
     if (searchQuery) {
@@ -111,7 +127,11 @@ const SearchBar = () => {
         <PopoverContent className="w-64">
           <div className="space-y-4">
             <h4 className="font-medium">Filters</h4>
-            <DateFilter onDateChange={handleDateChange} />
+            <DateFilter 
+              onDateChange={handleDateChange}
+              initialDate={selectedDate}
+              initialIsExact={isExactDate}
+            />
           </div>
         </PopoverContent>
       </Popover>
