@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import PropertyCard from "@/components/PropertyCard";
 import SearchBar from "@/components/SearchBar";
 import CategoryFilter from "@/components/CategoryFilter";
-import { PropertiesMap } from "@/components/property/PropertiesMap";
 import { supabase } from "@/lib/supabase";
 import { groupPropertiesByLocation, LOCATION_CATEGORIES } from "@/utils/locationUtils";
 
@@ -11,8 +10,6 @@ const Index = () => {
   const [properties, setProperties] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [groupedProperties, setGroupedProperties] = useState<Record<string, any[]>>({});
-  const [hoveredPropertyId, setHoveredPropertyId] = useState<string | null>(null);
-  const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -53,18 +50,6 @@ const Index = () => {
   // Get location names without country for display
   const locationNames = LOCATION_CATEGORIES.map(cat => cat.split(' - ')[0]);
 
-  const handleMarkerClick = (propertyId: string) => {
-    setSelectedPropertyId(propertyId);
-    const element = document.getElementById(`property-${propertyId}`);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      element.classList.add('ring-2', 'ring-primary', 'ring-offset-2');
-      setTimeout(() => {
-        element.classList.remove('ring-2', 'ring-primary', 'ring-offset-2');
-      }, 2000);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <div className="relative h-[70vh] bg-gradient-to-r from-gray-900/90 to-gray-900/70 flex items-center justify-center">
@@ -89,42 +74,28 @@ const Index = () => {
       <div className="container mx-auto px-4 py-12">
         <CategoryFilter />
         
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr,400px] gap-8 mb-12">
-          <div className="space-y-6">
-            <h2 className="text-2xl font-semibold">All Locations</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {!isLoading && properties.map((property) => (
-                <div
-                  key={property.id}
-                  id={`property-${property.id}`}
-                  onMouseEnter={() => setHoveredPropertyId(property.id)}
-                  onMouseLeave={() => setHoveredPropertyId(null)}
-                >
-                  <PropertyCard 
-                    id={property.id}
-                    title={property.title}
-                    location={property.location}
-                    location_category={property.locations?.name}
-                    price={property.price}
-                    price_three_months={property.price_three_months}
-                    price_six_months={property.price_six_months}
-                    price_one_year={property.price_one_year}
-                    image={property.image_url}
-                  />
-                </div>
-              ))}
-            </div>
+        <div className="space-y-6">
+          <h2 className="text-2xl font-semibold">All Locations</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {!isLoading && properties.map((property) => (
+              <div
+                key={property.id}
+                id={`property-${property.id}`}
+              >
+                <PropertyCard 
+                  id={property.id}
+                  title={property.title}
+                  location={property.location}
+                  location_category={property.locations?.name}
+                  price={property.price}
+                  price_three_months={property.price_three_months}
+                  price_six_months={property.price_six_months}
+                  price_one_year={property.price_one_year}
+                  image={property.image_url}
+                />
+              </div>
+            ))}
           </div>
-          
-          {!isLoading && properties.length > 0 && (
-            <div className="sticky top-24 h-[600px]">
-              <PropertiesMap 
-                properties={properties}
-                onMarkerClick={handleMarkerClick}
-                hoveredPropertyId={hoveredPropertyId}
-              />
-            </div>
-          )}
         </div>
       </div>
     </div>
