@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/lib/supabase";
-import { PropertiesGrid } from "@/components/property/PropertiesGrid";
+import PropertiesGrid from "@/components/property/PropertiesGrid";
 
 interface Property {
   id: number;
@@ -176,3 +176,4 @@ const Profile = () => {
 };
 
 export default Profile;
+
