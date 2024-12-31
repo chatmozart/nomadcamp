@@ -1,14 +1,27 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LOCATION_CATEGORIES, getUrlFriendlyLocation } from "@/utils/locationUtils";
+import { LOCATION_CATEGORIES, getUrlFriendlyLocation, getDisplayLocation } from "@/utils/locationUtils";
 
 const CategoryFilter = () => {
   const [activeCategory, setActiveCategory] = useState("All");
   const navigate = useNavigate();
+  const location = useLocation();
   
   // Extract just the location names without the country for display
   const categories = ["All", ...LOCATION_CATEGORIES.map(cat => cat.split(' - ')[0])];
+
+  useEffect(() => {
+    // Extract the location from the URL path
+    const pathSegments = location.pathname.split('/');
+    if (pathSegments[1] === 'properties' && pathSegments[2]) {
+      const currentLocation = getDisplayLocation(pathSegments[2]);
+      console.log('Current location from URL:', currentLocation);
+      setActiveCategory(currentLocation);
+    } else {
+      setActiveCategory("All");
+    }
+  }, [location.pathname]);
 
   const handleCategoryClick = (category: string) => {
     setActiveCategory(category);
