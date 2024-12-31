@@ -10,10 +10,18 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { DateFilter } from "./filters/DateFilter";
+import { getDisplayLocation } from "@/utils/locationUtils";
 
 const SearchBar = () => {
   const { isLoading } = useGoogleMaps();
+  const location = useLocation();
   const [searchQuery, setSearchQuery] = useState(() => {
+    // Initialize from URL if available
+    const pathParts = location.pathname.split('/');
+    if (pathParts[1] === 'properties' && pathParts[2]) {
+      return getDisplayLocation(pathParts[2]);
+    }
+    // Fallback to localStorage
     const saved = localStorage.getItem('searchQuery');
     return saved || "";
   });
@@ -29,7 +37,6 @@ const SearchBar = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const navigate = useNavigate();
-  const location = useLocation();
   const [searchParams] = useSearchParams();
   const isIndexPage = location.pathname === "/";
 
@@ -64,6 +71,16 @@ const SearchBar = () => {
       }
     };
   }, [navigate, isLoading]);
+
+  useEffect(() => {
+    // Update search query when location changes
+    const pathParts = location.pathname.split('/');
+    if (pathParts[1] === 'properties' && pathParts[2]) {
+      const displayLocation = getDisplayLocation(pathParts[2]);
+      setSearchQuery(displayLocation);
+      localStorage.setItem('searchQuery', displayLocation);
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     if (selectedDate) {
