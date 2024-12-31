@@ -5,17 +5,79 @@ import { Link } from "react-router-dom";
 import { Plus, User } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/lib/supabase";
-import PropertiesGrid from "@/components/property/PropertiesGrid";
 import { Property } from "@/types/property";
 import { Card } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+
+interface UserProfile {
+  name: string | null;
+  email: string | null;
+  whatsapp: string | null;
+}
+
+const profileFormSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters").max(50),
+  email: z.string().email("Invalid email address"),
+  whatsapp: z.string().min(10, "WhatsApp number must be at least 10 digits").max(15),
+});
 
 const Profile = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [properties, setProperties] = useState<Property[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const form = useForm<z.infer<typeof profileFormSchema>>({
+    resolver: zodResolver(profileFormSchema),
+    defaultValues: {
+      name: "",
+      email: user?.email || "",
+      whatsapp: "",
+    },
+  });
 
   useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!user) return;
+
+      try {
+        console.log('Fetching user profile:', user.id);
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (error) throw error;
+
+        console.log('Fetched profile:', profile);
+        form.reset({
+          name: profile.name || "",
+          email: profile.email || user.email || "",
+          whatsapp: profile.whatsapp || "",
+        });
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load your profile",
+        });
+      }
+    };
+
     const fetchProperties = async () => {
       if (!user) return;
 
@@ -55,8 +117,43 @@ const Profile = () => {
       }
     };
 
+    fetchUserProfile();
     fetchProperties();
-  }, [user, toast]);
+  }, [user, toast, form]);
+
+  const onSubmit = async (values: z.infer<typeof profileFormSchema>) => {
+    if (!user) return;
+
+    setIsSaving(true);
+    try {
+      console.log('Updating profile:', values);
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          name: values.name,
+          email: values.email,
+          whatsapp: values.whatsapp,
+          updated_at: new Date().toISOString(),
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been successfully updated.",
+      });
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update your profile",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   if (!user) {
     return (
@@ -77,10 +174,60 @@ const Profile = () => {
             <User className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold">{user.email}</h2>
+            <h2 className="text-xl font-semibold">Profile Settings</h2>
             <p className="text-muted-foreground">Member since {new Date(user.created_at).toLocaleDateString()}</p>
           </div>
         </div>
+
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Your name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input type="email" placeholder="Your email" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="whatsapp"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>WhatsApp Number</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Your WhatsApp number" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button type="submit" disabled={isSaving}>
+              {isSaving ? "Saving..." : "Save Changes"}
+            </Button>
+          </form>
+        </Form>
       </Card>
 
       <div className="flex justify-between items-center mb-6">
