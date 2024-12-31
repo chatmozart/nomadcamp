@@ -9,10 +9,16 @@ interface BaseMapProps extends Omit<GoogleMapProps, 'onLoad'> {
 }
 
 export const BaseMap = ({ children, className = "h-[600px]", ...props }: BaseMapProps) => {
-  const { isLoading } = useGoogleMaps();
+  const { isLoading, isError } = useGoogleMaps();
+
+  console.log('BaseMap - Rendering with loading state:', isLoading);
 
   if (isLoading) {
     return <div className={`${className} bg-muted flex items-center justify-center`}>Loading map...</div>;
+  }
+
+  if (isError) {
+    return <div className={`${className} bg-muted flex items-center justify-center`}>Failed to load map</div>;
   }
 
   return (

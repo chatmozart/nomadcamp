@@ -21,8 +21,15 @@ export const PropertiesMap = ({ properties, onMarkerClick, hoveredPropertyId }: 
 
   useEffect(() => {
     const geocodeAddresses = async () => {
-      if (!window.google || !properties.length) {
+      if (!window.google?.maps) {
+        console.log('PropertiesMap - Google Maps not yet loaded');
+        return;
+      }
+
+      if (!properties.length) {
+        console.log('PropertiesMap - No properties to geocode');
         setIsGeocoding(false);
+        setMapCenter({ lat: 13.7563, lng: 100.5018 }); // Default to Thailand
         return;
       }
 
@@ -74,24 +81,17 @@ export const PropertiesMap = ({ properties, onMarkerClick, hoveredPropertyId }: 
           );
           setMapCenter(center);
         } else {
-          // If no markers were created, set a default center (e.g., Thailand)
-          setMapCenter({ lat: 13.7563, lng: 100.5018 });
+          setMapCenter({ lat: 13.7563, lng: 100.5018 }); // Default to Thailand
         }
       } catch (error) {
         console.error('PropertiesMap - Geocoding error:', error);
-        // Set default center on error
-        setMapCenter({ lat: 13.7563, lng: 100.5018 });
+        setMapCenter({ lat: 13.7563, lng: 100.5018 }); // Default to Thailand
       } finally {
         setIsGeocoding(false);
       }
     };
 
-    if (properties.length > 0) {
-      geocodeAddresses();
-    } else {
-      setIsGeocoding(false);
-      setMapCenter({ lat: 13.7563, lng: 100.5018 }); // Default center when no properties
-    }
+    geocodeAddresses();
   }, [properties]);
 
   if (isGeocoding) {
