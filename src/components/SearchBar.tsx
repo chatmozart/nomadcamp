@@ -114,6 +114,23 @@ const SearchBar = () => {
     setIsExactDate(isExact);
   };
 
+  const handleClearFilters = () => {
+    setSelectedDate(null);
+    setIsExactDate(false);
+    localStorage.removeItem('selectedDate');
+    localStorage.removeItem('isExactDate');
+    setShowFilters(false);
+    
+    // Remove filter params from URL if they exist
+    if (location.pathname.startsWith('/properties/')) {
+      const urlFriendlyQuery = searchQuery
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+      navigate(`/properties/${urlFriendlyQuery}`);
+    }
+  };
+
   return (
     <div className={`search-bar rounded-full p-2 flex items-center gap-2 ${
       isIndexPage 
@@ -150,14 +167,19 @@ const SearchBar = () => {
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-64">
-          <div className="space-y-4">
-            <h4 className="font-medium">Filters</h4>
-            <DateFilter 
-              onDateChange={handleDateChange}
-              initialDate={selectedDate}
-              initialIsExact={isExactDate}
-            />
-          </div>
+          <DateFilter 
+            onDateChange={handleDateChange}
+            initialDate={selectedDate}
+            initialIsExact={isExactDate}
+          />
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleClearFilters}
+            className="h-8 px-2 text-muted-foreground hover:text-foreground"
+          >
+            Clear Filters
+          </Button>
         </PopoverContent>
       </Popover>
 

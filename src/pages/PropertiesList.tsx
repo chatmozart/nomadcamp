@@ -4,7 +4,7 @@ import PropertyCard from "@/components/PropertyCard";
 import { PropertiesMap } from "@/components/property/PropertiesMap";
 import { supabase } from "@/lib/supabase";
 import { getDisplayLocation, LOCATION_CATEGORIES } from "@/utils/locationUtils";
-import { addDays, subDays, parseISO, isWithinInterval } from "date-fns";
+import { addDays, subDays, parseISO, isWithinInterval, isSameDay, isBefore } from "date-fns";
 
 const PropertiesList = () => {
   const { location } = useParams();
@@ -60,9 +60,8 @@ const PropertiesList = () => {
             const availabilityStart = parseISO(property.availability_start);
             
             if (isExactDate) {
-              // For exact date, the property must be available on the selected date
-              return availabilityStart <= filterDate && 
-                (!property.availability_end || parseISO(property.availability_end) >= filterDate);
+              // For exact date, property must be available on or after the selected date
+              return isSameDay(availabilityStart, filterDate) || isBefore(availabilityStart, filterDate);
             } else {
               // For approximate date (±10 days)
               const intervalStart = subDays(filterDate, 10);

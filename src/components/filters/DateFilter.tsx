@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
+import { X } from "lucide-react";
 
 interface DateFilterProps {
   onDateChange: (date: string | null, isExact: boolean) => void;
@@ -41,8 +43,27 @@ export const DateFilter = ({
     onDateChange(date, dateType === "exact");
   };
 
+  const handleClear = () => {
+    setSelectedDate("");
+    setDateType("approximate");
+    onDateChange(null, false);
+  };
+
   return (
     <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h4 className="font-medium">Date Filter</h4>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleClear}
+          className="h-8 px-2 text-muted-foreground hover:text-foreground"
+        >
+          <X className="h-4 w-4 mr-1" />
+          Clear
+        </Button>
+      </div>
+
       <RadioGroup
         defaultValue={dateType}
         value={dateType}
