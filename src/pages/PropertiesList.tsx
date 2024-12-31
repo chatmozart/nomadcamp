@@ -1,19 +1,21 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { PropertyGridItem } from "@/components/property/PropertyGridItem";
+import SearchBar from "@/components/SearchBar";
+import CategoryFilter from "@/components/CategoryFilter";
+import { PropertiesMap } from "@/components/property/PropertiesMap";
+import { Property } from "@/types/property";
+import PropertiesGrid from "@/components/PropertiesGrid";
 
 const PropertiesList = () => {
-  const [properties, setProperties] = useState([]);
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null);
+  const [hoveredPropertyId, setHoveredPropertyId] = useState<string | null>(null);
 
   const fetchProperties = async (locationId: string | null = null) => {
     let query = supabase
       .from('properties')
       .select(`
         *,
-        property_images (
-          image_url,
-          order
-        ),
         locations (
           name
         )
@@ -46,7 +48,7 @@ const PropertiesList = () => {
     const loadProperties = async () => {
       try {
         const propertiesData = await fetchProperties();
-        setProperties(propertiesData);
+        setProperties(propertiesData || []);
       } catch (error) {
         console.error('Error loading properties:', error);
       }
@@ -55,18 +57,41 @@ const PropertiesList = () => {
     loadProperties();
   }, []);
 
+  const handleMarkerClick = (propertyId: string) => {
+    setSelectedPropertyId(propertyId);
+    const element = document.getElementById(`property-${propertyId}`);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      element.classList.add('ring-2', 'ring-primary', 'ring-offset-2');
+      setTimeout(() => {
+        element.classList.remove('ring-2', 'ring-primary', 'ring-offset-2');
+      }, 2000);
+    }
+  };
+
   return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-semibold">Properties</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-        {properties.map((property) => (
-          <PropertyGridItem
-            key={property.id}
-            id={property.id}
-            title={property.title}
-            image_url={property.image_url}
-          />
-        ))}
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8">
+        <SearchBar />
+        <CategoryFilter />
+        
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr,400px] gap-8 mt-8">
+          <div className="space-y-6">
+            <h2 className="text-2xl font-semibold">Properties</h2>
+            <PropertiesGrid 
+              properties={properties}
+              onPropertyHover={setHoveredPropertyId}
+            />
+          </div>
+
+          <div className="sticky top-24 h-[600px]">
+            <PropertiesMap 
+              properties={properties}
+              onMarkerClick={handleMarkerClick}
+              hoveredPropertyId={hoveredPropertyId}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
