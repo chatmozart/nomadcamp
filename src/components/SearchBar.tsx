@@ -9,12 +9,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { DateFilter } from "./filters/DateFilter";
 
 const SearchBar = () => {
   const { isLoading } = useGoogleMaps();
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [priceRange, setPriceRange] = useState("any");
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [isExactDate, setIsExactDate] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const navigate = useNavigate();
@@ -65,6 +67,12 @@ const SearchBar = () => {
     }
   };
 
+  const handleDateChange = (date: string | null, isExact: boolean) => {
+    console.log('Date filter changed:', { date, isExact });
+    setSelectedDate(date);
+    setIsExactDate(isExact);
+  };
+
   return (
     <div className={`search-bar rounded-full p-2 flex items-center gap-2 ${
       isIndexPage 
@@ -103,20 +111,7 @@ const SearchBar = () => {
         <PopoverContent className="w-64">
           <div className="space-y-4">
             <h4 className="font-medium">Filters</h4>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Price Range</label>
-              <select
-                className="w-full rounded-md border border-input bg-background px-3 py-2"
-                value={priceRange}
-                onChange={(e) => setPriceRange(e.target.value)}
-              >
-                <option value="any">Any</option>
-                <option value="0-500">$0 - $500</option>
-                <option value="501-1000">$501 - $1000</option>
-                <option value="1001-2000">$1001 - $2000</option>
-                <option value="2000+">$2000+</option>
-              </select>
-            </div>
+            <DateFilter onDateChange={handleDateChange} />
           </div>
         </PopoverContent>
       </Popover>
