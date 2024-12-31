@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Link } from "react-router-dom";
+import { Plus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/lib/supabase";
 import PropertiesGrid from "@/components/property/PropertiesGrid";
@@ -11,152 +11,84 @@ import { Property } from "@/types/property";
 const Profile = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [name, setName] = useState("");
-  const [newPassword, setNewPassword] = useState("");
   const [properties, setProperties] = useState<Property[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      if (user) {
-        console.log('Fetching user profile data...');
-        const { data: { user: userData }, error } = await supabase.auth.getUser();
-
-        if (error) {
-          console.error('Error fetching user profile:', error);
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: "Failed to load profile data",
-          });
-          return;
-        }
-
-        if (userData?.user_metadata?.full_name) {
-          console.log('User profile data loaded:', userData.user_metadata);
-          setName(userData.user_metadata.full_name);
-        }
-        setIsLoading(false);
-      }
-    };
-
-    fetchUserProfile();
-  }, [user, toast]);
-
-  useEffect(() => {
     const fetchProperties = async () => {
-      if (user) {
-        console.log('Fetching user properties...');
+      if (!user) return;
+
+      try {
         const { data, error } = await supabase
           .from('properties')
           .select(`
-            id,
-            title,
-            description,
-            price,
-            location,
-            image_url,
-            owner_id,
-            price_three_months,
-            price_six_months,
-            price_one_year,
-            availability_start,
-            availability_end,
-            contact_name,
-            contact_email,
-            contact_whatsapp,
-            location_category_id,
-            published,
+            *,
             locations (
               name
             )
           `)
-          .eq('owner_id', user.id);
+          .eq('owner_id', user.id)
+          .order('created_at', { ascending: false });
 
-        if (!error && data) {
-          console.log('Properties loaded:', data);
-          setProperties(data);
-        } else if (error) {
-          console.error('Error fetching properties:', error);
-        }
+        if (error) throw error;
+
+        // Transform the data to match the Property type
+        const transformedData = data?.map(property => ({
+          ...property,
+          locations: property.locations ? {
+            name: property.locations.name
+          } : null
+        })) as Property[];
+
+        setProperties(transformedData || []);
+      } catch (error) {
+        console.error('Error fetching properties:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load your properties",
+        });
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchProperties();
-  }, [user]);
+  }, [user, toast]);
 
-  const handleProfileUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      console.log('Updating user profile...');
-      if (newPassword) {
-        await supabase.auth.updateUser({ password: newPassword });
-      }
-      
-      const { error } = await supabase.auth.updateUser({ 
-        data: { 
-          full_name: name,
-        }
-      });
-
-      if (error) throw error;
-
-      console.log('Profile updated successfully');
-      toast({
-        title: "Profile updated",
-        description: "Your profile has been updated successfully.",
-      });
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to update profile",
-      });
-    }
-  };
-
-  if (isLoading) {
+  if (!user) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="text-center">Loading profile...</div>
+        <h1 className="text-2xl font-bold mb-4">Profile</h1>
+        <p>Please log in to view your profile.</p>
       </div>
     );
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="grid gap-8 md:grid-cols-2">
-        <div className="space-y-6">
-          <h2 className="text-xl font-semibold">Update Profile</h2>
-          <form onSubmit={handleProfileUpdate} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Your name"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="newPassword">New Password</Label>
-              <Input
-                id="newPassword"
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Enter new password"
-              />
-            </div>
-
-            <Button type="submit">Update Profile</Button>
-          </form>
-        </div>
-
-        <PropertiesGrid properties={properties} />
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">My Properties</h1>
+        <Link to="/property/new">
+          <Button className="flex items-center gap-2">
+            <Plus className="w-4 h-4" />
+            List Property
+          </Button>
+        </Link>
       </div>
+
+      {isLoading ? (
+        <div>Loading your properties...</div>
+      ) : properties.length === 0 ? (
+        <div className="text-center py-8">
+          <p className="text-muted-foreground mb-4">You haven't listed any properties yet.</p>
+          <Link to="/property/new">
+            <Button>List Your First Property</Button>
+          </Link>
+        </div>
+      ) : (
+        <PropertiesGrid properties={properties} />
+      )}
     </div>
   );
 };

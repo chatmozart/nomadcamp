@@ -3,8 +3,8 @@ import { supabase } from "@/lib/supabase";
 import SearchBar from "@/components/SearchBar";
 import CategoryFilter from "@/components/CategoryFilter";
 import { PropertiesMap } from "@/components/property/PropertiesMap";
+import PropertiesGrid from "@/components/property/PropertiesGrid";
 import { Property } from "@/types/property";
-import PropertiesGrid from "@/components/PropertiesGrid";
 
 const PropertiesList = () => {
   const [properties, setProperties] = useState<Property[]>([]);
@@ -80,7 +80,6 @@ const PropertiesList = () => {
             <h2 className="text-2xl font-semibold">Properties</h2>
             <PropertiesGrid 
               properties={properties}
-              onPropertyHover={setHoveredPropertyId}
             />
           </div>
 
