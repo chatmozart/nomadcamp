@@ -78,7 +78,7 @@ const PropertyCard = ({
               containerClassName="w-full h-full"
             />
           </div>
-          {isOwner && (
+          {user && isOwner && (
             <div className="absolute top-2 right-2">
               <Badge 
                 variant={published ? "default" : "destructive"}
