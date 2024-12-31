@@ -1,8 +1,10 @@
-import { MapPin } from "lucide-react";
+import { MapPin, Check, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 import { useSupabaseImage } from "@/hooks/useSupabaseImage";
 import { format } from "date-fns";
+import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface PropertyCardProps {
   id: string;
@@ -16,6 +18,8 @@ interface PropertyCardProps {
   price_one_year?: number | null;
   availability_start?: string | null;
   availability_end?: string | null;
+  owner_id?: string;
+  published?: boolean;
 }
 
 const PropertyCard = ({
@@ -30,8 +34,11 @@ const PropertyCard = ({
   price_one_year,
   availability_start,
   availability_end,
+  owner_id,
+  published = true,
 }: PropertyCardProps) => {
   const { displayImageUrl } = useSupabaseImage(id, image);
+  const { user } = useAuth();
 
   const getCheapestPrice = () => {
     const monthlyPrices = [
@@ -57,6 +64,8 @@ const PropertyCard = ({
     return `Available: ${startDate} - ${endDate}`;
   };
 
+  const isOwner = user?.id === owner_id;
+
   return (
     <Link to={`/property/${id}`} className="block h-full">
       <div className="property-card rounded-xl overflow-hidden bg-card h-full flex flex-col">
@@ -69,6 +78,26 @@ const PropertyCard = ({
               containerClassName="w-full h-full"
             />
           </div>
+          {isOwner && (
+            <div className="absolute top-2 right-2">
+              <Badge 
+                variant={published ? "default" : "destructive"}
+                className="flex items-center gap-1"
+              >
+                {published ? (
+                  <>
+                    <Check className="w-3 h-3" />
+                    Published
+                  </>
+                ) : (
+                  <>
+                    <X className="w-3 h-3" />
+                    Unpublished
+                  </>
+                )}
+              </Badge>
+            </div>
+          )}
         </div>
         <div className="p-2 flex flex-col flex-1">
           <div className="flex-1">
