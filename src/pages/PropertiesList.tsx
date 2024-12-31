@@ -1,73 +1,60 @@
-import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { PropertyGridItem } from "@/components/property/PropertyGridItem";
+import { PropertiesGrid } from "@/components/property/PropertiesGrid";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const PropertiesList = () => {
-  const [properties, setProperties] = useState([]);
+  const { location } = useParams();
 
-  const fetchProperties = async (locationId: string | null = null) => {
-    let query = supabase
-      .from('properties')
-      .select(`
-        *,
-        property_images (
+  const { data: properties, isLoading } = useQuery({
+    queryKey: ['properties', location],
+    queryFn: async () => {
+      console.log('Fetching properties for location:', location);
+      const { data, error } = await supabase
+        .from('properties')
+        .select(`
+          id,
+          title,
+          description,
+          price,
           image_url,
-          order
-        ),
-        locations (
-          name
-        )
-      `);
+          availability_start,
+          availability_end,
+          locations (
+            name
+          )
+        `)
+        .eq('locations.name', location)
+        .eq('published', true); // Only fetch published properties
 
-    // If locationId is provided, filter by location
-    if (locationId) {
-      query = query.eq('location_category_id', locationId);
-    }
-
-    // Only show published properties unless user is the owner
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      query = query.eq('published', true);
-    } else {
-      query = query.or(`published.eq.true,owner_id.eq.${user.id}`);
-    }
-
-    const { data, error } = await query;
-
-    if (error) {
-      console.error('Error fetching properties:', error);
-      throw error;
-    }
-
-    return data;
-  };
-
-  useEffect(() => {
-    const loadProperties = async () => {
-      try {
-        const propertiesData = await fetchProperties();
-        setProperties(propertiesData);
-      } catch (error) {
-        console.error('Error loading properties:', error);
+      if (error) {
+        console.error('Error fetching properties:', error);
+        throw error;
       }
-    };
 
-    loadProperties();
-  }, []);
+      console.log('Fetched properties:', data);
+      return data || [];
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Skeleton className="h-8 w-48 mb-8" />
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {[...Array(6)].map((_, i) => (
+            <Skeleton key={i} className="h-[300px]" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-semibold">Properties</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-        {properties.map((property) => (
-          <PropertyGridItem
-            key={property.id}
-            id={property.id}
-            title={property.title}
-            image_url={property.image_url}
-          />
-        ))}
-      </div>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-8">Properties in {location}</h1>
+      <PropertiesGrid properties={properties || []} />
     </div>
   );
 };
