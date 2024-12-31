@@ -21,6 +21,7 @@ export const ProfileForm = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const form = useForm<z.infer<typeof profileFormSchema>>({
     resolver: zodResolver(profileFormSchema),
@@ -43,21 +44,40 @@ export const ProfileForm = () => {
           .eq('id', user.id)
           .single();
 
-        if (error) throw error;
+        if (error) {
+          // Check if the error is due to the table not existing
+          if (error.code === '42P01') {
+            console.log('Profiles table does not exist yet. Using default values.');
+            form.reset({
+              name: user.user_metadata?.full_name || "",
+              email: user.email || "",
+              whatsapp: "",
+            });
+            return;
+          }
+          throw error;
+        }
 
         console.log('Fetched profile:', profile);
-        form.reset({
-          name: profile.name || "",
-          email: profile.email || user.email || "",
-          whatsapp: profile.whatsapp || "",
-        });
-      } catch (error) {
+        if (profile) {
+          form.reset({
+            name: profile.name || user.user_metadata?.full_name || "",
+            email: profile.email || user.email || "",
+            whatsapp: profile.whatsapp || "",
+          });
+        }
+      } catch (error: any) {
         console.error('Error fetching user profile:', error);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to load your profile",
-        });
+        // Don't show error toast for missing table
+        if (error.code !== '42P01') {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to load your profile",
+          });
+        }
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -80,7 +100,18 @@ export const ProfileForm = () => {
           updated_at: new Date().toISOString(),
         });
 
-      if (error) throw error;
+      if (error) {
+        // If table doesn't exist, show a more helpful message
+        if (error.code === '42P01') {
+          toast({
+            variant: "destructive",
+            title: "Setup Required",
+            description: "The profile system needs to be set up. Please contact support.",
+          });
+          return;
+        }
+        throw error;
+      }
 
       toast({
         title: "Profile updated",
@@ -97,6 +128,21 @@ export const ProfileForm = () => {
       setIsSaving(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <Card className="p-6 mb-8">
+        <div className="animate-pulse space-y-4">
+          <div className="h-12 bg-primary/10 rounded-full w-12"></div>
+          <div className="h-4 bg-muted rounded w-1/4"></div>
+          <div className="h-4 bg-muted rounded w-1/2"></div>
+          <div className="h-10 bg-muted rounded"></div>
+          <div className="h-10 bg-muted rounded"></div>
+          <div className="h-10 bg-muted rounded"></div>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="p-6 mb-8">
