@@ -1,41 +1,33 @@
-import { Link } from "react-router-dom";
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { PropertyGridItem } from "./PropertyGridItem";
-
-interface Property {
-  id: number;
-  title: string;
-  imageSignedUrl?: string;
-}
+import PropertyCard from "@/components/PropertyCard";
+import { Property } from "@/types/property";
 
 interface PropertiesGridProps {
   properties: Property[];
 }
 
-export const PropertiesGrid = ({ properties }: PropertiesGridProps) => {
+const PropertiesGrid = ({ properties }: PropertiesGridProps) => {
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">My Properties</h2>
-        <Link to="/list-property">
-          <Button>
-            <Plus className="w-4 h-4 mr-2" />
-            List Property
-          </Button>
-        </Link>
-      </div>
-      
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-        {properties.map((property) => (
-          <PropertyGridItem
-            key={property.id}
-            id={property.id}
-            title={property.title}
-            image_url={property.imageSignedUrl || ''}
-          />
-        ))}
-      </div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      {properties.map((property) => (
+        <PropertyCard
+          key={property.id}
+          id={property.id}
+          title={property.title}
+          location={property.location}
+          location_category={property.locations?.name}
+          price={property.price}
+          image={property.image_url}
+          price_three_months={property.price_three_months}
+          price_six_months={property.price_six_months}
+          price_one_year={property.price_one_year}
+          availability_start={property.availability_start}
+          availability_end={property.availability_end}
+          owner_id={property.owner_id}
+          published={property.published}
+        />
+      ))}
     </div>
   );
 };
+
+export default PropertiesGrid;
