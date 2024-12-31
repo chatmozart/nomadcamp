@@ -103,7 +103,7 @@ export const PropertyBookingCard = ({
           <Collapsible open={isOpen} onOpenChange={setIsOpen}>
             <CollapsibleTrigger asChild>
               <button className="w-full bg-primary text-white py-3 rounded-lg hover:bg-primary/90 transition-colors">
-                Book
+                Contact
               </button>
             </CollapsibleTrigger>
             <CollapsibleContent className="space-y-4 pt-4">
