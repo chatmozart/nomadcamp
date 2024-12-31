@@ -19,6 +19,7 @@ interface Property {
   location: string;
   image_url: string;
   owner_id: string;
+  published: boolean;
   availability_start: string | null;
   availability_end: string | null;
   contact_name: string | null;
@@ -123,6 +124,7 @@ const PropertyDetails = () => {
             <PropertyActions 
               isOwner={isOwner}
               propertyId={property.id}
+              published={property.published}
               onDelete={async () => {
                 try {
                   const { error } = await supabase

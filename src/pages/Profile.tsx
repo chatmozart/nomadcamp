@@ -12,6 +12,7 @@ interface Property {
   title: string;
   image_url: string;
   imageSignedUrl?: string;
+  published: boolean;
 }
 
 const Profile = () => {
@@ -55,7 +56,7 @@ const Profile = () => {
         console.log('Fetching user properties...');
         const { data, error } = await supabase
           .from('properties')
-          .select('id, title, image_url')
+          .select('id, title, image_url, published')
           .eq('owner_id', user.id);
 
         if (!error && data) {
