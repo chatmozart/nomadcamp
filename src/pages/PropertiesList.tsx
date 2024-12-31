@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import SearchBar from "@/components/SearchBar";
 import CategoryFilter from "@/components/CategoryFilter";
 import { PropertiesMap } from "@/components/property/PropertiesMap";
 import PropertiesGrid from "@/components/property/PropertiesGrid";
@@ -71,12 +70,11 @@ const PropertiesList = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <SearchBar />
+      <div className="container mx-auto py-8">
         <CategoryFilter />
         
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr,400px] gap-8 mt-8">
-          <div className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr,400px] gap-4 mt-8">
+          <div className="space-y-4">
             <h2 className="text-2xl font-semibold">Properties</h2>
             <PropertiesGrid 
               properties={properties}
