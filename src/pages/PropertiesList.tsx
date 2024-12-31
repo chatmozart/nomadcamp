@@ -76,9 +76,14 @@ const PropertiesList = () => {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr,400px] gap-4 mt-8">
           <div className="space-y-4">
             <h2 className="text-2xl font-semibold">Properties</h2>
-            <PropertiesGrid 
-              properties={properties}
-            />
+            <div 
+              onMouseLeave={() => setHoveredPropertyId(null)}
+            >
+              <PropertiesGrid 
+                properties={properties}
+                onPropertyHover={setHoveredPropertyId}
+              />
+            </div>
           </div>
 
           <div className="sticky top-24 h-[600px]">
