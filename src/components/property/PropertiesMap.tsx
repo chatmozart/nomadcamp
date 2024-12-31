@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { BaseMap } from "./BaseMap";
 import { PropertyMapMarker } from "./PropertyMapMarker";
+import { useGoogleMaps } from "@/hooks/useGoogleMaps";
 
 interface Property {
   id: string;
@@ -18,11 +19,17 @@ export const PropertiesMap = ({ properties, onMarkerClick, hoveredPropertyId }: 
   const [markers, setMarkers] = useState<{ lat: number; lng: number; id: string }[]>([]);
   const [isGeocoding, setIsGeocoding] = useState(true);
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null);
+  const { isLoading: isLoadingMaps, isError: isMapsError } = useGoogleMaps();
 
   useEffect(() => {
     const geocodeAddresses = async () => {
+      if (isLoadingMaps) {
+        console.log('PropertiesMap - Waiting for Google Maps to load...');
+        return;
+      }
+
       if (!window.google?.maps) {
-        console.log('PropertiesMap - Google Maps not yet loaded');
+        console.log('PropertiesMap - Google Maps not available');
         return;
       }
 
@@ -92,13 +99,13 @@ export const PropertiesMap = ({ properties, onMarkerClick, hoveredPropertyId }: 
     };
 
     geocodeAddresses();
-  }, [properties]);
+  }, [properties, isLoadingMaps]);
 
-  if (isGeocoding) {
+  if (isLoadingMaps || isGeocoding) {
     return <div className="h-full bg-muted flex items-center justify-center">Loading map locations...</div>;
   }
 
-  if (!mapCenter) {
+  if (isMapsError || !mapCenter) {
     return <div className="h-full bg-muted flex items-center justify-center">Could not load map</div>;
   }
 
