@@ -111,6 +111,8 @@ const Index = () => {
                     price_six_months={property.price_six_months}
                     price_one_year={property.price_one_year}
                     image={property.image_url}
+                    availability_start={property.availability_start}
+                    availability_end={property.availability_end}
                   />
                 </div>
               ))}

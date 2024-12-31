@@ -108,6 +108,7 @@ const PropertiesList = () => {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr,400px] gap-8">
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
               {isLoading ? (
                 <p>Loading properties...</p>
               ) : properties.length === 0 ? (
@@ -125,15 +126,19 @@ const PropertiesList = () => {
                       id={property.id}
                       title={property.title}
                       location={property.location}
+                      location_category={property.locations?.name}
                       price={property.price}
                       image={property.image_url}
                       price_three_months={property.price_three_months}
                       price_six_months={property.price_six_months}
                       price_one_year={property.price_one_year}
+                      availability_start={property.availability_start}
+                      availability_end={property.availability_end}
                     />
                   </div>
                 ))
               )}
+
             </div>
           </div>
 
@@ -151,3 +156,4 @@ const PropertiesList = () => {
 };
 
 export default PropertiesList;
+
