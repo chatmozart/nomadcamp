@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Search, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { useGoogleMaps } from "@/hooks/useGoogleMaps";
 import {
   Popover,
@@ -30,6 +30,7 @@ const SearchBar = () => {
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const isIndexPage = location.pathname === "/";
 
   useEffect(() => {
@@ -53,7 +54,7 @@ const SearchBar = () => {
           .replace(/^-+|-+$/g, '');
 
         console.log('Navigating to:', `/properties/${urlFriendlyName}`);
-        navigate(`/properties/${urlFriendlyName}`);
+        navigate(`/properties/${urlFriendlyName}?${getFilterParams()}`);
       }
     });
 
@@ -64,7 +65,6 @@ const SearchBar = () => {
     };
   }, [navigate, isLoading]);
 
-  // Save filters and search query to localStorage whenever they change
   useEffect(() => {
     if (selectedDate) {
       localStorage.setItem('selectedDate', selectedDate);
@@ -82,6 +82,15 @@ const SearchBar = () => {
     }
   }, [searchQuery]);
 
+  const getFilterParams = () => {
+    const params = new URLSearchParams();
+    if (selectedDate) {
+      params.set('date', selectedDate);
+      params.set('isExactDate', String(isExactDate));
+    }
+    return params.toString();
+  };
+
   const handleSearch = () => {
     if (searchQuery) {
       const urlFriendlyQuery = searchQuery
@@ -89,10 +98,13 @@ const SearchBar = () => {
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-+|-+$/g, '');
       
-      console.log('Navigating to:', `/properties/${urlFriendlyQuery}`);
+      const queryParams = getFilterParams();
+      const url = `/properties/${urlFriendlyQuery}${queryParams ? `?${queryParams}` : ''}`;
+      
+      console.log('Navigating to:', url);
       console.log('Current filters:', { selectedDate, isExactDate });
       
-      navigate(`/properties/${urlFriendlyQuery}`);
+      navigate(url);
     }
   };
 

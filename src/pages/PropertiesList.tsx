@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import PropertyCard from "@/components/PropertyCard";
 import { PropertiesMap } from "@/components/property/PropertiesMap";
 import { supabase } from "@/lib/supabase";
 import { getDisplayLocation, LOCATION_CATEGORIES } from "@/utils/locationUtils";
+import { addDays, subDays, parseISO, isWithinInterval } from "date-fns";
 
 const PropertiesList = () => {
   const { location } = useParams();
+  const [searchParams] = useSearchParams();
   const [properties, setProperties] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null);
@@ -16,7 +18,6 @@ const PropertiesList = () => {
     const fetchProperties = async () => {
       console.log('Fetching properties for location:', location);
       
-      // Include the locations relationship in the query
       const { data, error } = await supabase
         .from('properties')
         .select(`
@@ -35,19 +36,45 @@ const PropertiesList = () => {
         const displayLocation = getDisplayLocation(location);
         console.log('Searching for location:', displayLocation);
         
-        // Find the full category (with country) that matches the URL location
         const matchingCategory = LOCATION_CATEGORIES.find(category => 
           category.split(' - ')[0].toLowerCase() === displayLocation.toLowerCase()
         );
         
         console.log('Matching category:', matchingCategory);
 
-        // Filter properties based on their location category from the database
-        const filteredProperties = data.filter(property => {
+        let filteredProperties = data.filter(property => {
           const propertyCategory = property.locations?.name;
-          console.log('Property location category:', propertyCategory);
           return propertyCategory === matchingCategory;
         });
+
+        // Apply date filtering if date parameters exist
+        const selectedDate = searchParams.get('date');
+        const isExactDate = searchParams.get('isExactDate') === 'true';
+
+        if (selectedDate) {
+          const filterDate = parseISO(selectedDate);
+          
+          filteredProperties = filteredProperties.filter(property => {
+            if (!property.availability_start) return false;
+            
+            const availabilityStart = parseISO(property.availability_start);
+            
+            if (isExactDate) {
+              // For exact date, the property must be available on the selected date
+              return availabilityStart <= filterDate && 
+                (!property.availability_end || parseISO(property.availability_end) >= filterDate);
+            } else {
+              // For approximate date (±10 days)
+              const intervalStart = subDays(filterDate, 10);
+              const intervalEnd = addDays(filterDate, 10);
+              
+              return isWithinInterval(availabilityStart, {
+                start: intervalStart,
+                end: intervalEnd
+              });
+            }
+          });
+        }
 
         console.log('Filtered properties:', filteredProperties);
         setProperties(filteredProperties);
@@ -58,7 +85,7 @@ const PropertiesList = () => {
     };
 
     fetchProperties();
-  }, [location]);
+  }, [location, searchParams]);
 
   const handleMarkerClick = (propertyId: string) => {
     setSelectedPropertyId(propertyId);
