@@ -13,7 +13,10 @@ import { DateFilter } from "./filters/DateFilter";
 
 const SearchBar = () => {
   const { isLoading } = useGoogleMaps();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(() => {
+    const saved = localStorage.getItem('searchQuery');
+    return saved || "";
+  });
   const [showFilters, setShowFilters] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(() => {
     const saved = localStorage.getItem('selectedDate');
@@ -61,7 +64,7 @@ const SearchBar = () => {
     };
   }, [navigate, isLoading]);
 
-  // Save filters to localStorage whenever they change
+  // Save filters and search query to localStorage whenever they change
   useEffect(() => {
     if (selectedDate) {
       localStorage.setItem('selectedDate', selectedDate);
@@ -71,6 +74,14 @@ const SearchBar = () => {
     localStorage.setItem('isExactDate', JSON.stringify(isExactDate));
   }, [selectedDate, isExactDate]);
 
+  useEffect(() => {
+    if (searchQuery) {
+      localStorage.setItem('searchQuery', searchQuery);
+    } else {
+      localStorage.removeItem('searchQuery');
+    }
+  }, [searchQuery]);
+
   const handleSearch = () => {
     if (searchQuery) {
       const urlFriendlyQuery = searchQuery
@@ -79,6 +90,8 @@ const SearchBar = () => {
         .replace(/^-+|-+$/g, '');
       
       console.log('Navigating to:', `/properties/${urlFriendlyQuery}`);
+      console.log('Current filters:', { selectedDate, isExactDate });
+      
       navigate(`/properties/${urlFriendlyQuery}`);
     }
   };
