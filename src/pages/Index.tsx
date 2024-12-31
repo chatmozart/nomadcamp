@@ -113,6 +113,8 @@ const Index = () => {
                     image={property.image_url}
                     availability_start={property.availability_start}
                     availability_end={property.availability_end}
+                    owner_id={property.owner_id}
+                    published={property.published}
                   />
                 </div>
               ))}
