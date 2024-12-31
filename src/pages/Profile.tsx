@@ -6,14 +6,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/lib/supabase";
 import PropertiesGrid from "@/components/property/PropertiesGrid";
-
-interface Property {
-  id: number;
-  title: string;
-  image_url: string;
-  imageSignedUrl?: string;
-  published: boolean;
-}
+import { Property } from "@/types/property";
 
 const Profile = () => {
   const { user } = useAuth();
@@ -56,40 +49,33 @@ const Profile = () => {
         console.log('Fetching user properties...');
         const { data, error } = await supabase
           .from('properties')
-          .select('id, title, image_url, published')
+          .select(`
+            id,
+            title,
+            description,
+            price,
+            location,
+            image_url,
+            owner_id,
+            price_three_months,
+            price_six_months,
+            price_one_year,
+            availability_start,
+            availability_end,
+            contact_name,
+            contact_email,
+            contact_whatsapp,
+            location_category_id,
+            published,
+            locations (
+              name
+            )
+          `)
           .eq('owner_id', user.id);
 
         if (!error && data) {
           console.log('Properties loaded:', data);
-          
-          // Generate signed URLs for each property image
-          const propertiesWithSignedUrls = await Promise.all(
-            data.map(async (property) => {
-              if (property.image_url) {
-                try {
-                  const { data: signedUrlData, error: signedUrlError } = await supabase.storage
-                    .from('properties')
-                    .createSignedUrl(property.image_url, 60 * 60); // URL valid for 1 hour
-
-                  if (signedUrlError) {
-                    console.error('Error generating signed URL for property:', property.id, signedUrlError);
-                    return property;
-                  }
-
-                  return {
-                    ...property,
-                    imageSignedUrl: signedUrlData?.signedUrl
-                  };
-                } catch (error) {
-                  console.error('Failed to generate signed URL for property:', property.id, error);
-                  return property;
-                }
-              }
-              return property;
-            })
-          );
-
-          setProperties(propertiesWithSignedUrls);
+          setProperties(data);
         } else if (error) {
           console.error('Error fetching properties:', error);
         }
@@ -176,4 +162,3 @@ const Profile = () => {
 };
 
 export default Profile;
-
