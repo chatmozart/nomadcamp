@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { ProfilePropertyCard } from "@/components/profile/ProfilePropertyCard";
+import PropertyCard from "@/components/PropertyCard";
 import { ProfileForm } from "@/components/profile/ProfileForm";
 
 const Profile = () => {
@@ -110,7 +110,21 @@ const Profile = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {properties.map((property) => (
             <div key={property.id} className="h-full">
-              <ProfilePropertyCard {...property} />
+              <PropertyCard
+                id={property.id}
+                title={property.title}
+                location={property.location}
+                location_category={property.locations?.name}
+                price={property.price}
+                image={property.image_url}
+                price_three_months={property.price_three_months}
+                price_six_months={property.price_six_months}
+                price_one_year={property.price_one_year}
+                availability_start={property.availability_start}
+                availability_end={property.availability_end}
+                owner_id={property.owner_id}
+                published={property.published}
+              />
             </div>
           ))}
         </div>
