@@ -27,8 +27,8 @@ properties = { public = true, file_size_limit = "50MiB", allowed_mime_types = ["
 
 [auth]
 enabled = true
-site_url = "http://127.0.0.1:3000"
-additional_redirect_urls = ["https://127.0.0.1:3000"]
+site_url = "https://nomadcamp.netlify.app"
+additional_redirect_urls = ["https://nomadcamp.netlify.app"]
 jwt_expiry = 3600
 enable_refresh_token_rotation = true
 refresh_token_reuse_interval = 10
