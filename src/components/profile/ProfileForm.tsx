@@ -40,7 +40,7 @@ export const ProfileForm = () => {
     const defaultValues: ProfileFormValues = {
       name: user.user_metadata?.full_name || "",
       email: user.email || "",
-      whatsapp: user.phone || "",  // Changed from user_metadata.whatsapp to user.phone
+      whatsapp: user.user_metadata?.whatsapp || "",  // Changed back to user_metadata.whatsapp
     };
     form.reset(defaultValues);
     setIsLoading(false);
