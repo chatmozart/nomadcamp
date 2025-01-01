@@ -2,15 +2,17 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
 
+interface UserProfileData {
+  name: string;
+  email: string;
+  whatsapp: string;
+}
+
 export const useUserProfile = () => {
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
-  const updateUserProfile = async (values: {
-    name: string;
-    email: string;
-    whatsapp: string;
-  }) => {
+  const updateUserProfile = async (values: UserProfileData) => {
     setIsSaving(true);
     try {
       console.log('Updating user profile:', values);

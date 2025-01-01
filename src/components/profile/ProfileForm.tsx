@@ -17,12 +17,14 @@ const profileFormSchema = z.object({
   whatsapp: z.string().min(10, "WhatsApp number must be at least 10 digits").max(15),
 });
 
+type ProfileFormValues = z.infer<typeof profileFormSchema>;
+
 export const ProfileForm = () => {
   const { user } = useAuth();
   const { updateUserProfile, isSaving } = useUserProfile();
   const [isLoading, setIsLoading] = useState(true);
 
-  const form = useForm<z.infer<typeof profileFormSchema>>({
+  const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
       name: "",
@@ -35,15 +37,16 @@ export const ProfileForm = () => {
     if (!user) return;
 
     console.log('Initializing form with user data:', user.email);
-    form.reset({
+    const defaultValues: ProfileFormValues = {
       name: user.user_metadata?.full_name || "",
       email: user.email || "",
       whatsapp: user.user_metadata?.whatsapp || "",
-    });
+    };
+    form.reset(defaultValues);
     setIsLoading(false);
   }, [user, form]);
 
-  const onSubmit = async (values: z.infer<typeof profileFormSchema>) => {
+  const onSubmit = async (values: ProfileFormValues) => {
     if (!user) return;
     await updateUserProfile(values);
   };
