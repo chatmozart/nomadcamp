@@ -17,14 +17,15 @@ export const useUserProfile = () => {
     try {
       console.log('Updating user profile:', values);
       
-      const { error: metadataError } = await supabase.auth.updateUser({
+      // Update user metadata (name) and phone number
+      const { error: updateError } = await supabase.auth.updateUser({
         data: { 
-          full_name: values.name,
-          whatsapp: values.whatsapp 
-        }
+          full_name: values.name
+        },
+        phone: values.whatsapp
       });
 
-      if (metadataError) throw metadataError;
+      if (updateError) throw updateError;
 
       toast({
         title: "Profile updated",

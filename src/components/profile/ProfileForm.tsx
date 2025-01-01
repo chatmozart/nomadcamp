@@ -36,11 +36,11 @@ export const ProfileForm = () => {
   useEffect(() => {
     if (!user) return;
 
-    console.log('Initializing form with user data:', user.email);
+    console.log('Initializing form with user data:', user);
     const defaultValues: ProfileFormValues = {
       name: user.user_metadata?.full_name || "",
       email: user.email || "",
-      whatsapp: user.user_metadata?.whatsapp || "",
+      whatsapp: user.phone || "",  // Changed from user_metadata.whatsapp to user.phone
     };
     form.reset(defaultValues);
     setIsLoading(false);
@@ -49,14 +49,11 @@ export const ProfileForm = () => {
   const onSubmit = async (values: ProfileFormValues) => {
     if (!user) return;
     
-    // Ensure all required fields are present
-    const profileData = {
-      name: values.name || "",
-      email: values.email || "",
-      whatsapp: values.whatsapp || "",
-    };
-    
-    await updateUserProfile(profileData);
+    await updateUserProfile({
+      name: values.name,
+      email: values.email,
+      whatsapp: values.whatsapp,
+    });
   };
 
   if (isLoading) {
