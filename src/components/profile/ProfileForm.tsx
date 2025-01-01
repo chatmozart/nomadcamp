@@ -48,7 +48,15 @@ export const ProfileForm = () => {
 
   const onSubmit = async (values: ProfileFormValues) => {
     if (!user) return;
-    await updateUserProfile(values);
+    
+    // Ensure all required fields are present
+    const profileData = {
+      name: values.name || "",
+      email: values.email || "",
+      whatsapp: values.whatsapp || "",
+    };
+    
+    await updateUserProfile(profileData);
   };
 
   if (isLoading) {
