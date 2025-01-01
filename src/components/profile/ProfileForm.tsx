@@ -26,18 +26,29 @@ export const ProfileForm = () => {
   const form = useForm<z.infer<typeof profileFormSchema>>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
-      name: user?.user_metadata?.full_name || "",
-      email: user?.email || "",
+      name: "",
+      email: "",
       whatsapp: "",
     },
   });
 
   useEffect(() => {
+    const initializeForm = () => {
+      // Initialize with auth user data first
+      form.reset({
+        name: user?.user_metadata?.full_name || "",
+        email: user?.email || "",
+        whatsapp: "",
+      });
+    };
+
     const fetchUserProfile = async () => {
       if (!user) return;
 
       try {
         console.log('Fetching user profile:', user.id);
+        
+        // Try to fetch from profiles table
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('*')
@@ -45,23 +56,30 @@ export const ProfileForm = () => {
           .maybeSingle();
 
         if (profileError) {
+          console.log('Profile fetch error:', profileError);
           if (profileError.code === '42P01') {
             console.log('Profiles table does not exist yet. Using default values from auth.users.');
+            initializeForm();
+            setIsLoading(false);
             return;
           }
           throw profileError;
         }
 
         if (profileData) {
-          console.log('Fetched profile:', profileData);
+          console.log('Fetched profile data:', profileData);
           form.reset({
             name: profileData.name || user.user_metadata?.full_name || "",
             email: profileData.email || user.email || "",
             whatsapp: profileData.whatsapp || "",
           });
+        } else {
+          console.log('No profile data found, using auth user data');
+          initializeForm();
         }
       } catch (error: any) {
         console.error('Error fetching user profile:', error);
+        initializeForm();
         if (error.code !== '42P01') {
           toast({
             variant: "destructive",
@@ -104,6 +122,7 @@ export const ProfileForm = () => {
           });
 
         if (profileError) {
+          console.log('Profile update error:', profileError);
           if (profileError.code === '42P01') {
             // If profiles table doesn't exist, just show success since we updated auth metadata
             toast({
@@ -115,6 +134,7 @@ export const ProfileForm = () => {
           throw profileError;
         }
       } catch (error: any) {
+        console.log('Profile update catch error:', error);
         if (error.code !== '42P01') {
           throw error;
         }
