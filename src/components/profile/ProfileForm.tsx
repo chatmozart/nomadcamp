@@ -26,7 +26,7 @@ export const ProfileForm = () => {
   const form = useForm<z.infer<typeof profileFormSchema>>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
-      name: "",
+      name: user?.user_metadata?.full_name || "",
       email: user?.email || "",
       whatsapp: "",
     },
@@ -45,9 +45,8 @@ export const ProfileForm = () => {
           .single();
 
         if (error) {
-          // Check if the error is due to the table not existing
           if (error.code === '42P01') {
-            console.log('Profiles table does not exist yet. Using default values.');
+            console.log('Profiles table does not exist yet. Using default values from auth.users.');
             form.reset({
               name: user.user_metadata?.full_name || "",
               email: user.email || "",
@@ -68,7 +67,6 @@ export const ProfileForm = () => {
         }
       } catch (error: any) {
         console.error('Error fetching user profile:', error);
-        // Don't show error toast for missing table
         if (error.code !== '42P01') {
           toast({
             variant: "destructive",
@@ -90,7 +88,16 @@ export const ProfileForm = () => {
     setIsSaving(true);
     try {
       console.log('Updating profile:', values);
-      const { error } = await supabase
+      
+      // Update auth.users metadata first
+      const { error: metadataError } = await supabase.auth.updateUser({
+        data: { full_name: values.name }
+      });
+
+      if (metadataError) throw metadataError;
+
+      // Then update profiles table
+      const { error: profileError } = await supabase
         .from('profiles')
         .upsert({
           id: user.id,
@@ -100,9 +107,8 @@ export const ProfileForm = () => {
           updated_at: new Date().toISOString(),
         });
 
-      if (error) {
-        // If table doesn't exist, show a more helpful message
-        if (error.code === '42P01') {
+      if (profileError) {
+        if (profileError.code === '42P01') {
           toast({
             variant: "destructive",
             title: "Setup Required",
@@ -110,7 +116,7 @@ export const ProfileForm = () => {
           });
           return;
         }
-        throw error;
+        throw profileError;
       }
 
       toast({
