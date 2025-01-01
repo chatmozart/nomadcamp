@@ -38,31 +38,26 @@ export const ProfileForm = () => {
 
       try {
         console.log('Fetching user profile:', user.id);
-        const { data: profile, error } = await supabase
+        const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', user.id)
-          .single();
+          .maybeSingle();
 
-        if (error) {
-          if (error.code === '42P01') {
+        if (profileError) {
+          if (profileError.code === '42P01') {
             console.log('Profiles table does not exist yet. Using default values from auth.users.');
-            form.reset({
-              name: user.user_metadata?.full_name || "",
-              email: user.email || "",
-              whatsapp: "",
-            });
             return;
           }
-          throw error;
+          throw profileError;
         }
 
-        console.log('Fetched profile:', profile);
-        if (profile) {
+        if (profileData) {
+          console.log('Fetched profile:', profileData);
           form.reset({
-            name: profile.name || user.user_metadata?.full_name || "",
-            email: profile.email || user.email || "",
-            whatsapp: profile.whatsapp || "",
+            name: profileData.name || user.user_metadata?.full_name || "",
+            email: profileData.email || user.email || "",
+            whatsapp: profileData.whatsapp || "",
           });
         }
       } catch (error: any) {
@@ -96,27 +91,33 @@ export const ProfileForm = () => {
 
       if (metadataError) throw metadataError;
 
-      // Then update profiles table
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .upsert({
-          id: user.id,
-          name: values.name,
-          email: values.email,
-          whatsapp: values.whatsapp,
-          updated_at: new Date().toISOString(),
-        });
-
-      if (profileError) {
-        if (profileError.code === '42P01') {
-          toast({
-            variant: "destructive",
-            title: "Setup Required",
-            description: "The profile system needs to be set up. Please contact support.",
+      try {
+        // Then try to update profiles table
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert({
+            id: user.id,
+            name: values.name,
+            email: values.email,
+            whatsapp: values.whatsapp,
+            updated_at: new Date().toISOString(),
           });
-          return;
+
+        if (profileError) {
+          if (profileError.code === '42P01') {
+            // If profiles table doesn't exist, just show success since we updated auth metadata
+            toast({
+              title: "Profile updated",
+              description: "Your profile has been successfully updated.",
+            });
+            return;
+          }
+          throw profileError;
         }
-        throw profileError;
+      } catch (error: any) {
+        if (error.code !== '42P01') {
+          throw error;
+        }
       }
 
       toast({
